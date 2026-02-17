@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>homeAImatch — AI-Powered Property Matching | UK</title>
+  <meta name="description" content="Find your perfect home in the UK with AI. Our lifestyle-first quiz matches you to properties based on commute, vibe, pets, and more — not just bedrooms and budget."/>
+  <meta name="keywords" content="property matching, UK homes, AI property search, house finder, buy home UK"/>
+  <meta property="og:title" content="homeAImatch — AI-Powered Property Matching"/>
+  <meta property="og:description" content="Find your perfect home with AI. Lifestyle-first matching across 12 UK cities."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://www.homeaimatch.com"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #fff; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel" src="app.js"></script>
+  <script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(HomeAIMatch));
+  </script>
+</body>
+</html>
