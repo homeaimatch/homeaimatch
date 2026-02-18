@@ -65,25 +65,11 @@ function PropertyImage({ style, size = 160 }) {
    LOGO COMPONENTS
    ════════════════════════════════════════════════════════════════════ */
 const LogoIcon = ({ size = 36 }) => (
-  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-    <path d="M50 8L10 40V88C10 91.3 12.7 94 16 94H84C87.3 94 90 91.3 90 88V40L50 8Z" stroke={B.blue} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="white"/>
-    <g transform="translate(28,38) scale(0.44)">
-      <path d="M50 10C30 10 15 28 15 48C15 55 17 61 21 66C17 72 14 80 14 80C14 80 28 76 35 72C39 74 44 75 50 75C70 75 85 60 85 45C85 28 70 10 50 10Z" fill="none" stroke={B.orange} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="35" cy="42" r="4" fill={B.orange}/><circle cx="50" cy="35" r="4" fill={B.orange}/><circle cx="65" cy="42" r="4" fill={B.orange}/><circle cx="42" cy="55" r="4" fill={B.orange}/><circle cx="58" cy="55" r="4" fill={B.orange}/>
-      <line x1="35" y1="42" x2="50" y2="35" stroke={B.orange} strokeWidth="3"/><line x1="50" y1="35" x2="65" y2="42" stroke={B.orange} strokeWidth="3"/><line x1="35" y1="42" x2="42" y2="55" stroke={B.orange} strokeWidth="3"/><line x1="65" y1="42" x2="58" y2="55" stroke={B.orange} strokeWidth="3"/><line x1="42" y1="55" x2="58" y2="55" stroke={B.orange} strokeWidth="3"/>
-    </g>
-  </svg>
+  <img src="logo-icon.png" alt="homeAImatch" width={size} height={size} style={{display:"block"}}/>
 );
 
 const LogoFull = ({ dark }) => (
-  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-    <LogoIcon size={36}/>
-    <div>
-      <span style={{ fontSize: 17, fontWeight: 300, color: dark ? B.white : B.blue, fontFamily: "'Outfit',sans-serif" }}>home</span>
-      <span style={{ fontSize: 17, fontWeight: 800, color: dark ? B.white : B.blue, fontFamily: "'Outfit',sans-serif" }}>AI</span>
-      <span style={{ fontSize: 17, fontWeight: 800, color: B.orange, fontFamily: "'Outfit',sans-serif" }}>match</span>
-    </div>
-  </div>
+  <img src="logo-full.png" alt="homeAImatch" height={38} style={{display:"block"}}/>
 );
 
 /* ════════════════════════════════════════════════════════════════════
@@ -234,7 +220,14 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
         <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>Why we matched you</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{reasons.map((r,i)=><span key={i} style={{fontSize:11,color:B.dark,background:B.grayL,padding:"3px 9px",borderRadius:14,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{r}</span>)}</div>
       </div>
+      {h.agent&&<div style={{padding:"0 18px 12px",borderTop:`1px solid ${B.border}`,paddingTop:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+          <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${B.blue},${B.blueD})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13,fontWeight:700,fontFamily:"'Outfit',sans-serif"}}>{h.agent.ph}</div>
+          <div><div style={{fontSize:13,fontWeight:700,color:B.dark,fontFamily:"'Outfit',sans-serif"}}>{h.agent.name}</div><div style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>{h.agent.agency}</div></div>
+        </div>
+      </div>}
       <div style={{padding:"0 18px 14px",display:"flex",gap:8}}>
+        {h.agent&&<button onClick={e=>{e.stopPropagation();onContact(h);}} style={{flex:2,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:700,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff",border:"none"}}>✉ Contact Agent</button>}
         <button onClick={e=>{e.stopPropagation();onSave(h.id);}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:saved?B.orange:B.white,color:saved?"#fff":B.orange,border:`1.5px solid ${B.orange}`,transition:"all 0.2s"}}>{saved?"♥ Saved":"♡ Save"}</button>
         <button onClick={e=>{e.stopPropagation();const t=`${h.name} in ${h.city} — £${(h.price/1e3).toFixed(0)}K, ${h.beds} bed, ${h.sqm}m². Found on homeaimatch.com`;if(navigator.share)navigator.share({title:h.name,text:t});else{navigator.clipboard?.writeText(t);alert("Copied!");}}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:B.white,color:B.blue,border:`1.5px solid ${B.blue}`}}>↗ Share</button>
       </div>
@@ -392,7 +385,7 @@ const ContactModal=({agent,house,onClose})=>{
           <input value={ce} onChange={e=>setCe(e.target.value)} placeholder="Your email" type="email" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <textarea value={cm} onChange={e=>setCm(e.target.value)} rows={4} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark,resize:"vertical",lineHeight:1.5}}/>
           <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>{if(cn&&ce.includes("@")){fetch("https://formspree.io/f/xzdagnqp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);}}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
+            <button onClick={()=>{if(cn&&ce.includes("@")){fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);}}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
             <a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>
           </div>
         </div>
@@ -520,7 +513,7 @@ function HomeAIMatch() {
   function handleEmailSubmit() {
     if(!email.includes("@"))return;
     // Send to Formspree (replace YOUR_FORM_ID with your actual Formspree form ID)
-    fetch("https://formspree.io/f/xzdagnqp", {
+    fetch("https://formspree.io/f/YOUR_FORM_ID", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, source: "landing_page", date: new Date().toISOString() })
