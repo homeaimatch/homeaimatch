@@ -1,4 +1,5 @@
 const { useState, useEffect, useRef } = React;
+const API_URL = 'homeaimatch-backend-production.up.railway.app';
 
 /* ════════════════════════════════════════════════════════════════════
    BRAND SYSTEM
