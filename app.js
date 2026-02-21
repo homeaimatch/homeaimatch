@@ -178,7 +178,7 @@ const HOUSES_UK = [
 function getQuestions(market) {
   const cities = market ? MARKETS[market].cities : [];
   return [
-    { id:"greeting",field:null,type:"single",text:"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which city or region?",options:["Cork","Lourinhã","Areal","London","Manchester","Birmingham","Leeds","Bristol","Edinburgh","Cardiff","Brighton"]},
+    { id:"greeting",field:null,type:"single",text:"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which city or region?",options:["Cork","Lourinhã","London","Manchester","Birmingham","Leeds","Bristol","Edinburgh","Cardiff","Brighton"]},
     { id:"location",field:"location",type:"search",text:`Which city or area interests you?`,options:cities,placeholder:"Type a city..."},
     { id:"radius",field:"radius",type:"single",text:"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
     { id:"workFromHome",field:"workFromHome",type:"single",text:"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
@@ -621,9 +621,9 @@ function HomeAIMatch() {
     const nA={...answers};if(q.field)nA[q.field]=ans;
 
     if(q.id==="greeting"){
-      const eurCities = ["Cork","Lourinhã","Areal","Dublin","Galway","Lisbon","Porto"];
+      const eurCities = ["Cork","Lourinhã","Lourinha","Dublin","Galway","Lisbon","Porto","Douglas","Wilton"];
       const isEur = eurCities.some(c => ans.toLowerCase().includes(c.toLowerCase()));
-      nA.market = isEur ? (["Cork","Dublin","Galway"].some(c=>ans.includes(c)) ? "ie" : "pt") : "uk";
+      nA.market = isEur ? (["Cork","Dublin","Galway","Douglas","Wilton"].some(c=>ans.includes(c)) ? "ie" : "pt") : "uk";
       nA.location = ans;
       nA.currency = isEur ? "EUR" : "GBP";
       setAnswers(nA);setAnswered(p=>p+1);
