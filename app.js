@@ -145,7 +145,7 @@ const LogoIcon = ({ size = 36 }) => (
 );
 
 const LogoFull = ({ dark }) => (
-  <img src="logo-full.png" alt="homeAImatch" height={38} style={{display:"block"}}/>
+  <img src="logo-full.png" alt="homeAImatch" height={52} style={{display:"block"}}/>
 );
 
 /* ════════════════════════════════════════════════════════════════════
