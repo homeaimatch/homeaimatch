@@ -1,5 +1,80 @@
 const { useState, useEffect, useRef } = React;
-const API_URL = 'homeaimatch-backend-production.up.railway.app';
+
+/* ════════════════════════════════════════════════════════════════════
+   API CONFIGURATION
+   ════════════════════════════════════════════════════════════════════ */
+const API_URL = 'https://homeaimatch-backend-production.up.railway.app';
+
+async function apiCall(endpoint, body) {
+  try {
+    const res = await fetch(API_URL + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    return await res.json();
+  } catch (err) {
+    console.error('API error:', err);
+    return null;
+  }
+}
+
+// Transform API response to format existing Card/CompTable components expect
+function adaptMatch(m) {
+  const p = m.property;
+  const currency = p.currency === 'EUR' ? '€' : '£';
+  return {
+    house: {
+      id: p.id,
+      name: p.title,
+      price: p.price,
+      currency: p.currency || 'EUR',
+      beds: p.beds,
+      baths: p.baths,
+      sqm: p.sqm,
+      sqft: p.sqft || Math.round((p.sqm || 0) * 10.764),
+      type: p.property_type,
+      style: p.style,
+      yard: p.features?.includes('garden') ? 'medium' : 'none',
+      neighborhood: (p.neighborhood_vibe || []).includes('urban') ? 'urban' : 'suburban',
+      city: p.city,
+      region: p.region || p.city,
+      postcode: p.postcode,
+      epc: p.epc_rating,
+      commuteMins: { cityCenter: p.commute_city_center || 20, techHub: (p.commute_city_center || 20) + 5, airport: 40 },
+      schools: p.schools_quality || 'good',
+      walkability: p.walkability || 5,
+      condition: p.condition || 'move-in',
+      parking: p.parking || [],
+      petFriendly: p.pet_friendly || false,
+      nearbyDogPark: p.nearby_dog_park || false,
+      neighborhoodVibe: p.neighborhood_vibe || [],
+      amenities: {
+        groceries: p.amenity_groceries_km || 0.5,
+        gyms: p.amenity_gyms_km || 1,
+        parks: p.amenity_parks_km || 0.3,
+        hospitals: p.amenity_hospitals_km || 3,
+      },
+      features: p.features || [],
+      img: '🏡',
+      tagline: p.tagline || `${p.property_type || 'Property'} in ${p.city}`,
+      desc: p.description || '',
+      source_url: p.source_url,
+      image_urls: p.image_urls || [],
+      agent: p.agent ? {
+        name: p.agent.name,
+        agency: p.agent.agency,
+        phone: p.agent.phone,
+        ph: p.agent.initials || p.agent.name?.split(' ').map(n => n[0]).join(''),
+      } : null,
+    },
+    pct: m.score || 0,
+    reasons: m.highlights || [],
+    concerns: m.concerns || [],
+    reasoning: m.reasoning || '',
+    commuteInfo: p.commute_city_center ? { mins: p.commute_city_center, to: 'City centre' } : null,
+  };
+}
 
 /* ════════════════════════════════════════════════════════════════════
    BRAND SYSTEM
@@ -103,7 +178,7 @@ const HOUSES_UK = [
 function getQuestions(market) {
   const cities = market ? MARKETS[market].cities : [];
   return [
-    { id:"greeting",field:null,type:"single",text:"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which city or region?",options:["London","Manchester","Birmingham","Leeds","Bristol","Edinburgh","Cardiff","Brighton"]},
+    { id:"greeting",field:null,type:"single",text:"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which city or region?",options:["Cork","Lourinhã","Areal","London","Manchester","Birmingham","Leeds","Bristol","Edinburgh","Cardiff","Brighton"]},
     { id:"location",field:"location",type:"search",text:`Which city or area interests you?`,options:cities,placeholder:"Type a city..."},
     { id:"radius",field:"radius",type:"single",text:"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
     { id:"workFromHome",field:"workFromHome",type:"single",text:"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
@@ -166,7 +241,7 @@ const AmStat = ({icon,label,dist}) => <div style={{display:"flex",alignItems:"ce
    COMPARISON TABLE
    ════════════════════════════════════════════════════════════════════ */
 const CompTable = ({results}) => {
-  const rows=[{l:"Price",f:m=>`£${(m.house.price/1e3).toFixed(0)}K`},{l:"Beds",f:m=>`${m.house.beds} / ${m.house.baths}`},{l:"Size",f:m=>`${m.house.sqm} m²`},{l:"Type",f:m=>m.house.type},{l:"Condition",f:m=>({"move-in":"✅ Ready","renovation-light":"🔧 Light","renovation-major":"🔨 Major"})[m.house.condition]},{l:"Walk",f:m=>`${m.house.walkability}/10`},{l:"Commute",f:m=>m.commuteInfo?`${m.commuteInfo.mins} min`:"—"},{l:"Pets",f:m=>m.house.petFriendly?"✅":"❌"},{l:"Energy",f:m=>m.house.epc||m.house.epc||"—"},{l:"Match",f:m=>`${m.pct}%`}];
+  const rows=[{l:"Price",f:m=>`${m.house.currency==='EUR'?'€':'£'}${(m.house.price/1e3).toFixed(0)}K`},{l:"Beds",f:m=>`${m.house.beds} / ${m.house.baths}`},{l:"Size",f:m=>`${m.house.sqm} m²`},{l:"Type",f:m=>m.house.type},{l:"Condition",f:m=>({"move-in":"✅ Ready","renovation-light":"🔧 Light","renovation-major":"🔨 Major"})[m.house.condition]},{l:"Walk",f:m=>`${m.house.walkability}/10`},{l:"Commute",f:m=>m.commuteInfo?`${m.commuteInfo.mins} min`:"—"},{l:"Pets",f:m=>m.house.petFriendly?"✅":"❌"},{l:"Energy",f:m=>m.house.epc||m.house.epc||"—"},{l:"Match",f:m=>`${m.pct}%`}];
   return(<div style={{overflowX:"auto",borderRadius:12,border:`1px solid ${B.border}`,background:B.white,animation:"fadeSlide 0.4s ease-out"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:11.5,fontFamily:"'Outfit',sans-serif"}}><thead><tr style={{background:B.dark}}><th style={{padding:"9px 10px",textAlign:"left",color:"#fff",fontWeight:600,fontSize:10.5,position:"sticky",left:0,background:B.dark,zIndex:1}}></th>{results.map((m,i)=><th key={i} style={{padding:"9px 10px",textAlign:"center",color:i===0?B.orange:"#fff",fontWeight:700,fontSize:10.5,minWidth:100}}>{m.house.img} {m.house.name.split(" ").slice(0,2).join(" ")}</th>)}</tr></thead><tbody>{rows.map((row,ri)=><tr key={ri} style={{background:ri%2===0?B.grayL:B.white}}><td style={{padding:"7px 10px",fontWeight:600,color:B.dark,whiteSpace:"nowrap",position:"sticky",left:0,background:ri%2===0?B.grayL:B.white,zIndex:1}}>{row.l}</td>{results.map((m,i)=><td key={i} style={{padding:"7px 10px",textAlign:"center",color:B.gray,fontWeight:row.l==="Match"?700:400,...(row.l==="Match"?{color:m.pct>=70?B.green:m.pct>=50?B.amepc:B.gray}:{})}}>{row.f(m)}</td>)}</tr>)}</tbody></table></div>);
 };
 
@@ -189,7 +264,7 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
           </div>
           <div style={{fontSize:12,color:B.gray,fontStyle:"italic",marginTop:3,fontFamily:"'Outfit',sans-serif"}}>{h.tagline}</div>
           <div style={{display:"flex",gap:6,marginTop:8,flexWrap:"wrap"}}>
-            {[`£${(h.price/1e3).toFixed(0)}K`,`${h.beds} bed · ${h.baths} bath`,`${h.sqm} m²`,h.region||h.city].map((t,i)=><span key={i} style={{fontSize:11,color:B.gray,background:B.grayL,padding:"2px 8px",borderRadius:5,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{t}</span>)}
+            {[`${h.currency==='EUR'?'€':'£'}${(h.price/1e3).toFixed(0)}K`,`${h.beds} bed · ${h.baths} bath`,`${h.sqm} m²`,h.region||h.city].map((t,i)=><span key={i} style={{fontSize:11,color:B.gray,background:B.grayL,padding:"2px 8px",borderRadius:5,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{t}</span>)}
           </div>
           {ci&&<div style={{marginTop:6,display:"inline-flex",alignItems:"center",gap:4,background:ci.mins<=20?"#e8f5e9":ci.mins<=35?"#fff8e1":"#fbe9e7",padding:"3px 10px",borderRadius:16,fontSize:11,fontWeight:600,color:ci.mins<=20?B.green:ci.mins<=35?B.amepc:B.red,fontFamily:"'Outfit',sans-serif"}}>🚗 {ci.mins} min → {ci.to}</div>}
         </div>
@@ -230,7 +305,7 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
       <div style={{padding:"0 18px 14px",display:"flex",gap:8}}>
         {h.agent&&<button onClick={e=>{e.stopPropagation();onContact(h);}} style={{flex:2,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:700,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff",border:"none"}}>✉ Contact Agent</button>}
         <button onClick={e=>{e.stopPropagation();onSave(h.id);}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:saved?B.orange:B.white,color:saved?"#fff":B.orange,border:`1.5px solid ${B.orange}`,transition:"all 0.2s"}}>{saved?"♥ Saved":"♡ Save"}</button>
-        <button onClick={e=>{e.stopPropagation();const t=`${h.name} in ${h.city} — £${(h.price/1e3).toFixed(0)}K, ${h.beds} bed, ${h.sqm}m². Found on homeaimatch.com`;if(navigator.share)navigator.share({title:h.name,text:t});else{navigator.clipboard?.writeText(t);alert("Copied!");}}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:B.white,color:B.blue,border:`1.5px solid ${B.blue}`}}>↗ Share</button>
+        <button onClick={e=>{e.stopPropagation();const cur=h.currency==='EUR'?'€':'£';const t=`${h.name} in ${h.city} — ${cur}${(h.price/1e3).toFixed(0)}K, ${h.beds} bed, ${h.sqm}m². Found on homeaimatch.com`;if(navigator.share)navigator.share({title:h.name,text:t});else{navigator.clipboard?.writeText(t);alert("Copied!");}}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:B.white,color:B.blue,border:`1.5px solid ${B.blue}`}}>↗ Share</button>
       </div>
     </div>)}
     <div onClick={onToggle} style={{textAlign:"center",padding:"5px 0 10px",fontSize:10.5,color:"#c0cad6",fontFamily:"'Outfit',sans-serif",cursor:"pointer"}}>{expanded?"collapse ▲":"details ▼"}</div>
@@ -386,7 +461,12 @@ const ContactModal=({agent,house,onClose})=>{
           <input value={ce} onChange={e=>setCe(e.target.value)} placeholder="Your email" type="email" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <textarea value={cm} onChange={e=>setCm(e.target.value)} rows={4} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark,resize:"vertical",lineHeight:1.5}}/>
           <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>{if(cn&&ce.includes("@")){fetch("https://formspree.io/f/xzdagnqp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);}}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
+            <button onClick={()=>{if(cn&&ce.includes("@")){
+              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null}).then(()=>setSent(true)).catch(()=>{
+                // Fallback to Formspree
+                fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);
+              });
+            }}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
             <a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>
           </div>
         </div>
@@ -513,12 +593,15 @@ function HomeAIMatch() {
 
   function handleEmailSubmit() {
     if(!email.includes("@"))return;
-    // Send to Formspree (replace YOUR_FORM_ID with your actual Formspree form ID)
-    fetch("https://formspree.io/f/xzdagnqp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, source: "landing_page", date: new Date().toISOString() })
-    }).catch(err => console.log("Email submit error:", err));
+    // Send to backend API
+    apiCall('/api/subscribe', { email: email, source: 'landing_page' }).catch(()=>{
+      // Fallback to Formspree
+      fetch("https://formspree.io/f/YOUR_FORM_ID", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, source: "landing_page", date: new Date().toISOString() })
+      }).catch(err => console.log("Email submit error:", err));
+    });
     setEmailSubmitted(true);
   }
 
@@ -530,7 +613,7 @@ function HomeAIMatch() {
     proceed(opt);
   }
 
-  function proceed(ans) {
+  async function proceed(ans) {
     const q=questions[currentQ];
     const disp=Array.isArray(ans)?ans.join(", "):ans;
     setMessages(p=>[...p,{text:disp,isUser:true}]);
@@ -538,7 +621,21 @@ function HomeAIMatch() {
     const nA={...answers};if(q.field)nA[q.field]=ans;
 
     if(q.id==="greeting"){
-      nA.market="uk";nA.location=ans;setAnswers(nA);setAnswered(p=>p+1);
+      const eurCities = ["Cork","Lourinhã","Areal","Dublin","Galway","Lisbon","Porto"];
+      const isEur = eurCities.some(c => ans.toLowerCase().includes(c.toLowerCase()));
+      nA.market = isEur ? (["Cork","Dublin","Galway"].some(c=>ans.includes(c)) ? "ie" : "pt") : "uk";
+      nA.location = ans;
+      nA.currency = isEur ? "EUR" : "GBP";
+      setAnswers(nA);setAnswered(p=>p+1);
+      // Dynamically update budget question based on currency
+      setQuestions(prev => prev.map(qq => {
+        if (qq.id === "budget") {
+          return isEur
+            ? {...qq, options: ["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]}
+            : {...qq, options: ["Under £200K","£200K – £400K","£400K – £600K","£600K – £800K","£800K+"]};
+        }
+        return qq;
+      }));
       setIsTyping(true);
       setTimeout(()=>{setMessages(p=>[...p,{text:questions[2].text,isUser:false}]);setIsTyping(false);setCurrentQ(2);setTimeout(()=>setShowOpts(true),200);},600);
       return;
@@ -552,12 +649,22 @@ function HomeAIMatch() {
       setTimeout(()=>{setMessages(p=>[...p,{text:questions[nx].text,isUser:false}]);setIsTyping(false);setCurrentQ(nx);setTimeout(()=>setShowOpts(true),200);},500+Math.random()*300);
     } else {
       setIsTyping(true);
-      setTimeout(()=>{
+      setMessages(pr=>[...pr,{text:"Searching for your perfect match...",isUser:false}]);
+      // Call real backend API
+      const apiResult = await apiCall('/api/match', { answers: nA });
+      if (apiResult && apiResult.matches && apiResult.matches.length > 0) {
+        const p = apiResult.persona || getPersona(nA);
+        setPersona(p);
+        setMessages(pr=>[...pr,{text:`${p.emoji} You're "${p.title}" — ${p.desc || p.description}\n\nI found ${apiResult.matches.length} matches for you!`,isUser:false}]);
+        setIsTyping(false);
+        setTimeout(()=>setResults(apiResult.matches.map(adaptMatch)),500);
+      } else {
+        // Fallback to local scoring if API fails or returns no results
         const p=getPersona(nA);setPersona(p);
-        setMessages(pr=>[...pr,{text:`${p.emoji} You're "${p.title}" — ${p.desc}\n\nSearching the UK market...`,isUser:false}]);
+        setMessages(pr=>[...pr,{text:`${p.emoji} You're "${p.title}" — ${p.desc}\n\nSearching properties...`,isUser:false}]);
         setIsTyping(false);
         setTimeout(()=>setResults(getMatches(nA)),500);
-      },1600);
+      }
     }
   }
 
@@ -623,7 +730,7 @@ function HomeAIMatch() {
               <>{results.map((m,i)=><Card key={m.house.id} match={m} rank={i} expanded={expandedCard===m.house.id} onToggle={()=>setExpandedCard(expandedCard===m.house.id?null:m.house.id)} saved={!!saved[m.house.id]} onSave={id=>setSaved(p=>({...p,[id]:!p[id]}))} onContact={h=>setContactHouse(h)}/>)}</>
             )}
             <div style={{textAlign:"center",padding:"18px 0 10px",fontSize:11.5,color:"#b0bec5",lineHeight:1.6}}>
-              Matched from {HOUSES_UK.length} listings · 10 criteria<br/>
+              Matched from real listings · AI-powered scoring<br/>
               <span style={{fontSize:10.5,opacity:0.7}}>homeaimatch.com</span>
             </div>
           </div>
