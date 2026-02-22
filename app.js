@@ -253,7 +253,13 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
   return(<div style={{background:B.white,borderRadius:14,overflow:"hidden",border:top?`2px solid ${B.blue}`:`1px solid ${B.border}`,boxShadow:top?`0 6px 24px rgba(30,150,209,0.1)`:"0 2px 6px rgba(0,0,0,0.03)",animation:`fadeSlide 0.45s ease-out ${rank*0.1}s both`}}>
     <div onClick={onToggle} style={{padding:"16px 18px 12px",cursor:"pointer"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-        <PropertyImage style={h.style} size={100}/>
+        {h.image_urls && h.image_urls.length > 0 ? (
+          <div style={{width:100,height:100,borderRadius:10,overflow:"hidden",flexShrink:0,background:B.grayL}}>
+            <img src={h.image_urls[0]} alt={h.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.target.onerror=null;e.target.style.display='none';e.target.parentNode.insertAdjacentHTML('beforeend','<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px">🏠</div>');}}/>
+          </div>
+        ) : (
+          <PropertyImage style={h.style} size={100}/>
+        )}
         <div style={{flex:1,minWidth:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div>
