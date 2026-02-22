@@ -253,13 +253,7 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
   return(<div style={{background:B.white,borderRadius:14,overflow:"hidden",border:top?`2px solid ${B.blue}`:`1px solid ${B.border}`,boxShadow:top?`0 6px 24px rgba(30,150,209,0.1)`:"0 2px 6px rgba(0,0,0,0.03)",animation:`fadeSlide 0.45s ease-out ${rank*0.1}s both`}}>
     <div onClick={onToggle} style={{padding:"16px 18px 12px",cursor:"pointer"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-        {h.image_urls && h.image_urls.length > 0 ? (
-          <div style={{width:100,height:100,borderRadius:10,overflow:"hidden",flexShrink:0,background:B.grayL}}>
-            <img src={h.image_urls[0]} alt={h.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.target.onerror=null;e.target.style.display='none';e.target.parentNode.insertAdjacentHTML('beforeend','<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px">🏠</div>');}}/>
-          </div>
-        ) : (
-          <PropertyImage style={h.style} size={100}/>
-        )}
+        <PropertyImage style={h.style} size={100}/>
         <div style={{flex:1,minWidth:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div>
@@ -277,7 +271,18 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
       </div>
     </div>
     {expanded&&(<div style={{animation:"fadeSlide 0.3s ease-out"}}>
-      <div style={{padding:"0 18px 12px",borderTop:`1px solid ${B.border}`,paddingTop:12}}><p style={{fontSize:12.5,color:"#4a5a6a",lineHeight:1.65,fontFamily:"'Outfit',sans-serif",margin:0}}>{h.desc}</p></div>
+      {h.image_urls && h.image_urls.length > 1 && (
+        <div style={{padding:"0 18px 12px",borderTop:`1px solid ${B.border}`,paddingTop:12}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:6,scrollSnapType:"x mandatory"}}>
+            {h.image_urls.map((url,i)=>(
+              <div key={i} style={{flexShrink:0,width:200,height:140,borderRadius:10,overflow:"hidden",background:B.grayL,scrollSnapAlign:"start",border:`1px solid ${B.border}`}}>
+                <img src={url} alt={`${h.name} photo ${i+1}`} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.target.onerror=null;e.target.style.display='none';}}/>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{padding:"0 18px 12px",...(!(h.image_urls && h.image_urls.length > 1)?{borderTop:`1px solid ${B.border}`,paddingTop:12}:{})}}><p style={{fontSize:12.5,color:"#4a5a6a",lineHeight:1.65,fontFamily:"'Outfit',sans-serif",margin:0}}>{h.desc}</p></div>
       <div style={{padding:"0 18px 10px",display:"flex",gap:6,flexWrap:"wrap"}}>
         <span style={{fontSize:11,fontWeight:600,fontFamily:"'Outfit',sans-serif",padding:"3px 10px",borderRadius:16,background:h.condition==="move-in"?"#e8f5e9":h.condition==="renovation-light"?"#fff8e1":"#fbe9e7",color:h.condition==="move-in"?B.green:h.condition==="renovation-light"?B.amepc:B.red}}>{h.condition==="move-in"?"✅ Move-in Ready":h.condition==="renovation-light"?"🔧 Light Reno":"🔨 Major Reno"}</span>
         {(h.epc||h.epc)&&<span style={{fontSize:11,fontWeight:600,fontFamily:"'Outfit',sans-serif",padding:"3px 10px",borderRadius:16,background:B.blueL,color:B.blue}}>⚡ {h.epc?`EPC ${h.epc}`:`EPC ${h.epc}`}</span>}
