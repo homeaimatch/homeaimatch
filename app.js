@@ -186,7 +186,7 @@ function getQuestions(market) {
     { id:"commuteMax",field:"commuteMax",type:"single",text:"Maximum one-way commute?",options:["Under 15 min","Under 30 min","Under 45 min","Don't mind"],showIf:a=>a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"},
     { id:"lifestyle",field:"lifestyle",type:"single",text:"What setting feels right?",options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
     { id:"family",field:"family",type:"single",text:"Who's moving in?",options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
-    { id:"budget",field:"budget",type:"single",text:"Budget ceiling?",options:["Under £200K","£200K – £400K","£400K – £600K","£600K – £800K","£800K+"]},
+    { id:"budget",field:"budget",type:"single",text:"Budget ceiling?",options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
     { id:"condition",field:"condition",type:"single",text:"How about renovation?",options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
     { id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:"What neighbourhood personality? Pick all that fit.",options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
     { id:"pets",field:"pets",type:"single",text:"Any furry companions?",options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
@@ -202,7 +202,7 @@ function getQuestions(market) {
 function scoreHouse(h, a) {
   let s=0,mx=0,r=[],ci=null;
   mx+=25;if(a.location){const l=a.location.toLowerCase();if(h.city.toLowerCase()===l||h.region?.toLowerCase().includes(l)){s+=25;r.push(`In ${h.region||h.city}`);}}
-  mx+=25;const bM={"Under £200K":[0,2e5],"£200K – £400K":[2e5,4e5],"£400K – £600K":[4e5,6e5],"£600K – £800K":[6e5,8e5],"£800K+":[8e5,Infinity]};const[bN,bX]=bM[a.budget]||[0,Infinity];if(h.price>=bN&&h.price<=bX){s+=25;r.push("Within budget");}else if(h.price>=bN*.85&&h.price<=bX*1.15){s+=12;r.push("Near budget range");}
+  mx+=25;const bM={"Under €200K":[0,2e5],"€200K – €400K":[2e5,4e5],"€400K – €600K":[4e5,6e5],"€600K – €800K":[6e5,8e5],"€800K+":[8e5,Infinity],"Under £200K":[0,2e5],"£200K – £400K":[2e5,4e5],"£400K – £600K":[4e5,6e5],"£600K – £800K":[6e5,8e5],"£800K+":[8e5,Infinity]};const[bN,bX]=bM[a.budget]||[0,Infinity];if(h.price>=bN&&h.price<=bX){s+=25;r.push("Within budget");}else if(h.price>=bN*.85&&h.price<=bX*1.15){s+=12;r.push("Near budget range");}
   mx+=20;const nc=a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office";if(nc&&a.commuteTo){const ck={"City centre":"cityCenter","Tech hub / business park":"techHub","Airport area":"airport","Multiple locations":"cityCenter"}[a.commuteTo]||"cityCenter";const m=h.commuteMins[ck]||40;ci={mins:m,to:a.commuteTo};const mm={"Under 15 min":15,"Under 30 min":30,"Under 45 min":45,"Don't mind":90}[a.commuteMax]||45;if(m<=mm){s+=20;r.push(`${m} min commute`);}else if(m<=mm*1.3){s+=10;r.push(`${m} min (slightly over)`);};}else if(a.workFromHome==="Fully remote"){if(h.features.some(f=>f.includes("office")||f.includes("coworking"))){s+=20;r.push("Workspace included");}else if(h.sqm>=140){s+=12;r.push("Room for office");}else s+=6;}else s+=10;
   mx+=15;const fb={"Just me":1,"Me and a partner":1,"Small family (1-2 kids)":3,"Larger family (3+ kids)":4,"Housemates":3};const mb=fb[a.family]||1;if(h.beds>=mb){s+=15;r.push(`${h.beds} bedrooms`);}else if(h.beds>=mb-1)s+=7;
   mx+=15;const cp={"Move-in ready only":["move-in"],"Light cosmetic work ok":["move-in","renovation-light"],"Big project — bring it on!":["renovation-major","renovation-light"],"Don't care":["move-in","renovation-light","renovation-major"]};if((cp[a.condition]||[]).includes(h.condition)){s+=15;r.push({"move-in":"Move-in ready","renovation-light":"Light reno","renovation-major":"Reno project"}[h.condition]);}
@@ -500,12 +500,14 @@ const PricingPage=({onBack,onStart})=>{
   const F2="'Outfit',sans-serif";
   const buyerPlans=[
     {name:"Free Search",price:"Free",per:"",desc:"See if homeAImatch is right for you",color:B.gray,pop:false,cta:"Try Free",feat:["AI lifestyle quiz","Top 3 matches (basic info)","Match score percentage","Buyer persona","-Full property details","-AI reasoning & insights","-Neighbourhood data","-Agent contact"]},
-    {name:"Full Report",price:"\u00a34.99",per:"/search",desc:"Everything you need to decide",color:B.blue,pop:true,cta:"Get Full Report",feat:["Everything in Free +","ALL matching properties scored","Full AI reasoning per match","Walkability & commute data","School ratings & EPC energy","Price history & area trends","Comparison table","Direct agent contact"]},
-    {name:"3-Pack",price:"\u00a39.99",per:"3 searches",desc:"Refine as you go \u2014 save 33%",color:B.blueD||B.blue,pop:false,cta:"Buy 3-Pack",feat:["3 Full Reports","Same features as Full Report","Use anytime, no expiry","Perfect for refining","Share reports with partner","Priority support","-","-"]}
+    {name:"Full Report",price:"€4.99",per:"/search",desc:"Everything you need to decide",color:B.blue,pop:true,cta:"Get Full Report",feat:["Everything in Free +","ALL matching properties scored","Full AI reasoning per match","Walkability & commute data","School ratings & EPC energy","Price history & area trends","Comparison table","Direct agent contact"]},
+    {name:"3-Pack",price:"€9.99",per:"3 searches",desc:"Refine as you go — save 33%",color:B.blueD||B.blue,pop:false,cta:"Buy 3-Pack",feat:["3 Full Reports","Same features as Full Report","Use anytime, no expiry","Perfect for refining","Share reports with partner","Priority support","-","-"]}
   ];
   const agentPlans=[
-    {name:"Pay Per Lead",price:"\u00a39.99",per:"/lead",desc:"Only pay for qualified buyers",color:B.orange,pop:false,cta:"Get Started",feat:["Leads with full lifestyle profile","Budget & priorities included","Match score per property","Buyer persona insights","Email notification per lead","No monthly commitment","Cancel anytime","-"]},
-    {name:"Unlimited Leads",price:"\u00a399",per:"/month",desc:"Best for active agents & agencies",color:B.orange,pop:true,cta:"Start Free Trial",feat:["Everything in Pay Per Lead +","Unlimited leads in your area","Your listings featured first","Monthly performance dashboard","Priority lead delivery","Dedicated support","Team access (up to 5)","14-day free trial"]}
+    {name:"Free",price:"€0",per:"",desc:"Try it — 3 listings, 3 leads, no card",color:B.gray,pop:false,cta:"Get Started",link:"agent-dashboard.html",feat:["Up to 3 listings","3 free leads included","Full buyer profiles","Claim existing listings","Agent profile","-Priority placement","-Featured badge"]},
+    {name:"10 Lead Pack",price:"€99",per:"one-time",desc:"€9.90 per lead",color:B.blue,pop:false,cta:"Buy Pack",link:"agent-dashboard.html",feat:["10 leads — use anytime","Up to 10 listings","Full buyer profiles","Lead management tools","Analytics dashboard","-Priority placement","-Featured badge"]},
+    {name:"25 Lead Pack",price:"€199",per:"one-time",desc:"€7.96 per lead — save 20%",color:B.blue,pop:false,cta:"Buy Pack",link:"agent-dashboard.html",feat:["25 leads — use anytime","Unlimited listings","Full buyer profiles","Lead management tools","Priority listing placement","Featured agent badge","-White-label quiz"]},
+    {name:"Unlimited",price:"€99",per:"/month",desc:"6-month min · unlimited leads",color:B.orange,pop:true,cta:"Go Unlimited",link:"agent-dashboard.html",feat:["Unlimited leads","Unlimited listings","Full buyer profiles & personas","Priority listing placement","Featured agent badge","Advanced analytics","Priority support"]}
   ];
   return(
     <div style={{minHeight:"100vh",background:B.white,fontFamily:F2}}>
@@ -516,7 +518,7 @@ const PricingPage=({onBack,onStart})=>{
       <section style={{maxWidth:1060,margin:"0 auto",padding:"40px 24px 10px",textAlign:"center"}}>
         <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10}}>Pricing</div>
         <h1 style={{fontSize:38,fontWeight:800,color:B.dark,lineHeight:1.15,letterSpacing:"-0.035em",marginBottom:12}}>Pay per search, not per month</h1>
-        <p style={{fontSize:15,color:B.gray,maxWidth:520,margin:"0 auto"}}>No subscriptions. Search when you need to, pay only for what you use.</p>
+        <p style={{fontSize:15,color:B.gray,maxWidth:520,margin:"0 auto"}}>No subscriptions for buyers. Agents only pay for results.</p>
       </section>
 
       <section style={{maxWidth:1060,margin:"0 auto",padding:"10px 24px 8px",textAlign:"center"}}>
@@ -533,7 +535,7 @@ const PricingPage=({onBack,onStart})=>{
               <button onClick={onStart} style={{width:"100%",padding:13,borderRadius:12,fontSize:14,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.blue+","+B.blueD+")":B.grayL,color:pl.pop?"#fff":B.dark}}>{pl.cta}</button>
               <div style={{marginTop:22,display:"flex",flexDirection:"column",gap:10}}>
                 {pl.feat.map((f,j)=>{const inc=!f.startsWith("-");const txt=inc?f:f.slice(1);if(!txt)return null;return(
-                  <div key={j} style={{display:"flex",gap:9,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>{inc?"\u2705":"\u2014"}</span><span style={{fontSize:13,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
+                  <div key={j} style={{display:"flex",gap:9,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:13,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
               </div>
             </div>
           </div>))}
@@ -541,19 +543,20 @@ const PricingPage=({onBack,onStart})=>{
 
       <section style={{maxWidth:1060,margin:"0 auto",padding:"10px 24px 8px",textAlign:"center"}}>
         <div style={{fontSize:12,fontWeight:700,color:B.orange,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:10,marginBottom:16}}>For Estate Agents</div>
+        <p style={{fontSize:13,color:B.gray,maxWidth:500,margin:"0 auto 8px"}}>Only pay when it works. Start free with 3 leads.</p>
       </section>
-      <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 30px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20,alignItems:"start"}}>
+      <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 30px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,alignItems:"start"}}>
         {agentPlans.map((pl,i)=>(
           <div key={i} style={{background:B.white,borderRadius:18,border:pl.pop?"2px solid "+B.orange:"1px solid "+B.border,overflow:"hidden",boxShadow:pl.pop?"0 12px 40px rgba(245,146,27,0.1)":"0 2px 8px rgba(0,0,0,0.04)",animation:"fadeSlide 0.5s ease-out "+(0.3+i*0.1)+"s both"}}>
-            {pl.pop&&<div style={{background:"linear-gradient(135deg,"+B.orange+","+B.orangeD+")",color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>MOST POPULAR</div>}
-            <div style={{padding:"28px 24px"}}>
-              <div style={{fontSize:13,fontWeight:700,color:pl.color,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>{pl.name}</div>
-              <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}}><span style={{fontSize:40,fontWeight:800,color:B.dark}}>{pl.price}</span><span style={{fontSize:14,color:B.gray}}>{pl.per}</span></div>
-              <div style={{fontSize:13,color:B.gray,marginBottom:22}}>{pl.desc}</div>
-              <button onClick={()=>alert("Agent signup coming soon! Email us at hello@homeaimatch.com")} style={{width:"100%",padding:13,borderRadius:12,fontSize:14,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":B.grayL,color:pl.pop?"#fff":B.dark}}>{pl.cta}</button>
-              <div style={{marginTop:22,display:"flex",flexDirection:"column",gap:10}}>
+            {pl.pop&&<div style={{background:"linear-gradient(135deg,"+B.orange+","+B.orangeD+")",color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>BEST VALUE</div>}
+            <div style={{padding:"24px 20px"}}>
+              <div style={{fontSize:12,fontWeight:700,color:pl.color,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>{pl.name}</div>
+              <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}}><span style={{fontSize:36,fontWeight:800,color:B.dark}}>{pl.price}</span><span style={{fontSize:13,color:B.gray}}>{pl.per}</span></div>
+              <div style={{fontSize:12.5,color:B.gray,marginBottom:20}}>{pl.desc}</div>
+              <a href={pl.link} style={{display:"block",width:"100%",padding:12,borderRadius:12,fontSize:13,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":B.grayL,color:pl.pop?"#fff":B.dark,textAlign:"center",textDecoration:"none",boxSizing:"border-box"}}>{pl.cta}</a>
+              <div style={{marginTop:18,display:"flex",flexDirection:"column",gap:8}}>
                 {pl.feat.map((f,j)=>{const inc=!f.startsWith("-");const txt=inc?f:f.slice(1);if(!txt)return null;return(
-                  <div key={j} style={{display:"flex",gap:9,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>{inc?"\u2705":"\u2014"}</span><span style={{fontSize:13,color:inc?B.dark:"#b0bec5",fontWeight:400,lineHeight:1.35}}>{txt}</span></div>);})}
+                  <div key={j} style={{display:"flex",gap:8,alignItems:"flex-start"}}><span style={{fontSize:12,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:12.5,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Unlimited leads")||f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
               </div>
             </div>
           </div>))}
@@ -569,7 +572,7 @@ const PricingPage=({onBack,onStart})=>{
 
       <section style={{maxWidth:700,margin:"0 auto",padding:"10px 24px 50px"}}>
         <h2 style={{fontSize:24,fontWeight:800,color:B.dark,textAlign:"center",marginBottom:24}}>FAQs</h2>
-        {[{q:"Is the free search really free?",a:"Yes. Take the quiz and see your top 3 matches with basic info, completely free. No card required."},{q:"What do I get in a Full Report?",a:"Every property in our database scored against your lifestyle. AI-powered reasoning, neighbourhood data, commute times, school ratings, energy costs, price trends, and direct agent contact."},{q:"Do searches expire?",a:"No. Buy a search or a 3-pack and use them whenever you like."},{q:"How does pay-per-lead work for agents?",a:"When a buyer matches with your listing and contacts you, that counts as one lead. You receive their full lifestyle profile, budget, and priorities. Pay \u00a39.99 per lead, or go unlimited for \u00a399/month."},{q:"What areas do you cover?",a:"Launching in Cork, Ireland and select UK cities. Sign up for early access to be first."}].map((f,i)=>(
+        {[{q:"Is the free search really free?",a:"Yes. Take the quiz and see your top 3 matches with basic info, completely free. No card required."},{q:"What do I get in a Full Report?",a:"Every property in our database scored against your lifestyle. AI-powered reasoning, neighbourhood data, commute times, school ratings, energy costs, price trends, and direct agent contact."},{q:"Do searches expire?",a:"No. Buy a search or a 3-pack and use them whenever you like."},{q:"How does agent pricing work?",a:"Agents start free with 3 listings and 3 leads. After that, buy lead packs (10 for €99, 25 for €199) or go unlimited at €99/month. You only pay for qualified buyer enquiries — never for listings."},{q:"What happens when an agent runs out of lead credits?",a:"You'll still see that a new lead came in, but the buyer's contact details are hidden until you top up. No leads are ever lost — upgrade anytime to unlock them."},{q:"What areas do you cover?",a:"Currently Cork, Ireland and the Silver Coast / Lourinhã region of Portugal. More European markets coming in 2026."}].map((f,i)=>(
           <div key={i} style={{borderBottom:"1px solid "+B.border,padding:"16px 0"}}><div style={{fontSize:14,fontWeight:700,color:B.dark,marginBottom:6}}>{f.q}</div><div style={{fontSize:13,color:B.gray,lineHeight:1.6}}>{f.a}</div></div>))}
       </section>
       <div style={{textAlign:"center",padding:"20px 0 40px",fontSize:12,color:"#b0bec5"}}>homeaimatch.com</div>
@@ -654,7 +657,7 @@ function HomeAIMatch() {
         if (qq.id === "budget") {
           return (isIreland || isPortugal)
             ? {...qq, options: ["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]}
-            : {...qq, options: ["Under £200K","£200K – £400K","£400K – £600K","£600K – £800K","£800K+"]};
+            : {...qq, options: ["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]};
         }
         return qq;
       }));
