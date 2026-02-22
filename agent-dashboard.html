@@ -205,10 +205,21 @@ async function apiFetch(path, method = 'GET', body = null) {
   const opts = { method, headers: { 'Content-Type': 'application/json' } };
   if (state.token) opts.headers.Authorization = `Bearer ${state.token}`;
   if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(API_URL + path, opts);
-  const data = await res.json();
+  let res;
+  try {
+    res = await fetch(API_URL + path, opts);
+  } catch (networkErr) {
+    throw new Error('Network error — check if backend is running. Detail: ' + networkErr.message);
+  }
+  let data;
+  try {
+    data = await res.json();
+  } catch (jsonErr) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Server returned status ${res.status}: ${text.substring(0, 200)}`);
+  }
   if (res.status === 401) { logout(); throw new Error('Session expired'); }
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  if (!res.ok) throw new Error(data.error || 'Request failed (status ' + res.status + ')');
   return data;
 }
 
