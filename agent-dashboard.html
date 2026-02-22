@@ -168,6 +168,7 @@ let state = {
   dashboard: null,
   unclaimed: [],
   loading: false,
+  editingProperty: null,
 };
 
 // ============================================================
@@ -553,6 +554,10 @@ function renderLeads() {
 // ============================================================
 function renderListings() {
   const props = state.dashboard?.properties || [];
+
+  // If editing a property, show edit form
+  if (state.editingProperty) return renderEditProperty(state.editingProperty);
+
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <span style="font-size:13px;color:var(--gray)">${props.length} listing${props.length !== 1 ? 's' : ''}</span>
@@ -561,17 +566,288 @@ function renderListings() {
     ${props.length === 0 ? '<div class="empty" style="padding:60px"><div class="icon">🏘️</div><div class="title">No listings yet</div><div class="desc">Add your first property or claim existing listings on the platform.</div></div>' :
       `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
         ${props.map(p => `<div class="card" style="padding:0;overflow:hidden">
-          <div style="height:140px;background:var(--gray-l);overflow:hidden">
+          <div style="height:140px;background:var(--gray-l);overflow:hidden;position:relative">
             ${p.image_urls?.length ? `<img src="${p.image_urls[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:36px">🏠</div>'}
           </div>
           <div style="padding:14px">
             <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:4px">${p.title}</div>
-            <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${formatPrice(p.price, p.currency)} · ${p.beds} bed · ${p.sqm}m² · ${p.city}</div>
-            <span class="badge badge-${p.listing_status || 'active'}">${p.listing_status || 'active'}</span>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${formatPrice(p.price, p.currency)} · ${p.beds || '?'} bed · ${p.sqm || '?'}m² · ${p.city}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="badge badge-${p.listing_status || 'active'}">${p.listing_status || 'active'}</span>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-outline btn-sm" onclick="startEditProperty('${p.id}')">✏️ Edit</button>
+                <button class="btn btn-ghost btn-sm" onclick="deleteProperty('${p.id}','${p.title.replace(/'/g,"\\'")}')">🗑️</button>
+              </div>
+            </div>
           </div>
         </div>`).join('')}
       </div>`}
   `;
+}
+
+function startEditProperty(id) {
+  const p = (state.dashboard?.properties || []).find(x => x.id === id);
+  if (!p) { showToast('Property not found', 'error'); return; }
+  state.editingProperty = p;
+  render();
+  // Populate chips and walkability after render
+  setTimeout(() => {
+    // Activate vibe chips
+    (p.neighborhood_vibe || []).forEach(v => {
+      const chip = document.querySelector(`#ep-vibe-chips .ap-chip[data-value="${v}"]`);
+      if (chip) chip.classList.add('active');
+    });
+    // Activate feature chips
+    (p.features || []).forEach(v => {
+      const chip = document.querySelector(`#ep-feature-chips .ap-chip[data-value="${v}"]`);
+      if (chip) chip.classList.add('active');
+    });
+    // Activate parking chips
+    (p.parking || []).forEach(v => {
+      const chip = document.querySelector(`#ep-parking-chips .ap-chip[data-value="${v}"]`);
+      if (chip) chip.classList.add('active');
+    });
+    // Walkability bar
+    updateEpWalk(p.walkability || 5);
+    // Image previews
+    document.querySelectorAll('.ep-img-input').forEach(input => previewEpImg(input));
+  }, 100);
+}
+
+function cancelEdit() {
+  state.editingProperty = null;
+  render();
+}
+
+async function deleteProperty(id, title) {
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  try {
+    await apiFetch(`/api/agents/properties/${id}`, 'DELETE');
+    showToast('Property deleted', 'success');
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function renderEditProperty(p) {
+  const imgs = p.image_urls || [];
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div><button class="btn btn-ghost btn-sm" onclick="cancelEdit()">← Back to Listings</button></div>
+      <h3 style="font-size:16px;font-weight:700">Editing: ${p.title}</h3>
+    </div>
+
+    <div class="card">
+      <h3>Basic Details</h3>
+      <div class="form-group"><label>Title *</label><input id="ep-title" value="${p.title || ''}"/></div>
+      <div class="form-group"><label>Tagline</label><input id="ep-tagline" value="${p.tagline || ''}"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Price *</label><input id="ep-price" type="number" value="${p.price || ''}"/></div>
+        <div class="form-group"><label>Currency</label><select id="ep-currency"><option value="EUR" ${p.currency==='EUR'?'selected':''}>€ EUR</option><option value="GBP" ${p.currency==='GBP'?'selected':''}>£ GBP</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Beds</label><input id="ep-beds" type="number" value="${p.beds || ''}"/></div>
+        <div class="form-group"><label>Baths</label><input id="ep-baths" type="number" value="${p.baths || ''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Size (m²)</label><input id="ep-sqm" type="number" value="${p.sqm || ''}"/></div>
+        <div class="form-group"><label>Type</label><select id="ep-type">${['terraced','semi-detached','detached','flat','cottage','townhouse','villa','farmhouse','bungalow'].map(t=>`<option value="${t}" ${p.property_type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Style</label><select id="ep-style">${['traditional','modern','victorian','georgian','cottage','mediterranean','artdeco'].map(t=>`<option value="${t}" ${p.style===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Condition</label><select id="ep-condition">${['move-in','renovation-light','renovation-major','new-build'].map(t=>`<option value="${t}" ${p.condition===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-group"><label>Listing Status</label><select id="ep-status">${['active','sale-agreed','sold'].map(t=>`<option value="${t}" ${p.listing_status===t?'selected':''}>${t}</option>`).join('')}</select></div>
+    </div>
+
+    <div class="card">
+      <h3>Location</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Address</label><input id="ep-address" value="${p.address_line1 || ''}"/></div>
+        <div class="form-group"><label>City *</label><input id="ep-city" value="${p.city || ''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Region / Area</label><input id="ep-region" value="${p.region || ''}"/></div>
+        <div class="form-group"><label>County</label><input id="ep-county" value="${p.county || ''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Postcode / Eircode</label><input id="ep-postcode" value="${p.postcode || ''}"/></div>
+        <div class="form-group"><label>Country</label><select id="ep-country"><option value="IE" ${p.country==='IE'?'selected':''}>Ireland</option><option value="PT" ${p.country==='PT'?'selected':''}>Portugal</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Latitude</label><input id="ep-lat" type="number" step="any" value="${p.latitude || ''}"/></div>
+        <div class="form-group"><label>Longitude</label><input id="ep-lng" type="number" step="any" value="${p.longitude || ''}"/></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Description</h3>
+      <div class="form-group"><textarea id="ep-desc" rows="5">${p.description || ''}</textarea></div>
+    </div>
+
+    <div class="card">
+      <h3>Images</h3>
+      <div id="ep-image-list">
+        ${(imgs.length ? imgs : ['']).map((url, i) => `
+          <div class="ep-img-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <div class="ep-img-preview" style="width:48px;height:48px;border-radius:8px;background:var(--gray-l);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${url ? `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span style=\\'color:var(--red)\\'>✕</span>'"/>` : `<span style="color:#ccc">${i+1}</span>`}</div>
+            <input class="ep-img-input" value="${url}" placeholder="Paste image URL..." style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" oninput="previewEpImg(this)"/>
+            <button class="btn btn-ghost btn-sm" onclick="removeEpImg(this)">✕</button>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="addEpImgRow()" style="margin-top:4px">+ Add another image</button>
+    </div>
+
+    <div class="card">
+      <h3>Livability & Neighbourhood</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Walkability (0-10)</label>
+          <input id="ep-walkability" type="range" min="0" max="10" value="${p.walkability || 5}" oninput="updateEpWalk(this.value)" style="width:100%;padding:2px 0;border:none;box-shadow:none"/>
+          <div id="ep-walk-bar" style="display:flex;gap:2px;margin-top:4px"></div>
+          <div id="ep-walk-label" style="font-size:11px;color:var(--gray);margin-top:3px"></div>
+        </div>
+        <div class="form-group"><label>Schools</label><select id="ep-schools">${['excellent','good','average','n/a'].map(t=>`<option value="${t}" ${p.schools_quality===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>EPC / BER</label><input id="ep-epc" value="${p.epc_rating || ''}"/></div>
+        <div class="form-group"><label>Commute to Centre (mins)</label><input id="ep-commute" type="number" value="${p.commute_city_center || ''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Pet Friendly</label><select id="ep-pets"><option value="true" ${p.pet_friendly===true?'selected':''}>Yes</option><option value="false" ${p.pet_friendly===false?'selected':''}>No</option></select></div>
+        <div class="form-group"><label>Dog Park Nearby</label><select id="ep-dogpark"><option value="true" ${p.nearby_dog_park===true?'selected':''}>Yes</option><option value="false" ${p.nearby_dog_park===false?'selected':''}>No</option></select></div>
+      </div>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin:16px 0 6px">Neighbourhood Vibe</label>
+      <div id="ep-vibe-chips" style="display:flex;flex-wrap:wrap;gap:6px">
+        ${['family-friendly:👨‍👩‍👧 Family','quiet:🤫 Quiet','vibrant:🎉 Vibrant','historic:🏛️ Historic','city-centre:🏙️ City centre','suburban:🏘️ Suburban','rural:🌾 Rural','coastal:🌊 Coastal','artsy:🎨 Artsy','upscale:💎 Upscale','walkable:🚶 Walkable','green:🌿 Green'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Features & Amenities</h3>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">Features</label>
+      <div id="ep-feature-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+        ${['garden:🌳 Garden','pool:🏊 Pool','home-office:💻 Home office','balcony:🌇 Balcony','terrace:☀️ Terrace','sea-view:🌊 Sea view','period-features:🏛️ Period features','modern-kitchen:🍳 Modern kitchen','fireplace:🔥 Fireplace','smart-home:📱 Smart home','garage:🚗 Garage','ev-charging:⚡ EV charging','solar-panels:☀️ Solar','storage:📦 Storage'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
+      </div>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">Parking</label>
+      <div id="ep-parking-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+        ${['driveway:Driveway','garage:Garage','on street parking:On-street','street parking / resident permit:Resident permit','public parking nearby:Public nearby','none:No parking'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Groceries (km)</label><input id="ep-groceries" type="number" step="0.1" value="${p.amenity_groceries_km || ''}"/></div>
+        <div class="form-group"><label>Gym (km)</label><input id="ep-gym" type="number" step="0.1" value="${p.amenity_gyms_km || ''}"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Park (km)</label><input id="ep-park" type="number" step="0.1" value="${p.amenity_parks_km || ''}"/></div>
+        <div class="form-group"><label>Hospital (km)</label><input id="ep-hospital" type="number" step="0.1" value="${p.amenity_hospitals_km || ''}"/></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Listing Source</h3>
+      <div class="form-group"><label>Original Listing URL</label><input id="ep-source" value="${p.source_url || ''}"/></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-primary" onclick="saveEditProperty('${p.id}')">💾 Save Changes</button>
+      <button class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+    </div>
+  `;
+}
+
+// Edit image helpers
+function addEpImgRow() {
+  const list = document.getElementById('ep-image-list');
+  const n = list.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'ep-img-row';
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+  row.innerHTML = `<div class="ep-img-preview" style="width:48px;height:48px;border-radius:8px;background:var(--gray-l);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><span style="color:#ccc">${n}</span></div><input class="ep-img-input" placeholder="Paste image URL..." style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" oninput="previewEpImg(this)"/><button class="btn btn-ghost btn-sm" onclick="removeEpImg(this)">✕</button>`;
+  list.appendChild(row);
+}
+function removeEpImg(btn) {
+  const list = document.getElementById('ep-image-list');
+  if (list.children.length > 1) btn.closest('.ep-img-row').remove();
+  else { btn.closest('.ep-img-row').querySelector('input').value = ''; const p = btn.closest('.ep-img-row').querySelector('.ep-img-preview'); p.innerHTML = '<span style="color:#ccc">1</span>'; }
+}
+function previewEpImg(input) {
+  const preview = input.closest('.ep-img-row')?.querySelector('.ep-img-preview');
+  if (!preview) return;
+  const url = input.value.trim();
+  if (url) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span style=\\'color:var(--red)\\'>✕</span>'"/>`;
+  else preview.innerHTML = '<span style="color:#ccc">?</span>';
+}
+function updateEpWalk(val) {
+  val = parseInt(val);
+  const bar = document.getElementById('ep-walk-bar');
+  const lbl = document.getElementById('ep-walk-label');
+  if (!bar) return;
+  bar.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const d = document.createElement('div');
+    d.style.cssText = `flex:1;height:6px;border-radius:3px;background:${i < val ? (val <= 3 ? '#e74c3c' : val <= 6 ? '#F5921B' : '#2E8B57') : 'var(--border)'}`;
+    bar.appendChild(d);
+  }
+  const labels = { 0:'Car essential', 1:'Very car-dependent', 2:'Car-dependent', 3:'A few local shops', 4:'Some basics nearby', 5:'Some shops nearby', 6:'Reasonably walkable', 7:'Very walkable', 8:'Most things on foot', 9:'Highly walkable', 10:'Everything walkable' };
+  if (lbl) lbl.textContent = `${val}/10 — ${labels[val]}`;
+}
+
+async function saveEditProperty(id) {
+  const val = fid => document.getElementById(fid)?.value?.trim();
+  const num = fid => val(fid) ? parseFloat(val(fid)) : null;
+
+  const update = {
+    title: val('ep-title'),
+    tagline: val('ep-tagline'),
+    price: num('ep-price'),
+    currency: val('ep-currency'),
+    beds: num('ep-beds'),
+    baths: num('ep-baths'),
+    sqm: num('ep-sqm'),
+    property_type: val('ep-type'),
+    style: val('ep-style'),
+    condition: val('ep-condition'),
+    listing_status: val('ep-status'),
+    address_line1: val('ep-address'),
+    city: val('ep-city'),
+    region: val('ep-region'),
+    county: val('ep-county'),
+    postcode: val('ep-postcode'),
+    country: val('ep-country'),
+    latitude: num('ep-lat'),
+    longitude: num('ep-lng'),
+    description: val('ep-desc'),
+    walkability: parseInt(document.getElementById('ep-walkability')?.value) || null,
+    schools_quality: val('ep-schools'),
+    epc_rating: val('ep-epc'),
+    commute_city_center: num('ep-commute'),
+    pet_friendly: val('ep-pets') === 'true',
+    nearby_dog_park: val('ep-dogpark') === 'true',
+    neighborhood_vibe: [...document.querySelectorAll('#ep-vibe-chips .ap-chip.active')].map(c => c.dataset.value),
+    features: [...document.querySelectorAll('#ep-feature-chips .ap-chip.active')].map(c => c.dataset.value),
+    parking: [...document.querySelectorAll('#ep-parking-chips .ap-chip.active')].map(c => c.dataset.value),
+    amenity_groceries_km: num('ep-groceries'),
+    amenity_gyms_km: num('ep-gym'),
+    amenity_parks_km: num('ep-park'),
+    amenity_hospitals_km: num('ep-hospital'),
+    source_url: val('ep-source'),
+    image_urls: [...document.querySelectorAll('.ep-img-input')].map(i => i.value.trim()).filter(Boolean),
+  };
+
+  if (!update.title || !update.price || !update.city) {
+    showToast('Title, Price, and City are required', 'error');
+    return;
+  }
+
+  try {
+    await apiFetch(`/api/agents/properties/${id}`, 'PUT', update);
+    showToast('Property updated!', 'success');
+    state.editingProperty = null;
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 }
 
 // ============================================================
@@ -620,16 +896,14 @@ function renderClaims() {
 // ============================================================
 function renderAddProperty() {
   return `
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="btn btn-sm ${apTemplate==='cork'?'btn-primary':'btn-outline'}" onclick="fillApTemplate('cork')">🇮🇪 Cork defaults</button>
-      <button class="btn btn-sm ${apTemplate==='portugal'?'btn-primary':'btn-outline'}" onclick="fillApTemplate('portugal')">🇵🇹 Portugal defaults</button>
-      <button class="btn btn-sm btn-ghost" onclick="clearApForm()">✕ Clear</button>
-    </div>
-
     <div class="card">
-      <h3>1. Basic Details</h3>
-      <div class="form-group" style="grid-column:1/-1"><label>Title *</label><input id="ap-title" placeholder="e.g. 3-Bed Terrace in Ballintemple, Cork"/><div style="font-size:11px;color:var(--gray);margin-top:3px">Format: [Type] in [Area], [City]</div></div>
-      <div class="form-group"><label>Tagline</label><input id="ap-tagline" placeholder="e.g. Charming period home with garden"/></div>
+      <h3>Add a New Property</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:18px">This property will be automatically assigned to your account.</p>
+      
+      <div class="form-row">
+        <div class="form-group"><label>Title *</label><input id="ap-title" placeholder="e.g. 3-Bed Terrace in Douglas, Cork"/></div>
+        <div class="form-group"><label>Tagline</label><input id="ap-tagline" placeholder="Brief description..."/></div>
+      </div>
       <div class="form-row">
         <div class="form-group"><label>Price *</label><input id="ap-price" type="number" placeholder="350000"/></div>
         <div class="form-group"><label>Currency</label><select id="ap-currency"><option value="EUR">€ EUR</option><option value="GBP">£ GBP</option></select></div>
@@ -640,186 +914,26 @@ function renderAddProperty() {
       </div>
       <div class="form-row">
         <div class="form-group"><label>Size (m²)</label><input id="ap-sqm" type="number" placeholder="120"/></div>
-        <div class="form-group"><label>Type</label><select id="ap-type"><option value="terraced">Terraced</option><option value="semi-detached">Semi-Detached</option><option value="detached">Detached</option><option value="flat">Flat/Apartment</option><option value="cottage">Cottage</option><option value="townhouse">Townhouse</option><option value="villa">Villa</option><option value="farmhouse">Farmhouse</option><option value="bungalow">Bungalow</option></select></div>
+        <div class="form-group"><label>Type</label><select id="ap-type"><option value="terraced">Terraced</option><option value="semi-detached">Semi-Detached</option><option value="detached">Detached</option><option value="flat">Flat/Apartment</option><option value="villa">Villa</option><option value="townhouse">Townhouse</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Style</label><select id="ap-style"><option value="traditional">Traditional</option><option value="modern">Modern</option><option value="victorian">Victorian</option><option value="georgian">Georgian</option><option value="cottage">Cottage</option><option value="mediterranean">Mediterranean</option><option value="artdeco">Art Deco</option></select></div>
-        <div class="form-group"><label>Condition</label><select id="ap-condition"><option value="move-in">Move-in Ready</option><option value="renovation-light">Light Renovation</option><option value="renovation-major">Major Renovation</option><option value="new-build">New Build</option></select></div>
-      </div>
-      <div class="form-group"><label>Listing Status</label><select id="ap-status"><option value="active">Active</option><option value="sale-agreed">Sale Agreed</option><option value="sold">Sold</option></select></div>
-    </div>
-
-    <div class="card">
-      <h3>2. Location</h3>
-      <div class="form-row">
-        <div class="form-group"><label>Address</label><input id="ap-address" placeholder="12 Victoria Road"/></div>
         <div class="form-group"><label>City *</label><input id="ap-city" placeholder="Cork"/></div>
+        <div class="form-group"><label>Region / Area</label><input id="ap-region" placeholder="Douglas"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Region / Area</label><input id="ap-region" placeholder="Ballintemple"/></div>
+        <div class="form-group"><label>Country</label><select id="ap-country"><option value="IE">Ireland</option><option value="PT">Portugal</option></select></div>
         <div class="form-group"><label>County</label><input id="ap-county" placeholder="Cork"/></div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label>Postcode / Eircode</label><input id="ap-postcode" placeholder="T12 AB34"/></div>
-        <div class="form-group"><label>Country</label><select id="ap-country"><option value="IE">Ireland 🇮🇪</option><option value="PT">Portugal 🇵🇹</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Latitude</label><input id="ap-lat" type="number" step="any" placeholder="51.8969"/></div>
-        <div class="form-group"><label>Longitude</label><input id="ap-lng" type="number" step="any" placeholder="-8.4863"/></div>
-      </div>
-      <div style="font-size:11px;color:var(--gray);margin-top:4px">📍 Right-click Google Maps → "What's here?" → copy coordinates</div>
-    </div>
-
-    <div class="card">
-      <h3>3. Description</h3>
-      <div class="form-group"><textarea id="ap-desc" rows="5" placeholder="Write or paste the property description. If Portuguese, translate to English — the AI uses this for scoring."></textarea></div>
-    </div>
-
-    <div class="card">
-      <h3>4. Images</h3>
-      <div style="font-size:12px;color:var(--gray);margin-bottom:12px">Add image URLs one at a time. Right-click image on listing → "Open image in new tab" → copy URL. First image = hero thumbnail.</div>
-      <div id="ap-image-list">
-        <div class="ap-img-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-          <div class="ap-img-preview" style="width:48px;height:48px;border-radius:8px;background:var(--gray-l);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><span style="color:#ccc">1</span></div>
-          <input class="ap-img-input" placeholder="Paste image URL..." style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" oninput="previewApImg(this)"/>
-          <button class="btn btn-ghost btn-sm" onclick="removeApImg(this)">✕</button>
-        </div>
-      </div>
-      <button class="btn btn-outline btn-sm" onclick="addApImgRow()" style="margin-top:4px">+ Add another image</button>
-    </div>
-
-    <div class="card">
-      <h3>5. Livability & Neighbourhood</h3>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Walkability (0-10)</label>
-          <input id="ap-walkability" type="range" min="0" max="10" value="5" oninput="updateApWalk(this.value)" style="width:100%;padding:2px 0;border:none;box-shadow:none"/>
-          <div id="ap-walk-bar" style="display:flex;gap:2px;margin-top:4px"></div>
-          <div id="ap-walk-label" style="font-size:11px;color:var(--gray);margin-top:3px">5/10 — Some shops nearby</div>
-        </div>
-        <div class="form-group"><label>Schools Quality</label><select id="ap-schools"><option value="excellent">Excellent</option><option value="good">Good</option><option value="average">Average</option><option value="n/a">N/A</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>EPC / BER Rating</label><input id="ap-epc" placeholder="e.g. B3, C, D1"/></div>
-        <div class="form-group"><label>Commute to City Centre (mins)</label><input id="ap-commute" type="number" placeholder="15"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Pet Friendly</label><select id="ap-pets"><option value="true">Yes</option><option value="false">No</option><option value="unknown">Unknown</option></select></div>
-        <div class="form-group"><label>Dog Park Nearby</label><select id="ap-dogpark"><option value="true">Yes</option><option value="false">No</option><option value="unknown">Unknown</option></select></div>
-      </div>
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin:16px 0 6px">Neighbourhood Vibe (click all that apply)</label>
-      <div id="ap-vibe-chips" style="display:flex;flex-wrap:wrap;gap:6px">
-        ${['family-friendly:👨‍👩‍👧 Family','quiet:🤫 Quiet','vibrant:🎉 Vibrant','historic:🏛️ Historic','city-centre:🏙️ City centre','suburban:🏘️ Suburban','rural:🌾 Rural','coastal:🌊 Coastal','artsy:🎨 Artsy','upscale:💎 Upscale','walkable:🚶 Walkable','green:🌿 Green'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>6. Features & Amenities</h3>
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">Property Features (click all that apply)</label>
-      <div id="ap-feature-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-        ${['garden:🌳 Garden','pool:🏊 Pool','home-office:💻 Home office','balcony:🌇 Balcony','terrace:☀️ Terrace','sea-view:🌊 Sea view','period-features:🏛️ Period features','modern-kitchen:🍳 Modern kitchen','fireplace:🔥 Fireplace','smart-home:📱 Smart home','garage:🚗 Garage','ev-charging:⚡ EV charging','solar-panels:☀️ Solar','storage:📦 Storage'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
-      </div>
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">Parking (click all that apply)</label>
-      <div id="ap-parking-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-        ${['driveway:Driveway','garage:Garage','on street parking:On-street','street parking / resident permit:Resident permit','public parking nearby:Public nearby','none:No parking'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Nearest Groceries (km)</label><input id="ap-groceries" type="number" step="0.1" placeholder="0.3"/></div>
-        <div class="form-group"><label>Nearest Gym (km)</label><input id="ap-gym" type="number" step="0.1" placeholder="0.5"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Nearest Park (km)</label><input id="ap-park" type="number" step="0.1" placeholder="0.2"/></div>
-        <div class="form-group"><label>Nearest Hospital (km)</label><input id="ap-hospital" type="number" step="0.1" placeholder="2.0"/></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>7. Listing Source</h3>
+      <div class="form-group"><label>Description</label><textarea id="ap-desc" rows="4" placeholder="Full property description..."></textarea></div>
+      <div class="form-group"><label>Image URLs (one per line)</label><textarea id="ap-images" rows="3" placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"></textarea></div>
       <div class="form-group"><label>Original Listing URL</label><input id="ap-source" placeholder="https://daft.ie/..."/></div>
-    </div>
-
-    <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn btn-primary" onclick="submitAgentProperty(false)">✓ Add Property</button>
-      <button class="btn btn-orange" onclick="submitAgentProperty(true)">✓ Add & Start New</button>
+      
+      <button class="btn btn-primary" onclick="submitAgentProperty()" style="margin-top:8px">Add Property</button>
     </div>
   `;
 }
 
-// Chip style injection
-const apChipStyle = document.createElement('style');
-apChipStyle.textContent = '.ap-chip.active{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important}';
-document.head.appendChild(apChipStyle);
-
-let apTemplate = '';
-
-function fillApTemplate(type) {
-  clearApForm();
-  apTemplate = type;
-  if (type === 'cork') {
-    document.getElementById('ap-currency').value = 'EUR';
-    document.getElementById('ap-country').value = 'IE';
-    document.getElementById('ap-county').value = 'Cork';
-  } else if (type === 'portugal') {
-    document.getElementById('ap-currency').value = 'EUR';
-    document.getElementById('ap-country').value = 'PT';
-    document.getElementById('ap-style').value = 'mediterranean';
-  }
-  showToast('Template applied!', 'success');
-}
-
-function clearApForm() {
-  apTemplate = '';
-  document.querySelectorAll('[id^="ap-"]').forEach(el => { if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = ''; });
-  document.querySelectorAll('.ap-chip.active').forEach(c => c.classList.remove('active'));
-  const wk = document.getElementById('ap-walkability');
-  if (wk) { wk.value = 5; updateApWalk(5); }
-  const imgList = document.getElementById('ap-image-list');
-  if (imgList) imgList.innerHTML = `<div class="ap-img-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><div class="ap-img-preview" style="width:48px;height:48px;border-radius:8px;background:var(--gray-l);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><span style="color:#ccc">1</span></div><input class="ap-img-input" placeholder="Paste image URL..." style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" oninput="previewApImg(this)"/><button class="btn btn-ghost btn-sm" onclick="removeApImg(this)">✕</button></div>`;
-}
-
-function updateApWalk(val) {
-  val = parseInt(val);
-  const bar = document.getElementById('ap-walk-bar');
-  const lbl = document.getElementById('ap-walk-label');
-  if (!bar) return;
-  bar.innerHTML = '';
-  for (let i = 0; i < 10; i++) {
-    const d = document.createElement('div');
-    d.style.cssText = `flex:1;height:6px;border-radius:3px;background:${i < val ? (val <= 3 ? '#e74c3c' : val <= 6 ? '#F5921B' : '#2E8B57') : 'var(--border)'}`;
-    bar.appendChild(d);
-  }
-  const labels = { 0:'Car essential', 1:'Very car-dependent', 2:'Car-dependent', 3:'A few local shops', 4:'Some basics nearby', 5:'Some shops nearby', 6:'Reasonably walkable', 7:'Very walkable', 8:'Most things on foot', 9:'Highly walkable', 10:'Everything walkable' };
-  if (lbl) lbl.textContent = `${val}/10 — ${labels[val]}`;
-}
-
-function addApImgRow() {
-  const list = document.getElementById('ap-image-list');
-  const n = list.children.length + 1;
-  const row = document.createElement('div');
-  row.className = 'ap-img-row';
-  row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
-  row.innerHTML = `<div class="ap-img-preview" style="width:48px;height:48px;border-radius:8px;background:var(--gray-l);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><span style="color:#ccc">${n}</span></div><input class="ap-img-input" placeholder="Paste image URL..." style="flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" oninput="previewApImg(this)"/><button class="btn btn-ghost btn-sm" onclick="removeApImg(this)">✕</button>`;
-  list.appendChild(row);
-}
-
-function removeApImg(btn) {
-  const list = document.getElementById('ap-image-list');
-  if (list.children.length > 1) btn.closest('.ap-img-row').remove();
-  else { btn.closest('.ap-img-row').querySelector('input').value = ''; const p = btn.closest('.ap-img-row').querySelector('.ap-img-preview'); p.innerHTML = '<span style="color:#ccc">1</span>'; }
-}
-
-function previewApImg(input) {
-  const preview = input.closest('.ap-img-row').querySelector('.ap-img-preview');
-  const url = input.value.trim();
-  if (url) preview.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML='<span style=\\'color:var(--red)\\'>✕</span>'"/>`;
-  else { const idx = [...input.closest('#ap-image-list').children].indexOf(input.closest('.ap-img-row')) + 1; preview.innerHTML = `<span style="color:#ccc">${idx}</span>`; }
-}
-
-function getApChips(containerId) {
-  return [...document.querySelectorAll(`#${containerId} .ap-chip.active`)].map(c => c.dataset.value);
-}
-
-async function submitAgentProperty(andNew = false) {
+async function submitAgentProperty() {
   const val = id => document.getElementById(id)?.value?.trim();
   const num = id => val(id) ? parseFloat(val(id)) : null;
 
@@ -832,33 +946,13 @@ async function submitAgentProperty(andNew = false) {
     baths: num('ap-baths'),
     sqm: num('ap-sqm'),
     property_type: val('ap-type'),
-    style: val('ap-style'),
-    condition: val('ap-condition'),
-    listing_status: val('ap-status'),
-    address_line1: val('ap-address'),
     city: val('ap-city'),
     region: val('ap-region'),
     county: val('ap-county'),
-    postcode: val('ap-postcode'),
     country: val('ap-country'),
-    latitude: num('ap-lat'),
-    longitude: num('ap-lng'),
     description: val('ap-desc'),
-    walkability: parseInt(document.getElementById('ap-walkability')?.value) || null,
-    schools_quality: val('ap-schools'),
-    epc_rating: val('ap-epc'),
-    commute_city_center: num('ap-commute'),
-    pet_friendly: val('ap-pets') === 'true',
-    nearby_dog_park: val('ap-dogpark') === 'true',
-    neighborhood_vibe: getApChips('ap-vibe-chips'),
-    features: getApChips('ap-feature-chips'),
-    parking: getApChips('ap-parking-chips'),
-    amenity_groceries_km: num('ap-groceries'),
-    amenity_gyms_km: num('ap-gym'),
-    amenity_parks_km: num('ap-park'),
-    amenity_hospitals_km: num('ap-hospital'),
     source_url: val('ap-source'),
-    image_urls: [...document.querySelectorAll('.ap-img-input')].map(i => i.value.trim()).filter(Boolean),
+    image_urls: val('ap-images') ? val('ap-images').split('\n').map(s => s.trim()).filter(Boolean) : [],
   };
 
   if (!property.title || !property.price || !property.city) {
@@ -870,8 +964,7 @@ async function submitAgentProperty(andNew = false) {
     await apiFetch('/api/agents/properties', 'POST', property);
     showToast('Property added!', 'success');
     loadDashboard();
-    if (andNew) { setTimeout(() => { switchTab('add-property'); setTimeout(clearApForm, 100); }, 200); }
-    else switchTab('listings');
+    switchTab('listings');
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -970,6 +1063,7 @@ loadSession();
 const origSwitch = switchTab;
 switchTab = function(tab) {
   state.tab = tab;
+  state.editingProperty = null;
   if (tab === 'claims') loadUnclaimed();
   render();
   if (tab === 'notifications') setTimeout(loadNotifications, 100);
