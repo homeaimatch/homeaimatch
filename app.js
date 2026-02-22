@@ -349,7 +349,10 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
       {/* Nav */}
       <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 24px",maxWidth:1000,margin:"0 auto"}}>
         <LogoFull/>
-        <span onClick={onPricing} style={{fontSize:13.5,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Pricing</span>
+        <div style={{display:"flex",gap:20,alignItems:"center"}}>
+          <span onClick={onPricing} style={{fontSize:13.5,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Pricing</span>
+          <a href="agent-dashboard.html" style={{fontSize:13.5,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>For Agents</a>
+        </div>
         <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"10px 24px",borderRadius:28,fontSize:13.5,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>Find My Home →</button>
       </nav>
 
