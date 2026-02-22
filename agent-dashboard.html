@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>homeAImatch — Agent Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f0f2f5; color: #1A2B3C; min-height: 100vh; }
+    
+    :root {
+      --blue: #1E96D1; --blue-d: #1578A8; --blue-l: #E8F4FB;
+      --orange: #F5921B; --orange-d: #D97E15;
+      --green: #2E8B57; --green-l: #e8f5e9;
+      --red: #e74c3c; --red-l: #fbe9e7;
+      --dark: #1A2B3C; --gray: #6B7D8E; --gray-l: #f4f6f8;
+      --border: #E4E9EE; --white: #ffffff;
+    }
+    
+    /* LAYOUT */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--dark); color: #fff; padding: 0; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 50; display: flex; flex-direction: column; }
+    .main { flex: 1; margin-left: 240px; min-height: 100vh; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 40; }
+    .content { padding: 24px 28px; max-width: 1200px; }
+    
+    /* SIDEBAR */
+    .sidebar-logo { padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-logo img { height: 36px; }
+    .sidebar-logo span { font-size: 18px; font-weight: 800; color: #fff; }
+    .sidebar-nav { flex: 1; padding: 12px 10px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; color: rgba(255,255,255,0.55); font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-bottom: 2px; position: relative; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: rgba(30,150,209,0.2); color: #fff; font-weight: 600; }
+    .nav-item .icon { font-size: 17px; width: 24px; text-align: center; }
+    .nav-badge { position: absolute; right: 10px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+    .sidebar-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-footer .agent-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .sidebar-footer .agent-agency { font-size: 11px; color: rgba(255,255,255,0.45); }
+    
+    /* CARDS */
+    .card { background: var(--white); border-radius: 14px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 16px; }
+    .card h3 { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 14px; }
+    
+    /* STAT CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--white); border-radius: 14px; padding: 20px; border: 1px solid var(--border); }
+    .stat-card .label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .stat-card .value { font-size: 32px; font-weight: 800; color: var(--dark); }
+    .stat-card .sub { font-size: 12px; color: var(--gray); margin-top: 4px; }
+    .stat-card.highlight { background: linear-gradient(135deg, var(--blue), var(--blue-d)); }
+    .stat-card.highlight .label, .stat-card.highlight .sub { color: rgba(255,255,255,0.7); }
+    .stat-card.highlight .value { color: #fff; }
+    
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; font-size: 10.5px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px; border-bottom: 1.5px solid var(--border); }
+    td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: var(--gray-l); }
+    
+    /* BADGES */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge-new { background: var(--blue-l); color: var(--blue); }
+    .badge-contacted { background: #fff8e1; color: #f59e0b; }
+    .badge-viewing { background: #e8f5e9; color: var(--green); }
+    .badge-closed { background: var(--gray-l); color: var(--gray); }
+    .badge-pending { background: #fff8e1; color: #f59e0b; }
+    .badge-approved { background: var(--green-l); color: var(--green); }
+    .badge-active { background: var(--green-l); color: var(--green); }
+    .badge-sale-agreed { background: #fff8e1; color: #f59e0b; }
+    
+    /* BUTTONS */
+    .btn { padding: 9px 20px; border: none; border-radius: 10px; font-family: 'Outfit'; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, var(--blue), var(--blue-d)); color: #fff; }
+    .btn-primary:hover { box-shadow: 0 4px 14px rgba(30,150,209,0.25); }
+    .btn-orange { background: linear-gradient(135deg, var(--orange), var(--orange-d)); color: #fff; }
+    .btn-outline { background: var(--white); color: var(--blue); border: 1.5px solid var(--blue); }
+    .btn-sm { padding: 5px 12px; font-size: 11.5px; border-radius: 8px; }
+    .btn-ghost { background: none; color: var(--gray); padding: 5px 10px; }
+    .btn-ghost:hover { color: var(--dark); background: var(--gray-l); }
+    
+    /* FORMS */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray); margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'Outfit'; font-size: 14px; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,150,209,0.1);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    
+    /* PROPERTY MINI CARD */
+    .prop-mini { display: flex; gap: 10px; align-items: center; padding: 10px; border-radius: 10px; background: var(--gray-l); margin-bottom: 8px; }
+    .prop-mini img { width: 60px; height: 45px; border-radius: 8px; object-fit: cover; }
+    .prop-mini .info { flex: 1; min-width: 0; }
+    .prop-mini .info .title { font-size: 12.5px; font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .prop-mini .info .meta { font-size: 11px; color: var(--gray); }
+    
+    /* NOTIFICATION */
+    .notif { padding: 12px 14px; border-radius: 10px; border-left: 3px solid var(--blue); background: var(--white); margin-bottom: 8px; cursor: pointer; transition: background 0.15s; }
+    .notif:hover { background: var(--gray-l); }
+    .notif.unread { background: var(--blue-l); border-left-color: var(--orange); }
+    .notif .title { font-size: 13px; font-weight: 600; color: var(--dark); }
+    .notif .msg { font-size: 12px; color: var(--gray); margin-top: 3px; line-height: 1.4; }
+    .notif .time { font-size: 10.5px; color: #b0bec5; margin-top: 4px; }
+    
+    /* AUTH SCREENS */
+    .auth-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1A2B3C 0%, #0f1a24 100%); padding: 20px; }
+    .auth-card { background: var(--white); border-radius: 20px; padding: 40px; max-width: 420px; width: 100%; box-shadow: 0 16px 48px rgba(0,0,0,0.2); }
+    .auth-card h1 { font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+    .auth-card .subtitle { font-size: 13.5px; color: var(--gray); margin-bottom: 28px; line-height: 1.5; }
+    .auth-card .divider { text-align: center; color: var(--gray); font-size: 12px; margin: 16px 0; position: relative; }
+    .auth-card .divider::before, .auth-card .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border); }
+    .auth-card .divider::before { left: 0; }
+    .auth-card .divider::after { right: 0; }
+    
+    /* TOAST */
+    .toast { position: fixed; top: 70px; right: 20px; padding: 14px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; z-index: 200; transform: translateX(400px); transition: transform 0.3s ease; max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .toast.show { transform: translateX(0); }
+    .toast.success { background: var(--green-l); color: var(--green); border: 1px solid #c8e6c9; }
+    .toast.error { background: var(--red-l); color: var(--red); border: 1px solid #ffcdd2; }
+    
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 40px 20px; color: var(--gray); }
+    .empty .icon { font-size: 40px; margin-bottom: 12px; }
+    .empty .title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .empty .desc { font-size: 13px; line-height: 1.5; max-width: 300px; margin: 0 auto; }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; }
+      .sidebar .nav-label, .sidebar-footer .agent-name, .sidebar-footer .agent-agency, .sidebar-logo span { display: none; }
+      .main { margin-left: 60px; }
+      .content { padding: 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    
+    /* ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const API_URL = 'https://homeaimatch-backend-production.up.railway.app';
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  screen: 'login', // login, register, dashboard
+  tab: 'overview', // overview, leads, listings, claims, add-property, notifications, profile
+  agent: null,
+  token: null,
+  dashboard: null,
+  unclaimed: [],
+  loading: false,
+};
+
+// ============================================================
+// AUTH
+// ============================================================
+function loadSession() {
+  const token = localStorage.getItem('agent_token');
+  const agent = localStorage.getItem('agent_data');
+  if (token && agent) {
+    state.token = token;
+    state.agent = JSON.parse(agent);
+    state.screen = 'dashboard';
+    loadDashboard();
+  }
+  render();
+}
+
+function saveSession(agent, token) {
+  localStorage.setItem('agent_token', token);
+  localStorage.setItem('agent_data', JSON.stringify(agent));
+  state.agent = agent;
+  state.token = token;
+  state.screen = 'dashboard';
+}
+
+function logout() {
+  apiFetch('/api/agents/logout', 'POST').catch(() => {});
+  localStorage.removeItem('agent_token');
+  localStorage.removeItem('agent_data');
+  state = { screen: 'login', tab: 'overview', agent: null, token: null, dashboard: null, unclaimed: [], loading: false };
+  render();
+}
+
+async function apiFetch(path, method = 'GET', body = null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (state.token) opts.headers.Authorization = `Bearer ${state.token}`;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API_URL + path, opts);
+  const data = await res.json();
+  if (res.status === 401) { logout(); throw new Error('Session expired'); }
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  try {
+    const data = await apiFetch('/api/agents/login', 'POST', { email, password });
+    saveSession(data.agent, data.token);
+    loadDashboard();
+    render();
+    showToast('Welcome back, ' + data.agent.name + '!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('reg-name').value;
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  const phone = document.getElementById('reg-phone').value;
+  const agency_name = document.getElementById('reg-agency').value;
+  try {
+    const data = await apiFetch('/api/agents/register', 'POST', { name, email, password, phone, agency_name });
+    saveSession(data.agent, data.token);
+    loadDashboard();
+    render();
+    showToast('Account created! Welcome to homeAImatch.', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadDashboard() {
+  try {
+    state.loading = true;
+    render();
+    state.dashboard = await apiFetch('/api/agents/dashboard');
+    state.loading = false;
+    render();
+  } catch (err) {
+    state.loading = false;
+    console.error('Dashboard load error:', err);
+    render();
+  }
+}
+
+async function loadUnclaimed(search = '') {
+  try {
+    const q = search ? `?search=${encodeURIComponent(search)}` : '';
+    const data = await apiFetch('/api/agents/unclaimed' + q);
+    state.unclaimed = data.properties || [];
+    render();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function claimListing(propertyId) {
+  try {
+    await apiFetch('/api/agents/claims', 'POST', { property_id: propertyId });
+    showToast('Listing claimed!', 'success');
+    loadDashboard();
+    loadUnclaimed();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function updateLeadStatus(leadId, status) {
+  try {
+    await apiFetch(`/api/agents/leads/${leadId}`, 'PUT', { status });
+    showToast('Lead updated', 'success');
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ============================================================
+// TIME FORMATTING
+// ============================================================
+function timeAgo(date) {
+  const s = Math.floor((Date.now() - new Date(date)) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+  return new Date(date).toLocaleDateString();
+}
+
+function formatPrice(p, c) {
+  const sym = c === 'GBP' ? '£' : '€';
+  return p >= 1000000 ? `${sym}${(p/1000000).toFixed(1)}M` : `${sym}${(p/1000).toFixed(0)}K`;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const app = document.getElementById('app');
+  if (state.screen === 'login') { app.innerHTML = renderLogin(); return; }
+  if (state.screen === 'register') { app.innerHTML = renderRegister(); return; }
+  app.innerHTML = renderDashboard();
+}
+
+function switchTab(tab) {
+  state.tab = tab;
+  if (tab === 'claims') loadUnclaimed();
+  if (tab === 'notifications') loadDashboard();
+  render();
+}
+
+// ============================================================
+// AUTH SCREENS
+// ============================================================
+function renderLogin() {
+  return `<div class="auth-wrap">
+    <div class="auth-card fade-in">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:32px;margin-bottom:8px">🏠</div>
+        <h1>Agent Login</h1>
+        <p class="subtitle">Sign in to your homeAImatch agent dashboard</p>
+      </div>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="agent@agency.ie" required/></div>
+        <div class="form-group"><label>Password</label><input id="login-password" type="password" placeholder="••••••••" required/></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Sign In</button>
+      </form>
+      <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
+        Don't have an account? <a href="#" onclick="state.screen='register';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">Register here</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderRegister() {
+  return `<div class="auth-wrap">
+    <div class="auth-card fade-in">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:32px;margin-bottom:8px">🏠</div>
+        <h1>Create Agent Account</h1>
+        <p class="subtitle">Join homeAImatch and connect with AI-matched buyers looking for properties like yours.</p>
+      </div>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-row">
+          <div class="form-group"><label>Full Name *</label><input id="reg-name" placeholder="Sarah O'Brien" required/></div>
+          <div class="form-group"><label>Phone</label><input id="reg-phone" placeholder="+353 21 123 4567"/></div>
+        </div>
+        <div class="form-group"><label>Agency Name</label><input id="reg-agency" placeholder="e.g. Sherry FitzGerald"/></div>
+        <div class="form-group"><label>Email *</label><input id="reg-email" type="email" placeholder="sarah@sherryfitz.ie" required/></div>
+        <div class="form-group"><label>Password *</label><input id="reg-password" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
+        <button type="submit" class="btn btn-orange" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Create Account</button>
+      </form>
+      <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
+        Already have an account? <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">Sign in</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const d = state.dashboard;
+  const agent = d?.agent || state.agent || {};
+  const stats = d?.stats || {};
+  const unread = d?.unread_notifications || 0;
+
+  return `<div class="app">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <span>🏠 homeAImatch</span>
+      </div>
+      <div class="sidebar-nav">
+        ${navItem('overview', '📊', 'Overview')}
+        ${navItem('leads', '📩', 'Leads', stats.new_leads)}
+        ${navItem('listings', '🏘️', 'My Listings')}
+        ${navItem('claims', '🔗', 'Claim Listings')}
+        ${navItem('add-property', '➕', 'Add Property')}
+        ${navItem('notifications', '🔔', 'Notifications', unread)}
+        ${navItem('profile', '👤', 'Profile')}
+      </div>
+      <div class="sidebar-footer">
+        <div class="agent-name">${agent.name || ''}</div>
+        <div class="agent-agency">${agent.agencies?.name || agent.agency || ''}</div>
+        <button class="btn btn-ghost" style="margin-top:8px;color:rgba(255,255,255,0.4);font-size:12px;padding:4px 0" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <h2 style="font-size:18px;font-weight:700;flex:1">${tabTitle()}</h2>
+        ${state.tab === 'overview' ? `<button class="btn btn-primary btn-sm" onclick="loadDashboard()">↻ Refresh</button>` : ''}
+      </div>
+      <div class="content fade-in">
+        ${state.loading ? '<div style="text-align:center;padding:60px;color:var(--gray)"><div style="font-size:32px;margin-bottom:12px">⏳</div>Loading...</div>' : renderTab()}
+      </div>
+    </div>
+  </div>`;
+}
+
+function navItem(tab, icon, label, badge = 0) {
+  return `<div class="nav-item ${state.tab === tab ? 'active' : ''}" onclick="switchTab('${tab}')">
+    <span class="icon">${icon}</span>
+    <span class="nav-label">${label}</span>
+    ${badge > 0 ? `<span class="nav-badge">${badge}</span>` : ''}
+  </div>`;
+}
+
+function tabTitle() {
+  const titles = { overview: 'Dashboard', leads: 'Leads', listings: 'My Listings', claims: 'Claim Listings', 'add-property': 'Add Property', notifications: 'Notifications', profile: 'Profile' };
+  return titles[state.tab] || 'Dashboard';
+}
+
+function renderTab() {
+  switch (state.tab) {
+    case 'overview': return renderOverview();
+    case 'leads': return renderLeads();
+    case 'listings': return renderListings();
+    case 'claims': return renderClaims();
+    case 'add-property': return renderAddProperty();
+    case 'notifications': return renderNotifications();
+    case 'profile': return renderProfile();
+    default: return renderOverview();
+  }
+}
+
+// ============================================================
+// OVERVIEW TAB
+// ============================================================
+function renderOverview() {
+  const d = state.dashboard;
+  const stats = d?.stats || {};
+  const leads = (d?.leads || []).slice(0, 5);
+
+  return `
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="label">New Leads</div>
+        <div class="value">${stats.new_leads || 0}</div>
+        <div class="sub">Awaiting your response</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total Leads</div>
+        <div class="value">${stats.total_leads || 0}</div>
+        <div class="sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">My Listings</div>
+        <div class="value">${stats.total_listings || 0}</div>
+        <div class="sub">${stats.pending_claims || 0} pending claims</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Property Views</div>
+        <div class="value">${stats.total_views || 0}</div>
+        <div class="sub">Last 30 days</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <h3>Recent Leads</h3>
+        ${leads.length === 0 ? '<div class="empty"><div class="icon">📭</div><div class="title">No leads yet</div><div class="desc">Leads will appear here when buyers enquire about your properties.</div></div>' :
+          leads.map(l => `<div class="prop-mini" style="cursor:pointer" onclick="switchTab('leads')">
+            <div class="info">
+              <div class="title">${l.buyer_name || 'Anonymous'}</div>
+              <div class="meta">${l.properties?.title || 'Property'} · ${timeAgo(l.created_at)}</div>
+            </div>
+            <span class="badge badge-${l.status || 'new'}">${l.status || 'new'}</span>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-primary" onclick="switchTab('add-property')" style="justify-content:center">➕ Add New Listing</button>
+          <button class="btn btn-outline" onclick="switchTab('claims')" style="justify-content:center">🔗 Claim Existing Listings</button>
+          <button class="btn btn-outline" onclick="switchTab('leads')" style="justify-content:center">📩 View All Leads</button>
+        </div>
+        <div style="margin-top:18px;padding:14px;background:var(--blue-l);border-radius:10px;font-size:12px;line-height:1.5;color:var(--blue)">
+          <strong>💡 Tip:</strong> Properties with complete details (images, description, neighbourhood info) get matched to more buyers.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// LEADS TAB
+// ============================================================
+function renderLeads() {
+  const leads = state.dashboard?.leads || [];
+  if (leads.length === 0) return '<div class="empty" style="padding:60px"><div class="icon">📭</div><div class="title">No leads yet</div><div class="desc">When buyers enquire about your properties through homeAImatch, their details will appear here.</div></div>';
+
+  return `<div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>Buyer</th><th>Property</th><th>Message</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody>
+    ${leads.map(l => `<tr>
+      <td>
+        <div style="font-weight:600">${l.buyer_name || 'Anonymous'}</div>
+        <div style="font-size:11px;color:var(--gray)">${l.buyer_email || ''}</div>
+        ${l.buyer_phone ? `<div style="font-size:11px;color:var(--gray)">${l.buyer_phone}</div>` : ''}
+      </td>
+      <td style="max-width:200px"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.properties?.title || '—'}</div><div style="font-size:11px;color:var(--gray)">${l.properties?.city || ''} · ${formatPrice(l.properties?.price, 'EUR')}</div></td>
+      <td style="max-width:200px;font-size:12px;color:var(--gray);line-height:1.4">${(l.message || l.buyer_message || '—').substring(0, 100)}</td>
+      <td><span class="badge badge-${l.status || 'new'}">${l.status || 'new'}</span></td>
+      <td style="font-size:12px;color:var(--gray);white-space:nowrap">${timeAgo(l.created_at)}</td>
+      <td>
+        <select onchange="updateLeadStatus('${l.id}', this.value)" style="padding:5px 8px;border-radius:8px;border:1px solid var(--border);font-size:11px;font-family:'Outfit'">
+          <option value="new" ${l.status === 'new' ? 'selected' : ''}>New</option>
+          <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+          <option value="viewing_booked" ${l.status === 'viewing_booked' ? 'selected' : ''}>Viewing Booked</option>
+          <option value="closed" ${l.status === 'closed' ? 'selected' : ''}>Closed</option>
+        </select>
+      </td>
+    </tr>`).join('')}
+    </tbody>
+  </table></div></div>`;
+}
+
+// ============================================================
+// LISTINGS TAB
+// ============================================================
+function renderListings() {
+  const props = state.dashboard?.properties || [];
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <span style="font-size:13px;color:var(--gray)">${props.length} listing${props.length !== 1 ? 's' : ''}</span>
+      <button class="btn btn-primary btn-sm" onclick="switchTab('add-property')">➕ Add Property</button>
+    </div>
+    ${props.length === 0 ? '<div class="empty" style="padding:60px"><div class="icon">🏘️</div><div class="title">No listings yet</div><div class="desc">Add your first property or claim existing listings on the platform.</div></div>' :
+      `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+        ${props.map(p => `<div class="card" style="padding:0;overflow:hidden">
+          <div style="height:140px;background:var(--gray-l);overflow:hidden">
+            ${p.image_urls?.length ? `<img src="${p.image_urls[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"/>` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:36px">🏠</div>'}
+          </div>
+          <div style="padding:14px">
+            <div style="font-size:14px;font-weight:700;color:var(--dark);margin-bottom:4px">${p.title}</div>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${formatPrice(p.price, p.currency)} · ${p.beds} bed · ${p.sqm}m² · ${p.city}</div>
+            <span class="badge badge-${p.listing_status || 'active'}">${p.listing_status || 'active'}</span>
+          </div>
+        </div>`).join('')}
+      </div>`}
+  `;
+}
+
+// ============================================================
+// CLAIMS TAB
+// ============================================================
+function renderClaims() {
+  const claims = state.dashboard?.claims || [];
+  return `
+    <div class="card" style="margin-bottom:20px">
+      <h3>🔗 Claim Your Listings</h3>
+      <p style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:14px">If your properties are already listed on homeAImatch, you can claim them here. Claimed listings will show your contact details when buyers enquire.</p>
+      <div style="display:flex;gap:10px">
+        <input id="claim-search" placeholder="Search by title, area, address..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" onkeyup="if(event.key==='Enter')loadUnclaimed(this.value)"/>
+        <button class="btn btn-primary" onclick="loadUnclaimed(document.getElementById('claim-search').value)">Search</button>
+      </div>
+    </div>
+
+    ${state.unclaimed.length > 0 ? `<div class="card"><h3>Unclaimed Properties</h3>
+      ${state.unclaimed.map(p => `<div class="prop-mini">
+        ${p.image_urls?.length ? `<img src="${p.image_urls[0]}" onerror="this.style.display='none'"/>` : '<div style="width:60px;height:45px;background:var(--gray-l);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">🏠</div>'}
+        <div class="info">
+          <div class="title">${p.title}</div>
+          <div class="meta">${formatPrice(p.price, p.currency)} · ${p.beds} bed · ${p.city}${p.region ? ' / ' + p.region : ''}</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="claimListing('${p.id}')">Claim</button>
+      </div>`).join('')}
+    </div>` : ''}
+
+    ${claims.length > 0 ? `<div class="card" style="margin-top:16px"><h3>My Claims</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Property</th><th>Status</th><th>Claimed</th></tr></thead>
+        <tbody>
+        ${claims.map(c => `<tr>
+          <td style="font-weight:500">${c.properties?.title || 'Unknown'}</td>
+          <td><span class="badge badge-${c.status}">${c.status}</span></td>
+          <td style="font-size:12px;color:var(--gray)">${timeAgo(c.claimed_at)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>` : ''}
+  `;
+}
+
+// ============================================================
+// ADD PROPERTY TAB (embeds the admin tool concept)
+// ============================================================
+function renderAddProperty() {
+  return `
+    <div class="card">
+      <h3>Add a New Property</h3>
+      <p style="font-size:13px;color:var(--gray);margin-bottom:18px">This property will be automatically assigned to your account.</p>
+      
+      <div class="form-row">
+        <div class="form-group"><label>Title *</label><input id="ap-title" placeholder="e.g. 3-Bed Terrace in Douglas, Cork"/></div>
+        <div class="form-group"><label>Tagline</label><input id="ap-tagline" placeholder="Brief description..."/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Price *</label><input id="ap-price" type="number" placeholder="350000"/></div>
+        <div class="form-group"><label>Currency</label><select id="ap-currency"><option value="EUR">€ EUR</option><option value="GBP">£ GBP</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Beds</label><input id="ap-beds" type="number" placeholder="3"/></div>
+        <div class="form-group"><label>Baths</label><input id="ap-baths" type="number" placeholder="2"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Size (m²)</label><input id="ap-sqm" type="number" placeholder="120"/></div>
+        <div class="form-group"><label>Type</label><select id="ap-type"><option value="terraced">Terraced</option><option value="semi-detached">Semi-Detached</option><option value="detached">Detached</option><option value="flat">Flat/Apartment</option><option value="villa">Villa</option><option value="townhouse">Townhouse</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>City *</label><input id="ap-city" placeholder="Cork"/></div>
+        <div class="form-group"><label>Region / Area</label><input id="ap-region" placeholder="Douglas"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Country</label><select id="ap-country"><option value="IE">Ireland</option><option value="PT">Portugal</option></select></div>
+        <div class="form-group"><label>County</label><input id="ap-county" placeholder="Cork"/></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="ap-desc" rows="4" placeholder="Full property description..."></textarea></div>
+      <div class="form-group"><label>Image URLs (one per line)</label><textarea id="ap-images" rows="3" placeholder="https://example.com/photo1.jpg&#10;https://example.com/photo2.jpg"></textarea></div>
+      <div class="form-group"><label>Original Listing URL</label><input id="ap-source" placeholder="https://daft.ie/..."/></div>
+      
+      <button class="btn btn-primary" onclick="submitAgentProperty()" style="margin-top:8px">Add Property</button>
+    </div>
+  `;
+}
+
+async function submitAgentProperty() {
+  const val = id => document.getElementById(id)?.value?.trim();
+  const num = id => val(id) ? parseFloat(val(id)) : null;
+
+  const property = {
+    title: val('ap-title'),
+    tagline: val('ap-tagline'),
+    price: num('ap-price'),
+    currency: val('ap-currency'),
+    beds: num('ap-beds'),
+    baths: num('ap-baths'),
+    sqm: num('ap-sqm'),
+    property_type: val('ap-type'),
+    city: val('ap-city'),
+    region: val('ap-region'),
+    county: val('ap-county'),
+    country: val('ap-country'),
+    description: val('ap-desc'),
+    source_url: val('ap-source'),
+    image_urls: val('ap-images') ? val('ap-images').split('\n').map(s => s.trim()).filter(Boolean) : [],
+  };
+
+  if (!property.title || !property.price || !property.city) {
+    showToast('Title, Price, and City are required', 'error');
+    return;
+  }
+
+  try {
+    await apiFetch('/api/agents/properties', 'POST', property);
+    showToast('Property added!', 'success');
+    loadDashboard();
+    switchTab('listings');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ============================================================
+// NOTIFICATIONS TAB
+// ============================================================
+function renderNotifications() {
+  const notifs = state.dashboard?.notifications || [];
+  // We'll load them separately
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <span style="font-size:13px;color:var(--gray)">${state.dashboard?.unread_notifications || 0} unread</span>
+      <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all as read</button>
+    </div>
+    <div id="notif-list"><div style="text-align:center;padding:40px;color:var(--gray)">Loading notifications...</div></div>
+  `;
+}
+
+async function loadNotifications() {
+  try {
+    const data = await apiFetch('/api/agents/notifications');
+    const list = document.getElementById('notif-list');
+    if (!list) return;
+    if (data.notifications.length === 0) {
+      list.innerHTML = '<div class="empty"><div class="icon">🔔</div><div class="title">All caught up!</div><div class="desc">No notifications yet.</div></div>';
+      return;
+    }
+    list.innerHTML = data.notifications.map(n => `
+      <div class="notif ${n.is_read ? '' : 'unread'}" onclick="markRead('${n.id}', this)">
+        <div class="title">${n.title}</div>
+        <div class="msg">${n.message || ''}</div>
+        <div class="time">${timeAgo(n.created_at)}</div>
+      </div>
+    `).join('');
+  } catch (err) {}
+}
+
+async function markRead(id, el) {
+  if (el) el.classList.remove('unread');
+  await apiFetch(`/api/agents/notifications/${id}/read`, 'PUT');
+}
+
+async function markAllRead() {
+  await apiFetch('/api/agents/notifications/read-all', 'PUT');
+  showToast('All marked as read', 'success');
+  loadDashboard();
+}
+
+// ============================================================
+// PROFILE TAB
+// ============================================================
+function renderProfile() {
+  const a = state.dashboard?.agent || state.agent || {};
+  return `
+    <div class="card" style="max-width:600px">
+      <h3>Your Profile</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Name</label><input id="prof-name" value="${a.name || ''}"/></div>
+        <div class="form-group"><label>Phone</label><input id="prof-phone" value="${a.phone || ''}"/></div>
+      </div>
+      <div class="form-group"><label>Email</label><input value="${a.email || ''}" disabled style="background:var(--gray-l)"/></div>
+      <div class="form-group"><label>Agency</label><input value="${a.agencies?.name || ''}" disabled style="background:var(--gray-l)"/></div>
+      <div class="form-group"><label>Bio</label><textarea id="prof-bio" rows="3" placeholder="Tell buyers about yourself...">${a.bio || ''}</textarea></div>
+      <div class="form-group"><label>Areas Served (comma-separated)</label><input id="prof-areas" value="${(a.areas_served || []).join(', ')}"/></div>
+      <div class="form-group"><label>License Number</label><input id="prof-license" value="${a.license_number || ''}" placeholder="PSR License No."/></div>
+      <button class="btn btn-primary" onclick="saveProfile()" style="margin-top:8px">Save Changes</button>
+    </div>
+  `;
+}
+
+async function saveProfile() {
+  const val = id => document.getElementById(id)?.value?.trim();
+  try {
+    await apiFetch('/api/agents/profile', 'PUT', {
+      name: val('prof-name'),
+      phone: val('prof-phone'),
+      bio: val('prof-bio'),
+      areas_served: val('prof-areas') ? val('prof-areas').split(',').map(s => s.trim()).filter(Boolean) : [],
+      license_number: val('prof-license'),
+    });
+    showToast('Profile updated', 'success');
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadSession();
+
+// Auto-load notifications when switching to that tab
+const origSwitch = switchTab;
+switchTab = function(tab) {
+  state.tab = tab;
+  if (tab === 'claims') loadUnclaimed();
+  render();
+  if (tab === 'notifications') setTimeout(loadNotifications, 100);
+};
+</script>
+</body>
+</html>
