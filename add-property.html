@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>homeAImatch Admin — Add Property</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f0f2f5; color: #1A2B3C; }
+    
+    .top-bar { background: #1A2B3C; color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .top-bar h1 { font-size: 18px; font-weight: 700; }
+    .top-bar .badge { background: #F5921B; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+    
+    .card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #e8ecf0; }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; cursor: pointer; }
+    .card-header h2 { font-size: 15px; color: #1E96D1; font-weight: 700; flex: 1; }
+    .card-header .num { width: 26px; height: 26px; background: #1E96D1; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+    .card-header .collapse-icon { color: #a8b5c4; font-size: 18px; transition: transform 0.2s; }
+    .card.collapsed .card-body { display: none; }
+    .card.collapsed .collapse-icon { transform: rotate(-90deg); }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .full-width { grid-column: 1 / -1; }
+    
+    label { display: block; font-size: 12px; font-weight: 600; color: #6B7D8E; margin-bottom: 4px; }
+    label .req { color: #e74c3c; }
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #E4E9EE; border-radius: 10px; font-family: 'Outfit'; font-size: 14px; transition: border-color 0.2s, box-shadow 0.2s; background: #fff; }
+    textarea { min-height: 100px; resize: vertical; line-height: 1.5; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #1E96D1; box-shadow: 0 0 0 3px rgba(30,150,209,0.1); }
+    input::placeholder { color: #b8c5d0; }
+    .help { font-size: 11px; color: #a8b5c4; margin-top: 3px; line-height: 1.4; }
+    .help a { color: #1E96D1; }
+    
+    /* Chip selector for neighbourhood vibe */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1.5px solid #E4E9EE; background: #fff; cursor: pointer; transition: all 0.15s; user-select: none; }
+    .chip:hover { border-color: #1E96D1; background: #f0f8ff; }
+    .chip.active { background: #1E96D1; color: #fff; border-color: #1E96D1; }
+    
+    /* Image URL list */
+    .image-list { display: flex; flex-direction: column; gap: 8px; }
+    .image-row { display: flex; gap: 8px; align-items: center; }
+    .image-row input { flex: 1; }
+    .image-row .preview { width: 48px; height: 48px; border-radius: 8px; overflow: hidden; background: #f4f6f8; border: 1px solid #E4E9EE; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .image-row .preview img { width: 100%; height: 100%; object-fit: cover; }
+    .image-row .preview .placeholder { font-size: 18px; color: #ccc; }
+    .image-row .remove-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #fbe9e7; color: #e74c3c; cursor: pointer; font-size: 14px; font-weight: 700; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .image-row .remove-btn:hover { background: #e74c3c; color: #fff; }
+    .add-image-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1.5px dashed #1E96D1; background: #f0f8ff; color: #1E96D1; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .add-image-btn:hover { background: #e0f0fa; }
+    
+    /* Walkability scale */
+    .walk-scale { display: flex; gap: 2px; margin-top: 6px; }
+    .walk-dot { width: 100%; height: 6px; border-radius: 3px; background: #E4E9EE; transition: background 0.15s; }
+    .walk-dot.filled { background: #1E96D1; }
+    .walk-dot.filled.low { background: #e74c3c; }
+    .walk-dot.filled.med { background: #F5921B; }
+    .walk-dot.filled.high { background: #2E8B57; }
+    .walk-label { font-size: 11px; color: #6B7D8E; margin-top: 4px; }
+    
+    /* Bottom actions bar */
+    .actions { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e8ecf0; padding: 14px 24px; display: flex; gap: 12px; justify-content: center; z-index: 100; box-shadow: 0 -2px 12px rgba(0,0,0,0.06); }
+    .btn { padding: 12px 32px; border: none; border-radius: 10px; font-family: 'Outfit'; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, #1E96D1, #1578A8); color: #fff; }
+    .btn-primary:hover { box-shadow: 0 4px 16px rgba(30,150,209,0.3); }
+    .btn-secondary { background: #f4f6f8; color: #6B7D8E; border: 1.5px solid #E4E9EE; }
+    .btn-secondary:hover { background: #e8ecf0; }
+    .btn-success { background: linear-gradient(135deg, #2E8B57, #1d7a45); color: #fff; }
+    
+    /* Status toast */
+    .toast { position: fixed; top: 70px; right: 20px; padding: 14px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; z-index: 200; transform: translateX(400px); transition: transform 0.3s ease; max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .toast.show { transform: translateX(0); }
+    .toast.success { background: #e8f5e9; color: #2E8B57; border: 1px solid #c8e6c9; }
+    .toast.error { background: #fbe9e7; color: #C0392B; border: 1px solid #ffcdd2; }
+    
+    /* Quick-fill template */
+    .template-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .template-btn { padding: 6px 14px; border-radius: 8px; border: 1.5px solid #E4E9EE; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; color: #6B7D8E; transition: all 0.15s; }
+    .template-btn:hover { border-color: #1E96D1; color: #1E96D1; background: #f0f8ff; }
+    
+    /* Recent properties sidebar */
+    .recent-item { padding: 10px 14px; border-radius: 10px; background: #f8f9fa; margin-bottom: 8px; font-size: 12px; border: 1px solid #e8ecf0; }
+    .recent-item .title { font-weight: 700; color: #1A2B3C; margin-bottom: 2px; }
+    .recent-item .meta { color: #a8b5c4; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <h1>🏠 homeAImatch Admin</h1>
+    <span class="badge">v2</span>
+    <span style="flex:1"></span>
+    <span id="propCount" style="font-size:12px;color:#8899aa">Loading...</span>
+  </div>
+
+  <div class="container">
+    <!-- Quick-fill templates -->
+    <div class="template-bar">
+      <span style="font-size:12px;font-weight:600;color:#6B7D8E;align-self:center">Quick fill:</span>
+      <button class="template-btn" onclick="fillTemplate('cork')">🇮🇪 Cork defaults</button>
+      <button class="template-btn" onclick="fillTemplate('portugal')">🇵🇹 Portugal defaults</button>
+      <button class="template-btn" onclick="clearForm()">✕ Clear all</button>
+    </div>
+
+    <!-- 1. BASIC DETAILS -->
+    <div class="card" id="card-basic">
+      <div class="card-header" onclick="toggleCard('card-basic')">
+        <span class="num">1</span>
+        <h2>Basic Details</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <div class="grid">
+          <div class="full-width"><label>Title <span class="req">*</span></label><input id="title" placeholder="e.g. 3-Bed Terrace in Ballintemple, Cork"/><p class="help">Use format: [Type] in [Area], [City] — works best for SEO and readability</p></div>
+          <div class="full-width"><label>Tagline</label><input id="tagline" placeholder="e.g. Charming period home with garden near the Lough"/></div>
+          <div><label>Price <span class="req">*</span></label><input id="price" type="number" placeholder="350000"/></div>
+          <div><label>Currency</label><select id="currency"><option value="EUR">€ EUR</option><option value="GBP">£ GBP</option></select></div>
+          <div><label>Beds</label><input id="beds" type="number" placeholder="3"/></div>
+          <div><label>Baths</label><input id="baths" type="number" placeholder="2"/></div>
+          <div><label>Size (m²)</label><input id="sqm" type="number" placeholder="120"/></div>
+          <div><label>Land Size (m²)</label><input id="land_sqm" type="number" placeholder="500"/><p class="help">Important for Portuguese properties with plots</p></div>
+          <div><label>Type</label><select id="property_type"><option value="terraced">Terraced</option><option value="semi-detached">Semi-Detached</option><option value="detached">Detached</option><option value="flat">Flat/Apartment</option><option value="cottage">Cottage</option><option value="townhouse">Townhouse</option><option value="villa">Villa</option><option value="farmhouse">Farmhouse</option><option value="bungalow">Bungalow</option></select></div>
+          <div><label>Style</label><select id="style"><option value="traditional">Traditional</option><option value="modern">Modern</option><option value="victorian">Victorian</option><option value="georgian">Georgian</option><option value="cottage">Cottage</option><option value="mediterranean">Mediterranean</option><option value="artdeco">Art Deco</option><option value="industrial">Industrial/Warehouse</option></select></div>
+          <div><label>Condition</label><select id="condition"><option value="move-in">Move-in Ready</option><option value="renovation-light">Light Renovation</option><option value="renovation-major">Major Renovation</option><option value="new-build">New Build</option></select></div>
+          <div><label>Listing Status</label><select id="listing_status"><option value="active">Active</option><option value="sale-agreed">Sale Agreed</option><option value="sold">Sold</option><option value="withdrawn">Withdrawn</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. LOCATION -->
+    <div class="card" id="card-location">
+      <div class="card-header" onclick="toggleCard('card-location')">
+        <span class="num">2</span>
+        <h2>Location</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <div class="grid">
+          <div><label>Address Line 1</label><input id="address_line1" placeholder="12 Victoria Road"/></div>
+          <div><label>City <span class="req">*</span></label><input id="city" placeholder="Cork"/></div>
+          <div><label>Region / Area</label><input id="region" placeholder="Ballintemple"/><p class="help">Neighbourhood or area name</p></div>
+          <div><label>County / District</label><input id="county" placeholder="Cork"/><p class="help">Important for search matching</p></div>
+          <div><label>Postcode / Eircode</label><input id="postcode" placeholder="T12 AB34"/></div>
+          <div><label>Country</label><select id="country"><option value="IE">Ireland 🇮🇪</option><option value="PT">Portugal 🇵🇹</option><option value="UK">United Kingdom 🇬🇧</option></select></div>
+        </div>
+        <div class="grid" style="margin-top:14px">
+          <div><label>Latitude</label><input id="latitude" type="number" step="any" placeholder="51.8969"/></div>
+          <div><label>Longitude</label><input id="longitude" type="number" step="any" placeholder="-8.4863"/></div>
+        </div>
+        <p class="help" style="margin-top:8px">📍 Right-click on Google Maps → "What's here?" → copy coordinates. <b>Important:</b> Make sure the decimal point is included (e.g. -9.33 not -933).</p>
+      </div>
+    </div>
+
+    <!-- 3. DESCRIPTION -->
+    <div class="card" id="card-desc">
+      <div class="card-header" onclick="toggleCard('card-desc')">
+        <span class="num">3</span>
+        <h2>Description</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <textarea id="description" placeholder="Write or paste the property description here. If Portuguese, translate to English first."></textarea>
+        <p class="help" style="margin-top:6px">Tip: Paste from the listing site and translate to English if needed. The AI uses this for scoring.</p>
+      </div>
+    </div>
+
+    <!-- 4. IMAGES -->
+    <div class="card" id="card-images">
+      <div class="card-header" onclick="toggleCard('card-images')">
+        <span class="num">4</span>
+        <h2>Images</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <p class="help" style="margin-bottom:12px">Add image URLs one at a time. Right-click an image on the listing → "Open image in new tab" → copy the URL. First image = hero thumbnail.</p>
+        <div class="image-list" id="imageList">
+          <div class="image-row">
+            <div class="preview"><span class="placeholder">1</span></div>
+            <input type="url" class="image-input" placeholder="Paste image URL here..." oninput="previewImage(this)"/>
+            <button class="remove-btn" onclick="removeImageRow(this)" title="Remove">✕</button>
+          </div>
+        </div>
+        <button class="add-image-btn" onclick="addImageRow()" style="margin-top:10px">+ Add another image</button>
+      </div>
+    </div>
+
+    <!-- 5. LIVABILITY -->
+    <div class="card" id="card-livability">
+      <div class="card-header" onclick="toggleCard('card-livability')">
+        <span class="num">5</span>
+        <h2>Livability & Neighbourhood</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <div class="grid">
+          <div>
+            <label>Walkability (0-10)</label>
+            <input id="walkability" type="range" min="0" max="10" value="5" oninput="updateWalkScale(this.value)" style="padding:4px 0;border:none;box-shadow:none"/>
+            <div class="walk-scale" id="walkScale"></div>
+            <div class="walk-label" id="walkLabel">5/10 — Some shops within walking distance</div>
+            <p class="help">0-2: Car essential · 3-4: Few local shops · 5-6: Some walkable · 7-8: Very walkable · 9-10: Everything on foot</p>
+          </div>
+          <div>
+            <label>Schools Quality</label>
+            <select id="schools_quality"><option value="excellent">Excellent</option><option value="good">Good</option><option value="average">Average</option><option value="below-average">Below Average</option><option value="n/a">N/A</option></select>
+          </div>
+          <div><label>EPC / BER Rating</label><input id="epc_rating" placeholder="e.g. B3, C, D1"/></div>
+          <div><label>Commute to City Centre (mins)</label><input id="commute_city_center" type="number" placeholder="15"/></div>
+          <div><label>Pet Friendly</label><select id="pet_friendly"><option value="true">Yes</option><option value="false">No</option><option value="unknown">Unknown</option></select></div>
+          <div><label>Dog Park Nearby</label><select id="nearby_dog_park"><option value="true">Yes</option><option value="false">No</option><option value="unknown">Unknown</option></select></div>
+        </div>
+        
+        <div style="margin-top:18px">
+          <label>Neighbourhood Vibe <span style="font-weight:400;color:#a8b5c4">(click all that apply)</span></label>
+          <div class="chip-group" id="vibeChips">
+            <span class="chip" onclick="toggleChip(this)" data-value="family-friendly">👨‍👩‍👧 Family-friendly</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="quiet">🤫 Quiet & peaceful</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="vibrant">🎉 Vibrant & lively</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="historic">🏛️ Historic</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="city-centre">🏙️ City centre</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="suburban">🏘️ Suburban</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="rural">🌾 Rural</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="coastal">🌊 Coastal</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="artsy">🎨 Artsy & creative</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="upscale">💎 Upscale</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="mature">🌳 Mature & established</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="walkable">🚶 Walkable</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="convenient">🛒 Convenient</span>
+            <span class="chip" onclick="toggleChip(this)" data-value="green">🌿 Green & nature</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. FEATURES & AMENITIES -->
+    <div class="card" id="card-features">
+      <div class="card-header" onclick="toggleCard('card-features')">
+        <span class="num">6</span>
+        <h2>Features & Amenities</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <label>Property Features <span style="font-weight:400;color:#a8b5c4">(click all that apply)</span></label>
+        <div class="chip-group" id="featureChips">
+          <span class="chip" onclick="toggleChip(this)" data-value="garden">🌳 Garden</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="pool">🏊 Pool</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="home-office">💻 Home office</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="balcony">🌇 Balcony</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="terrace">☀️ Terrace</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="sea-view">🌊 Sea view</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="period-features">🏛️ Period features</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="modern-kitchen">🍳 Modern kitchen</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="fireplace">🔥 Fireplace</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="smart-home">📱 Smart home</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="garage">🚗 Garage</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="ev-charging">⚡ EV charging</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="solar-panels">☀️ Solar panels</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="storage">📦 Storage</span>
+        </div>
+
+        <label style="margin-top:18px">Parking <span style="font-weight:400;color:#a8b5c4">(click all that apply)</span></label>
+        <div class="chip-group" id="parkingChips">
+          <span class="chip" onclick="toggleChip(this)" data-value="driveway">Driveway</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="garage">Garage</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="on street parking">On-street</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="street parking / resident permit">Resident permit</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="public parking nearby">Public parking nearby</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="ev-charging">EV charging</span>
+          <span class="chip" onclick="toggleChip(this)" data-value="none">No parking</span>
+        </div>
+
+        <div class="grid" style="margin-top:18px">
+          <div><label>Nearest Groceries (km)</label><input id="amenity_groceries_km" type="number" step="0.1" placeholder="0.3"/></div>
+          <div><label>Nearest Gym (km)</label><input id="amenity_gyms_km" type="number" step="0.1" placeholder="0.5"/></div>
+          <div><label>Nearest Park (km)</label><input id="amenity_parks_km" type="number" step="0.1" placeholder="0.2"/></div>
+          <div><label>Nearest Hospital (km)</label><input id="amenity_hospitals_km" type="number" step="0.1" placeholder="2.0"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. AGENT -->
+    <div class="card" id="card-agent">
+      <div class="card-header" onclick="toggleCard('card-agent')">
+        <span class="num">7</span>
+        <h2>Agent / Agency</h2>
+        <span class="collapse-icon">▾</span>
+      </div>
+      <div class="card-body">
+        <div class="grid">
+          <div><label>Agent Name</label><input id="agent_name" placeholder="John Murphy"/></div>
+          <div><label>Agency Name</label><input id="agent_agency" placeholder="Sherry FitzGerald"/></div>
+          <div><label>Phone</label><input id="agent_phone" placeholder="+353 21 123 4567"/></div>
+          <div><label>Original Listing URL</label><input id="source_url" placeholder="https://daft.ie/..."/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- spacer for fixed bottom bar -->
+    <div style="height:60px"></div>
+  </div>
+
+  <!-- Fixed bottom actions -->
+  <div class="actions">
+    <button class="btn btn-primary" onclick="submitProperty()" id="submitBtn">✓ Add Property</button>
+    <button class="btn btn-success" onclick="submitAndNew()" id="submitNewBtn">✓ Add & Start New</button>
+    <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_URL = 'https://homeaimatch-backend-production.up.railway.app';
+
+    // ===== CARD COLLAPSING =====
+    function toggleCard(id) {
+      document.getElementById(id).classList.toggle('collapsed');
+    }
+
+    // ===== CHIP SELECTORS =====
+    function toggleChip(el) {
+      el.classList.toggle('active');
+    }
+    function getChipValues(containerId) {
+      return [...document.querySelectorAll(`#${containerId} .chip.active`)].map(c => c.dataset.value);
+    }
+
+    // ===== WALKABILITY SCALE =====
+    function updateWalkScale(val) {
+      const scale = document.getElementById('walkScale');
+      const label = document.getElementById('walkLabel');
+      val = parseInt(val);
+      scale.innerHTML = '';
+      for (let i = 0; i < 10; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'walk-dot' + (i < val ? ' filled' : '');
+        if (i < val) dot.classList.add(val <= 3 ? 'low' : val <= 6 ? 'med' : 'high');
+        scale.appendChild(dot);
+      }
+      const labels = {
+        0: 'Car essential for everything',
+        1: 'Very car-dependent', 2: 'Car-dependent area',
+        3: 'A few local shops', 4: 'Some basic amenities nearby',
+        5: 'Some shops within walking distance', 6: 'Reasonably walkable',
+        7: 'Very walkable area', 8: 'Most things on foot',
+        9: 'Highly walkable — almost everything nearby', 10: 'Everything within walking distance'
+      };
+      label.textContent = `${val}/10 — ${labels[val]}`;
+    }
+
+    // ===== IMAGE HANDLING =====
+    function addImageRow() {
+      const list = document.getElementById('imageList');
+      const count = list.children.length + 1;
+      const row = document.createElement('div');
+      row.className = 'image-row';
+      row.innerHTML = `
+        <div class="preview"><span class="placeholder">${count}</span></div>
+        <input type="url" class="image-input" placeholder="Paste image URL here..." oninput="previewImage(this)"/>
+        <button class="remove-btn" onclick="removeImageRow(this)" title="Remove">✕</button>
+      `;
+      list.appendChild(row);
+    }
+    function removeImageRow(btn) {
+      const list = document.getElementById('imageList');
+      if (list.children.length > 1) {
+        btn.closest('.image-row').remove();
+      } else {
+        btn.closest('.image-row').querySelector('input').value = '';
+        const preview = btn.closest('.image-row').querySelector('.preview');
+        preview.innerHTML = '<span class="placeholder">1</span>';
+      }
+    }
+    function previewImage(input) {
+      const preview = input.closest('.image-row').querySelector('.preview');
+      const url = input.value.trim();
+      if (url) {
+        preview.innerHTML = `<img src="${url}" onerror="this.parentNode.innerHTML='<span class=\\'placeholder\\' style=\\'color:#e74c3c\\'>✕</span>'"/>`;
+      } else {
+        const idx = [...input.closest('.image-list').children].indexOf(input.closest('.image-row')) + 1;
+        preview.innerHTML = `<span class="placeholder">${idx}</span>`;
+      }
+    }
+    function getImageUrls() {
+      return [...document.querySelectorAll('.image-input')]
+        .map(i => i.value.trim())
+        .filter(Boolean);
+    }
+
+    // ===== TEMPLATES =====
+    function fillTemplate(type) {
+      clearForm();
+      if (type === 'cork') {
+        document.getElementById('currency').value = 'EUR';
+        document.getElementById('country').value = 'IE';
+        document.getElementById('county').value = 'Cork';
+        document.getElementById('city').value = '';
+        document.getElementById('pet_friendly').value = 'true';
+        document.getElementById('nearby_dog_park').value = 'true';
+      } else if (type === 'portugal') {
+        document.getElementById('currency').value = 'EUR';
+        document.getElementById('country').value = 'PT';
+        document.getElementById('county').value = '';
+        document.getElementById('style').value = 'mediterranean';
+        document.getElementById('pet_friendly').value = 'true';
+      }
+      showToast('Template applied — fill in the rest!', 'success');
+    }
+
+    // ===== SUBMIT =====
+    async function submitProperty(andNew = false) {
+      const el = id => document.getElementById(id);
+      const val = id => el(id)?.value?.trim();
+      const num = id => val(id) ? parseFloat(val(id)) : null;
+      const bool = id => val(id) === 'true';
+
+      const property = {
+        title: val('title'),
+        tagline: val('tagline'),
+        description: val('description'),
+        price: num('price'),
+        currency: val('currency'),
+        beds: num('beds'),
+        baths: num('baths'),
+        sqm: num('sqm'),
+        land_sqm: num('land_sqm'),
+        property_type: val('property_type'),
+        style: val('style'),
+        condition: val('condition'),
+        listing_status: val('listing_status'),
+        address_line1: val('address_line1'),
+        city: val('city'),
+        region: val('region'),
+        county: val('county'),
+        postcode: val('postcode'),
+        country: val('country'),
+        latitude: num('latitude'),
+        longitude: num('longitude'),
+        walkability: num('walkability') || parseInt(el('walkability')?.value) || null,
+        schools_quality: val('schools_quality'),
+        pet_friendly: bool('pet_friendly'),
+        nearby_dog_park: bool('nearby_dog_park'),
+        epc_rating: val('epc_rating'),
+        commute_city_center: num('commute_city_center'),
+        neighborhood_vibe: getChipValues('vibeChips'),
+        features: getChipValues('featureChips'),
+        parking: getChipValues('parkingChips'),
+        amenity_groceries_km: num('amenity_groceries_km'),
+        amenity_gyms_km: num('amenity_gyms_km'),
+        amenity_parks_km: num('amenity_parks_km'),
+        amenity_hospitals_km: num('amenity_hospitals_km'),
+        source_url: val('source_url'),
+        image_urls: getImageUrls(),
+        agent: val('agent_name') ? {
+          name: val('agent_name'),
+          agency: val('agent_agency'),
+          phone: val('agent_phone'),
+        } : undefined,
+      };
+
+      if (!property.title || !property.price || !property.city) {
+        showToast('Please fill in Title, Price, and City.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById(andNew ? 'submitNewBtn' : 'submitBtn');
+      const origText = btn.textContent;
+      btn.textContent = 'Adding...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(API_URL + '/api/properties', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(property),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`✓ Added "${property.title}" successfully!`, 'success');
+          loadPropertyCount();
+          if (andNew) {
+            setTimeout(() => clearForm(), 500);
+          }
+        } else {
+          showToast('Error: ' + (data.error || 'Unknown error'), 'error');
+        }
+      } catch (err) {
+        showToast('Connection error: ' + err.message, 'error');
+      } finally {
+        btn.textContent = origText;
+        btn.disabled = false;
+      }
+    }
+
+    function submitAndNew() { submitProperty(true); }
+
+    // ===== TOAST =====
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast ' + type + ' show';
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    // ===== CLEAR =====
+    function clearForm() {
+      document.querySelectorAll('input:not([type=range]), textarea').forEach(el => el.value = '');
+      document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
+      document.getElementById('walkability').value = 5;
+      updateWalkScale(5);
+      // Reset images to single empty row
+      const list = document.getElementById('imageList');
+      list.innerHTML = `<div class="image-row">
+        <div class="preview"><span class="placeholder">1</span></div>
+        <input type="url" class="image-input" placeholder="Paste image URL here..." oninput="previewImage(this)"/>
+        <button class="remove-btn" onclick="removeImageRow(this)" title="Remove">✕</button>
+      </div>`;
+    }
+
+    // ===== PROPERTY COUNT =====
+    async function loadPropertyCount() {
+      try {
+        const res = await fetch(API_URL + '/api/properties?status=active');
+        const data = await res.json();
+        document.getElementById('propCount').textContent = `${data.count || 0} properties in database`;
+      } catch (e) {
+        document.getElementById('propCount').textContent = 'Backend connected';
+      }
+    }
+
+    // ===== INIT =====
+    updateWalkScale(5);
+    loadPropertyCount();
+  </script>
+</body>
+</html>
