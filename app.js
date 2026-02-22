@@ -145,7 +145,7 @@ const LogoIcon = ({ size = 36 }) => (
 );
 
 const LogoFull = ({ dark }) => (
-  <img src="logo-full.png" alt="homeAImatch" height={90} style={{display:"block",maxWidth:260}}/>
+  <img src="logo-full.png" alt="homeAImatch" height={38} style={{display:"block"}}/>
 );
 
 /* ════════════════════════════════════════════════════════════════════
@@ -178,7 +178,7 @@ const HOUSES_UK = [
 function getQuestions(market) {
   const cities = market ? MARKETS[market].cities : [];
   return [
-    { id:"greeting",field:null,type:"single",text:"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which region?",options:["Cork, Ireland","Lourinhã, Portugal"]},
+    { id:"greeting",field:null,type:"single",text:"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which city or region?",options:["Cork","Lourinhã","London","Manchester","Birmingham","Leeds","Bristol","Edinburgh","Cardiff","Brighton"]},
     { id:"location",field:"location",type:"search",text:`Which city or area interests you?`,options:cities,placeholder:"Type a city..."},
     { id:"radius",field:"radius",type:"single",text:"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
     { id:"workFromHome",field:"workFromHome",type:"single",text:"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
@@ -253,7 +253,13 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
   return(<div style={{background:B.white,borderRadius:14,overflow:"hidden",border:top?`2px solid ${B.blue}`:`1px solid ${B.border}`,boxShadow:top?`0 6px 24px rgba(30,150,209,0.1)`:"0 2px 6px rgba(0,0,0,0.03)",animation:`fadeSlide 0.45s ease-out ${rank*0.1}s both`}}>
     <div onClick={onToggle} style={{padding:"16px 18px 12px",cursor:"pointer"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-        <PropertyImage style={h.style} size={100}/>
+        {h.image_urls && h.image_urls.length > 0 ? (
+          <div style={{width:100,height:100,borderRadius:10,overflow:"hidden",flexShrink:0,background:B.grayL}}>
+            <img src={h.image_urls[0]} alt={h.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.target.style.display='none';e.target.parentNode.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px">🏠</div>';}}/>
+          </div>
+        ) : (
+          <PropertyImage style={h.style} size={100}/>
+        )}
         <div style={{flex:1,minWidth:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div>
@@ -319,8 +325,8 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
   const features = [
     {icon:"🧠",title:"AI-Powered Matching",desc:"Our algorithm scores properties across 10+ criteria tailored to your unique lifestyle."},
     {icon:"🎯",title:"Lifestyle-First Approach",desc:"We don't just match bedrooms and budget — we match your commute, pets, neighbourhood vibe, and more."},
-    {icon:"🇮🇪🇵🇹",title:"Cork & West Portugal",desc:"Live now in Cork, Ireland and the Lourinhã coast of Portugal. More regions coming soon."},
-    {icon:"⚡",title:"2-Minute Quiz",desc:"Answer a few conversational questions and get your personalised top matches instantly."},
+    {icon:"🇬🇧",title:"United Kingdom",desc:"London to Edinburgh, 12 cities covered. From Bath to Brighton, Manchester to Cardiff — we've got you covered."},
+    {icon:"⚡",title:"2-Minute Quiz",desc:"Answer a few conversational questions and get your personalised top 5 matches instantly."},
   ];
   const steps = [
     {n:"01",title:"Tell us about you",desc:"Quick chat about your lifestyle, family, budget, and preferences."},
@@ -344,7 +350,7 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
             Find the home that<br/>fits <span style={{color:B.blue}}>your life</span>
           </h1>
           <p style={{fontSize:16,color:B.gray,lineHeight:1.65,marginBottom:28,maxWidth:420}}>
-            Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit — now live in Cork, Ireland and West Portugal.
+            Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit — in the UK.
           </p>
           {/* Email Capture */}
           {!emailSubmitted ? (
@@ -419,11 +425,10 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
       {/* CTA */}
       <section style={{textAlign:"center",padding:"56px 24px"}}>
         <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:12}}>Ready to find your perfect home?</h2>
-        <p style={{fontSize:15,color:B.gray,marginBottom:20}}>Live now in Cork, Ireland & Lourinhã coast, Portugal.</p>
         <button onClick={onStart} style={{padding:"16px 40px",borderRadius:32,fontSize:16,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"'Outfit',sans-serif",background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",boxShadow:`0 6px 24px rgba(30,150,209,0.25)`,transition:"transform 0.2s"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>
           Take the 2-Minute Quiz →
         </button>
-        <p style={{fontSize:14,color:B.gray,marginBottom:16,marginTop:16}}>Or see <span onClick={onPricing} style={{color:B.blue,cursor:"pointer",fontWeight:600}}>pricing</span> for agencies.</p>
+        <p style={{fontSize:14,color:B.gray,marginBottom:16}}>Or see <span onClick={onPricing} style={{color:B.blue,cursor:"pointer",fontWeight:600}}>pricing</span> for agencies.</p>
         <p style={{fontSize:12,color:"#b0bec5",marginTop:8}}>homeaimatch.com</p>
       </section>
     </div>
@@ -622,17 +627,16 @@ function HomeAIMatch() {
     const nA={...answers};if(q.field)nA[q.field]=ans;
 
     if(q.id==="greeting"){
-      const isIreland = ans.toLowerCase().includes("cork") || ans.toLowerCase().includes("ireland");
-      const isPortugal = ans.toLowerCase().includes("lourinh") || ans.toLowerCase().includes("portugal");
-      nA.market = isIreland ? "ie" : isPortugal ? "pt" : "uk";
-      // Extract just the city name for the location field
-      nA.location = isIreland ? "Cork" : isPortugal ? "Lourinhã" : ans;
-      nA.currency = (isIreland || isPortugal) ? "EUR" : "GBP";
+      const eurCities = ["Cork","Lourinhã","Lourinha","Dublin","Galway","Lisbon","Porto","Douglas","Wilton"];
+      const isEur = eurCities.some(c => ans.toLowerCase().includes(c.toLowerCase()));
+      nA.market = isEur ? (["Cork","Dublin","Galway","Douglas","Wilton"].some(c=>ans.includes(c)) ? "ie" : "pt") : "uk";
+      nA.location = ans;
+      nA.currency = isEur ? "EUR" : "GBP";
       setAnswers(nA);setAnswered(p=>p+1);
       // Dynamically update budget question based on currency
       setQuestions(prev => prev.map(qq => {
         if (qq.id === "budget") {
-          return (isIreland || isPortugal)
+          return isEur
             ? {...qq, options: ["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]}
             : {...qq, options: ["Under £200K","£200K – £400K","£400K – £600K","£600K – £800K","£800K+"]};
         }
