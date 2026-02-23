@@ -378,6 +378,10 @@ function renderRegister() {
         <div class="form-group"><label>Agency Name</label><input id="reg-agency" placeholder="e.g. Sherry FitzGerald"/></div>
         <div class="form-group"><label>Email *</label><input id="reg-email" type="email" placeholder="sarah@sherryfitz.ie" required/></div>
         <div class="form-group"><label>Password *</label><input id="reg-password" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:12px;color:var(--gray);line-height:1.5;margin-top:8px">
+          <input type="checkbox" id="reg-consent" required style="margin-top:2px;flex-shrink:0;accent-color:var(--blue)"/>
+          <span>I agree to the <a href="legal.html#tos" target="_blank" style="color:var(--blue)">Terms of Service</a> and <a href="legal.html#privacy" target="_blank" style="color:var(--blue)">Privacy Policy</a>. I confirm that I am authorised to list properties on behalf of my agency.</span>
+        </label>
         <button type="submit" class="btn btn-orange" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Create Account</button>
       </form>
       <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
@@ -415,6 +419,7 @@ function renderDashboard() {
         <div class="agent-name">${agent.name || ''}</div>
         <div class="agent-agency">${agent.agencies?.name || agent.agency || ''}</div>
         <button class="btn btn-ghost" style="margin-top:8px;color:rgba(255,255,255,0.4);font-size:12px;padding:4px 0" onclick="logout()">Sign out</button>
+        <div style="margin-top:6px;font-size:10px"><a href="legal.html#tos" target="_blank" style="color:rgba(255,255,255,0.3);text-decoration:none">Terms</a> · <a href="legal.html#privacy" target="_blank" style="color:rgba(255,255,255,0.3);text-decoration:none">Privacy</a></div>
       </div>
     </div>
 
@@ -524,20 +529,16 @@ function renderLeads() {
   if (leads.length === 0) return '<div class="empty" style="padding:60px"><div class="icon">📭</div><div class="title">No leads yet</div><div class="desc">When buyers enquire about your properties through homeAImatch, their details will appear here.</div></div>';
 
   return `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Buyer</th><th>Property</th><th>Message</th><th>Buyer Profile</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Buyer</th><th>Property</th><th>Message</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
     <tbody>
-    ${leads.map(l => {
-      const bp = l.buyer_profile;
-      const hasProfile = bp && Object.keys(bp).length > 0;
-      return `<tr>
+    ${leads.map(l => `<tr>
       <td>
         <div style="font-weight:600">${l.buyer_name || 'Anonymous'}</div>
         <div style="font-size:11px;color:var(--gray)">${l.buyer_email || ''}</div>
         ${l.buyer_phone ? `<div style="font-size:11px;color:var(--gray)">${l.buyer_phone}</div>` : ''}
       </td>
-      <td style="max-width:200px"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.properties?.title || '—'}</div><div style="font-size:11px;color:var(--gray)">${l.properties?.city || ''} · ${formatPrice(l.properties?.price, l.properties?.currency || 'EUR')}</div></td>
-      <td style="max-width:200px;font-size:12px;color:var(--gray);line-height:1.4">${(l.buyer_message || '—').substring(0, 100)}</td>
-      <td style="min-width:200px">${hasProfile ? renderBuyerProfile(bp) : '<span style="font-size:11px;color:#b0bec5">No profile data</span>'}</td>
+      <td style="max-width:200px"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.properties?.title || '—'}</div><div style="font-size:11px;color:var(--gray)">${l.properties?.city || ''} · ${formatPrice(l.properties?.price, 'EUR')}</div></td>
+      <td style="max-width:200px;font-size:12px;color:var(--gray);line-height:1.4">${(l.message || l.buyer_message || '—').substring(0, 100)}</td>
       <td><span class="badge badge-${l.status || 'new'}">${l.status || 'new'}</span></td>
       <td style="font-size:12px;color:var(--gray);white-space:nowrap">${timeAgo(l.created_at)}</td>
       <td>
@@ -548,51 +549,9 @@ function renderLeads() {
           <option value="closed" ${l.status === 'closed' ? 'selected' : ''}>Closed</option>
         </select>
       </td>
-    </tr>`}).join('')}
+    </tr>`).join('')}
     </tbody>
   </table></div></div>`;
-}
-
-function renderBuyerProfile(bp) {
-  const pills = [];
-  if (bp.budget) pills.push({icon: '💰', text: bp.budget});
-  if (bp.family) pills.push({icon: '👥', text: bp.family});
-  if (bp.lifestyle) pills.push({icon: '🏡', text: bp.lifestyle.replace(/ — .*/, '')});
-  if (bp.condition) pills.push({icon: '🔧', text: bp.condition.replace(/ — .*/, '').replace(/ only/, '')});
-  if (bp.workFromHome) pills.push({icon: '💼', text: bp.workFromHome});
-  if (bp.pets) pills.push({icon: '🐾', text: bp.pets.replace(/ — .*/, '')});
-  if (bp.vibe) pills.push({icon: '✨', text: bp.vibe});
-  
-  const vibes = bp.neighborhoodVibe || [];
-  const priorities = bp.priorities || [];
-  const parking = bp.parking || [];
-  
-  const profileId = 'bp-' + Math.random().toString(36).substr(2, 9);
-  
-  return `
-    <div style="font-size:11px;line-height:1.6">
-      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">
-        ${pills.slice(0, 4).map(p => `<span style="background:var(--blue-l);color:var(--blue-d, #1578A8);padding:2px 7px;border-radius:10px;font-size:10px;font-weight:500;white-space:nowrap">${p.icon} ${p.text}</span>`).join('')}
-      </div>
-      <button onclick="document.getElementById('${profileId}').style.display=document.getElementById('${profileId}').style.display==='none'?'block':'none'" class="btn btn-ghost" style="font-size:10px;padding:2px 6px;color:var(--blue)">View full profile ▾</button>
-      <div id="${profileId}" style="display:none;margin-top:6px;padding:10px;background:var(--gray-l);border-radius:8px;font-size:11px">
-        ${bp.budget ? `<div style="margin-bottom:4px"><strong>Budget:</strong> ${bp.budget}</div>` : ''}
-        ${bp.family ? `<div style="margin-bottom:4px"><strong>Household:</strong> ${bp.family}</div>` : ''}
-        ${bp.lifestyle ? `<div style="margin-bottom:4px"><strong>Setting:</strong> ${bp.lifestyle}</div>` : ''}
-        ${bp.workFromHome ? `<div style="margin-bottom:4px"><strong>Work:</strong> ${bp.workFromHome}</div>` : ''}
-        ${bp.commuteTo ? `<div style="margin-bottom:4px"><strong>Commute to:</strong> ${bp.commuteTo}</div>` : ''}
-        ${bp.commuteMax ? `<div style="margin-bottom:4px"><strong>Max commute:</strong> ${bp.commuteMax}</div>` : ''}
-        ${bp.condition ? `<div style="margin-bottom:4px"><strong>Condition:</strong> ${bp.condition}</div>` : ''}
-        ${bp.pets ? `<div style="margin-bottom:4px"><strong>Pets:</strong> ${bp.pets}</div>` : ''}
-        ${bp.vibe ? `<div style="margin-bottom:4px"><strong>Dream style:</strong> ${bp.vibe}</div>` : ''}
-        ${vibes.length ? `<div style="margin-bottom:4px"><strong>Neighbourhood:</strong> ${vibes.join(', ')}</div>` : ''}
-        ${priorities.length ? `<div style="margin-bottom:4px"><strong>Top priorities:</strong> ${priorities.join(', ')}</div>` : ''}
-        ${parking.length ? `<div style="margin-bottom:4px"><strong>Parking:</strong> ${parking.join(', ')}</div>` : ''}
-        ${bp.location ? `<div style="margin-bottom:4px"><strong>Location:</strong> ${bp.location}</div>` : ''}
-        ${bp.radius ? `<div><strong>Radius:</strong> ${bp.radius}</div>` : ''}
-      </div>
-    </div>
-  `;
 }
 
 // ============================================================
