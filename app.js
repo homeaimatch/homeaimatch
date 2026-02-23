@@ -320,7 +320,8 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
         </div>
       </div>}
       <div style={{padding:"0 18px 14px",display:"flex",gap:8}}>
-        {h.agent&&<button onClick={e=>{e.stopPropagation();onContact(h);}} style={{flex:2,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:700,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff",border:"none"}}>✉ Contact Agent</button>}
+        {h.agent?<button onClick={e=>{e.stopPropagation();onContact(h);}} style={{flex:2,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:700,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff",border:"none"}}>✉ Contact Agent</button>
+        :<button onClick={e=>{e.stopPropagation();onContact({...h,agent:{name:"homeAImatch Team",agency:"homeAImatch",phone:"",ph:"HA"}});}} style={{flex:2,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:700,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none"}}>✉ Enquire</button>}
         <button onClick={e=>{e.stopPropagation();onSave(h.id);}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:saved?B.orange:B.white,color:saved?"#fff":B.orange,border:`1.5px solid ${B.orange}`,transition:"all 0.2s"}}>{saved?"♥ Saved":"♡ Save"}</button>
         <button onClick={e=>{e.stopPropagation();const cur=h.currency==='EUR'?'€':'£';const t=`${h.name} in ${h.city} — ${cur}${(h.price/1e3).toFixed(0)}K, ${h.beds} bed, ${h.sqm}m². Found on homeaimatch.com`;if(navigator.share)navigator.share({title:h.name,text:t});else{navigator.clipboard?.writeText(t);alert("Copied!");}}} style={{flex:1,padding:"9px",borderRadius:10,fontSize:12.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",background:B.white,color:B.blue,border:`1.5px solid ${B.blue}`}}>↗ Share</button>
       </div>
@@ -475,7 +476,7 @@ const ContactModal=({agent,house,onClose})=>{
         </div>
         <div style={{display:"flex",gap:12,alignItems:"center",background:B.grayL,borderRadius:12,padding:14,marginBottom:16}}>
           <div style={{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,"+B.blue+","+B.blueD+")",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:14,fontWeight:700,fontFamily:F2,flexShrink:0}}>{agent.ph}</div>
-          <div><div style={{fontSize:14,fontWeight:700,color:B.dark,fontFamily:F2}}>{agent.name}</div><div style={{fontSize:12,color:B.gray,fontFamily:F2}}>{agent.agency}</div><div style={{fontSize:12,color:B.blue,fontFamily:F2,marginTop:2}}>{agent.phone}</div></div>
+          <div><div style={{fontSize:14,fontWeight:700,color:B.dark,fontFamily:F2}}>{agent.name}</div><div style={{fontSize:12,color:B.gray,fontFamily:F2}}>{agent.agency}</div>{agent.phone&&<div style={{fontSize:12,color:B.blue,fontFamily:F2,marginTop:2}}>{agent.phone}</div>}</div>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:10}}>
           <input value={cn} onChange={e=>setCn(e.target.value)} placeholder="Your name" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
@@ -488,7 +489,7 @@ const ContactModal=({agent,house,onClose})=>{
                 fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);
               });
             }}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
-            <a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>
+            {agent.phone&&<a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>}
           </div>
         </div>
       </div>
