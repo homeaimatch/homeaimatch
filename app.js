@@ -145,7 +145,7 @@ const LogoIcon = ({ size = 36 }) => (
 );
 
 const LogoFull = ({ dark }) => (
-  <img src="logo-full.png" alt="homeAImatch" height={90} style={{display:"block",maxWidth:260}}/>
+  <img src="logo-full.png" alt="homeAImatch" height={60} style={{display:"block",maxWidth:180}}/>
 );
 
 /* ════════════════════════════════════════════════════════════════════
@@ -452,7 +452,7 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
 };
 
 
-const ContactModal=({agent,house,onClose})=>{
+const ContactModal=({agent,house,onClose,buyerAnswers})=>{
   const[cn,setCn]=useState("");
   const[ce,setCe]=useState("");
   const[cm,setCm]=useState("Hi " + agent.name + ", I found " + house.name + " on homeAImatch and would love to arrange a viewing.");
@@ -484,7 +484,7 @@ const ContactModal=({agent,house,onClose})=>{
           <textarea value={cm} onChange={e=>setCm(e.target.value)} rows={4} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark,resize:"vertical",lineHeight:1.5}}/>
           <div style={{display:"flex",gap:8}}>
             <button onClick={()=>{if(cn&&ce.includes("@")){
-              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null}).then(()=>setSent(true)).catch(()=>{
+              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null,buyer_profile:buyerAnswers||null}).then(()=>setSent(true)).catch(()=>{
                 // Fallback to Formspree
                 fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);
               });
@@ -716,7 +716,7 @@ function HomeAIMatch() {
     <div style={{minHeight:"100vh",background:"#fafbfc",fontFamily:"'Outfit',sans-serif",display:"flex",flexDirection:"column"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');@keyframes fadeSlide{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}}*{box-sizing:border-box;margin:0;padding:0;}body{background:#fafbfc;}input::placeholder{color:#b0bec5;}::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#d0d8e0;border-radius:3px;}`}</style>
 
-      {contactHouse&&contactHouse.agent&&<ContactModal agent={contactHouse.agent} house={contactHouse} onClose={()=>setContactHouse(null)}/>}
+      {contactHouse&&contactHouse.agent&&<ContactModal agent={contactHouse.agent} house={contactHouse} onClose={()=>setContactHouse(null)} buyerAnswers={answers}/>}
       {/* Header */}
       <div style={{background:B.white,borderBottom:`1px solid ${B.border}`,padding:"11px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
         <LogoFull/>
