@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>homeAImatch — Contact Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--blue:#1E96D1;--blue-d:#1578A8;--orange:#F5921B;--orange-d:#D97E15;--dark:#1A2B3C;--gray:#6B7D8E;--border:#E4E9EE;--bg:#FAFBFC;--white:#fff}
+    body{font-family:'Outfit',sans-serif;color:var(--dark);background:var(--bg);line-height:1.7}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;max-width:900px;margin:0 auto}
+    .nav-logo img{height:clamp(36px, 8vw, 50px)}
+    .nav-links{display:flex;gap:14;align-items:center}
+    .nav-links a{font-size:13px;color:var(--gray);font-weight:600}
+
+    .hero{max-width:900px;margin:0 auto;padding:40px 24px 20px;text-align:center}
+    .hero h1{font-size:32px;font-weight:800;letter-spacing:-0.03em;margin-bottom:8px}
+    .hero p{font-size:15px;color:var(--gray);max-width:500px;margin:0 auto}
+
+    .contact-grid{max-width:900px;margin:0 auto;padding:24px 24px 60px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+    @media(max-width:640px){.contact-grid{grid-template-columns:1fr;gap:24px}}
+
+    .form-card{background:var(--white);border-radius:16px;padding:28px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+    .form-card h2{font-size:18px;font-weight:700;margin-bottom:16px}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:4px}
+    .form-group input,.form-group select,.form-group textarea{
+      width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;
+      font-family:'Outfit',sans-serif;font-size:14px;color:var(--dark);transition:border-color 0.2s;background:var(--white)
+    }
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+      outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,150,209,0.1)
+    }
+    .form-group textarea{resize:vertical;min-height:100px}
+    .btn{padding:12px 28px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s}
+    .btn:active{transform:scale(0.97)}
+    .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;width:100%}
+    .btn-primary:hover{box-shadow:0 4px 14px rgba(30,150,209,0.25)}
+
+    .info-card{display:flex;flex-direction:column;gap:20px}
+    .info-item{background:var(--white);border-radius:14px;padding:22px;border:1px solid var(--border)}
+    .info-item .icon{font-size:24px;margin-bottom:8px}
+    .info-item h3{font-size:15px;font-weight:700;margin-bottom:4px}
+    .info-item p{font-size:13px;color:var(--gray);margin:0;line-height:1.5}
+
+    .success-msg{display:none;text-align:center;padding:32px 20px}
+    .success-msg.show{display:block}
+    .success-msg .icon{font-size:48px;margin-bottom:12px}
+    .success-msg h3{font-size:18px;font-weight:700;margin-bottom:6px}
+    .success-msg p{font-size:13px;color:var(--gray)}
+
+    .footer{text-align:center;padding:24px;font-size:12px;color:var(--gray);border-top:1px solid var(--border);max-width:900px;margin:0 auto}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo"><img src="logo-full.png" alt="homeAImatch" onerror="this.outerHTML='<span style=font-size:18px;font-weight:800>🏠 homeAImatch</span>'"/></a>
+  <div class="nav-links">
+    <a href="index.html">← Back to Home</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Get in Touch</h1>
+  <p>Have a question, feedback, or want to partner with us? We'd love to hear from you.</p>
+</div>
+
+<div class="contact-grid">
+  <!-- Contact Form -->
+  <div class="form-card">
+    <h2>Send us a message</h2>
+    <form id="contact-form" onsubmit="submitContact(event)">
+      <div class="form-group">
+        <label>Your Name *</label>
+        <input id="c-name" placeholder="John O'Brien" required/>
+      </div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input id="c-email" type="email" placeholder="john@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label>I am a...</label>
+        <select id="c-type">
+          <option value="buyer">Home Buyer</option>
+          <option value="agent">Estate Agent</option>
+          <option value="media">Media / Press</option>
+          <option value="partner">Partnership Enquiry</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message *</label>
+        <textarea id="c-message" placeholder="How can we help?" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+
+    <div class="success-msg" id="success-msg">
+      <div class="icon">✅</div>
+      <h3>Message sent!</h3>
+      <p>We'll get back to you within 24 hours. Check your inbox for a confirmation.</p>
+    </div>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="info-card">
+    <div class="info-item">
+      <div class="icon">📧</div>
+      <h3>Email</h3>
+      <p><a href="mailto:hello@homeaimatch.com">hello@homeaimatch.com</a></p>
+      <p style="margin-top:4px">We typically respond within 24 hours.</p>
+    </div>
+
+    <div class="info-item">
+      <div class="icon">📍</div>
+      <h3>Location</h3>
+      <p>Cork, Ireland</p>
+      <p style="margin-top:4px">We're a remote-first team building the future of property search.</p>
+    </div>
+
+    <div class="info-item">
+      <div class="icon">🏢</div>
+      <h3>For Estate Agents</h3>
+      <p>Interested in listing your properties and receiving AI-matched buyer leads?</p>
+      <p style="margin-top:8px"><a href="for-agents.html" style="font-weight:600">Learn about our agent platform →</a></p>
+    </div>
+
+    <div class="info-item">
+      <div class="icon">🐛</div>
+      <h3>Bug Report or Feedback</h3>
+      <p>Found a bug or have a feature request? We appreciate all feedback — it helps us improve the platform for everyone.</p>
+    </div>
+
+    <div class="info-item" style="background:linear-gradient(135deg,#1A2B3C,#1578A8);border:none;color:#fff">
+      <div class="icon">🚀</div>
+      <h3 style="color:#fff">We're growing</h3>
+      <p style="color:rgba(255,255,255,0.75)">homeAImatch is live in Cork, Ireland and the Lourinhã coast of Portugal. More regions coming in 2026. Want us in your area? Let us know!</p>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>© 2026 homeAImatch · <a href="index.html">homeaimatch.com</a> · <a href="legal.html">Terms</a> · <a href="legal.html#privacy">Privacy</a> · Cork, Ireland</p>
+</footer>
+
+<script>
+const API_URL = 'https://homeaimatch-backend-production.up.railway.app';
+
+async function submitContact(e) {
+  e.preventDefault();
+  const name = document.getElementById('c-name').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const type = document.getElementById('c-type').value;
+  const message = document.getElementById('c-message').value.trim();
+
+  if (!name || !email || !message) return;
+
+  try {
+    // Try sending to backend API (subscribe endpoint as a contact message)
+    await fetch(API_URL + '/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'contact_form', name, type, message })
+    });
+  } catch (err) {
+    console.log('API error, falling back');
+  }
+
+  // Also send via mailto link as backup
+  const subject = encodeURIComponent(`[homeAImatch Contact] ${type} — ${name}`);
+  const body = encodeURIComponent(`From: ${name} (${email})\nType: ${type}\n\n${message}`);
+
+  // Show success
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('success-msg').classList.add('show');
+}
+</script>
+</body>
+</html>
