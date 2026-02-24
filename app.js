@@ -145,7 +145,7 @@ const LogoIcon = ({ size = 36 }) => (
 );
 
 const LogoFull = ({ dark }) => (
-  <img src="logo-full.png" alt="homeAImatch" height={90} style={{display:"block",maxWidth:260}}/>
+  <img src="logo-full.png" alt="homeAImatch" style={{display:"block",height:"clamp(36px, 8vw, 56px)",maxWidth:"clamp(120px, 28vw, 200px)"}}/>
 );
 
 /* ════════════════════════════════════════════════════════════════════
@@ -348,13 +348,13 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
   return(
     <div style={{minHeight:"100vh",background:B.white,fontFamily:"'Outfit',sans-serif"}}>
       {/* Nav */}
-      <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 24px",maxWidth:1000,margin:"0 auto"}}>
+      <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",maxWidth:1000,margin:"0 auto",flexWrap:"wrap",gap:8}}>
         <LogoFull/>
-        <div style={{display:"flex",gap:20,alignItems:"center"}}>
-          <span onClick={onPricing} style={{fontSize:13.5,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Pricing</span>
-          <a href="for-agents.html" style={{fontSize:13.5,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>For Agents</a>
+        <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap"}}>
+          <span onClick={onPricing} style={{fontSize:13,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Pricing</span>
+          <a href="for-agents.html" style={{fontSize:13,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>For Agents</a>
+          <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"8px 18px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em",whiteSpace:"nowrap"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>Find My Home →</button>
         </div>
-        <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"10px 24px",borderRadius:28,fontSize:13.5,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>Find My Home →</button>
       </nav>
 
       {/* Hero */}
@@ -445,7 +445,7 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
           Take the 2-Minute Quiz →
         </button>
         <p style={{fontSize:14,color:B.gray,marginBottom:16,marginTop:16}}>Or see <span onClick={onPricing} style={{color:B.blue,cursor:"pointer",fontWeight:600}}>pricing</span> for agencies.</p>
-        <p style={{fontSize:12,color:"#b0bec5",marginTop:8}}>homeaimatch.com · <a href="legal.html" style={{color:"#90a4ae",textDecoration:"none"}}>Terms</a> · <a href="legal.html#privacy" style={{color:"#90a4ae",textDecoration:"none"}}>Privacy</a></p>
+        <p style={{fontSize:12,color:"#b0bec5",marginTop:8}}>homeaimatch.com</p>
       </section>
     </div>
   );
@@ -457,9 +457,7 @@ const ContactModal=({agent,house,onClose})=>{
   const[ce,setCe]=useState("");
   const[cm,setCm]=useState("Hi " + agent.name + ", I found " + house.name + " on homeAImatch and would love to arrange a viewing.");
   const[sent,setSent]=useState(false);
-  const[consent,setConsent]=useState(false);
   const F2 = "'Outfit',sans-serif";
-  const canSend = cn && ce.includes("@") && consent;
   if(sent)return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:16,animation:"fadeSlide 0.3s ease-out"}} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} style={{background:B.white,borderRadius:18,padding:32,maxWidth:400,width:"100%",textAlign:"center"}}>
@@ -484,17 +482,13 @@ const ContactModal=({agent,house,onClose})=>{
           <input value={cn} onChange={e=>setCn(e.target.value)} placeholder="Your name" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <input value={ce} onChange={e=>setCe(e.target.value)} placeholder="Your email" type="email" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <textarea value={cm} onChange={e=>setCm(e.target.value)} rows={4} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark,resize:"vertical",lineHeight:1.5}}/>
-          <label style={{display:"flex",gap:8,alignItems:"flex-start",cursor:"pointer",fontSize:11.5,color:B.gray,lineHeight:1.5,fontFamily:F2}}>
-            <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{marginTop:2,flexShrink:0,accentColor:B.blue}}/>
-            <span>I agree to share my name, email, and message with the agent. I have read the <a href="legal.html#privacy" target="_blank" style={{color:B.blue}}>Privacy Policy</a> and <a href="legal.html#tos" target="_blank" style={{color:B.blue}}>Terms of Service</a>.</span>
-          </label>
           <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>{if(canSend){
+            <button onClick={()=>{if(cn&&ce.includes("@")){
               apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null}).then(()=>setSent(true)).catch(()=>{
                 // Fallback to Formspree
                 fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);
               });
-            }}} disabled={!canSend} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:canSend?"pointer":"not-allowed",fontFamily:F2,background:canSend?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
+            }}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
             {agent.phone&&<a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>}
           </div>
         </div>
