@@ -316,4 +316,27 @@
   <p>© 2026 homeAImatch · <a href="index.html">homeaimatch.com</a> · Cork, Ireland</p>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-deco
+<script>
+function switchLegalTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const section = document.getElementById(id);
+  if (section) section.classList.add('active');
+  // Find the tab that matches
+  document.querySelectorAll('.tab').forEach(t => {
+    if (t.getAttribute('onclick')?.includes(id)) t.classList.add('active');
+  });
+  // Update URL hash without scrolling
+  history.replaceState(null, '', '#' + id);
+}
+
+// On page load, check for hash in URL (e.g. legal.html#privacy)
+(function() {
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById(hash)) {
+    switchLegalTab(hash);
+  }
+})();
+</script>
+</body>
+</html>
