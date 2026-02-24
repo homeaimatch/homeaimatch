@@ -145,7 +145,7 @@ const LogoIcon = ({ size = 36 }) => (
 );
 
 const LogoFull = ({ dark }) => (
-  <img src="logo-full.png" alt="homeAImatch" height={60} style={{display:"block",maxWidth:180}}/>
+  <img src="logo-full.png" alt="homeAImatch" style={{display:"block",height:"clamp(36px, 8vw, 56px)",maxWidth:"clamp(120px, 28vw, 200px)"}}/>
 );
 
 /* ════════════════════════════════════════════════════════════════════
@@ -348,13 +348,13 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
   return(
     <div style={{minHeight:"100vh",background:B.white,fontFamily:"'Outfit',sans-serif"}}>
       {/* Nav */}
-      <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 24px",maxWidth:1000,margin:"0 auto"}}>
+      <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",maxWidth:1000,margin:"0 auto",flexWrap:"wrap",gap:8}}>
         <LogoFull/>
-        <div style={{display:"flex",gap:20,alignItems:"center"}}>
-          <span onClick={onPricing} style={{fontSize:13.5,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Pricing</span>
-          <a href="for-agents.html" style={{fontSize:13.5,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>For Agents</a>
+        <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap"}}>
+          <span onClick={onPricing} style={{fontSize:13,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Pricing</span>
+          <a href="for-agents.html" style={{fontSize:13,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>For Agents</a>
+          <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"8px 18px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em",whiteSpace:"nowrap"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>Find My Home →</button>
         </div>
-        <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"10px 24px",borderRadius:28,fontSize:13.5,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>Find My Home →</button>
       </nav>
 
       {/* Hero */}
@@ -367,30 +367,14 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
           <p style={{fontSize:16,color:B.gray,lineHeight:1.65,marginBottom:28,maxWidth:420}}>
             Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit — now live in Cork, Ireland and West Portugal.
           </p>
-          {/* Email Capture */}
-          {!emailSubmitted ? (
-            <div style={{display:"flex",gap:8,maxWidth:420,flexWrap:"wrap"}}>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email to get started"
-                style={{flex:1,minWidth:200,padding:"14px 18px",borderRadius:12,border:`1.5px solid ${B.border}`,fontSize:14,fontFamily:"'Outfit',sans-serif",outline:"none",color:B.dark,transition:"border-color 0.2s"}}
-                onFocus={e=>e.target.style.borderColor=B.blue} onBlur={e=>e.target.style.borderColor=B.border}
-                onKeyDown={e=>{if(e.key==="Enter"&&email.includes("@"))onEmailSubmit();}}
-              />
-              <button onClick={onEmailSubmit} disabled={!email.includes("@")} style={{padding:"14px 28px",borderRadius:12,fontSize:14,fontWeight:700,border:"none",cursor:email.includes("@")?"pointer":"not-allowed",fontFamily:"'Outfit',sans-serif",background:email.includes("@")?`linear-gradient(135deg,${B.blue},${B.blueD})`:"#ccc",color:"#fff",transition:"all 0.2s",opacity:email.includes("@")?1:0.6}}>
-                Start Matching
-              </button>
-            </div>
-          ) : (
-            <div style={{animation:"fadeSlide 0.4s ease-out"}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-                <div style={{width:28,height:28,borderRadius:"50%",background:"#e8f5e9",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14}}>✓</div>
-                <span style={{fontSize:14,color:B.green,fontWeight:600}}>You're in! Let's find your home.</span>
-              </div>
-              <button onClick={onStart} style={{padding:"14px 32px",borderRadius:12,fontSize:15,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"'Outfit',sans-serif",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff"}}>
-                Start the Quiz →
-              </button>
-            </div>
-          )}
-          <p style={{fontSize:11.5,color:"#b0bec5",marginTop:12}}>Free forever · No spam · 2 min quiz</p>
+          {/* Direct CTA — no email friction */}
+          <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
+            <button onClick={onStart} style={{padding:"16px 36px",borderRadius:14,fontSize:16,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"'Outfit',sans-serif",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff",boxShadow:"0 4px 16px rgba(245,146,27,0.3)",transition:"transform 0.2s",letterSpacing:"0.01em"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>
+              Find My Home →
+            </button>
+            <span onClick={onPricing} style={{fontSize:13.5,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>See pricing</span>
+          </div>
+          <p style={{fontSize:11.5,color:"#b0bec5",marginTop:12}}>Free · No signup required · 2 min quiz</p>
         </div>
         {/* Hero Visual */}
         <div style={{flex:1,minWidth:280,display:"flex",justifyContent:"center"}}>
@@ -445,19 +429,142 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
           Take the 2-Minute Quiz →
         </button>
         <p style={{fontSize:14,color:B.gray,marginBottom:16,marginTop:16}}>Or see <span onClick={onPricing} style={{color:B.blue,cursor:"pointer",fontWeight:600}}>pricing</span> for agencies.</p>
-        <p style={{fontSize:12,color:"#b0bec5",marginTop:8}}>homeaimatch.com</p>
+        <p style={{fontSize:12,color:"#b0bec5",marginTop:8}}>homeaimatch.com · <a href="contact.html" style={{color:"#90a4ae",textDecoration:"none"}}>Contact</a> · <a href="legal.html" style={{color:"#90a4ae",textDecoration:"none"}}>Terms</a> · <a href="legal.html#privacy" style={{color:"#90a4ae",textDecoration:"none"}}>Privacy</a></p>
       </section>
     </div>
   );
 };
 
 
-const ContactModal=({agent,house,onClose,buyerAnswers})=>{
+/* ════════════════════════════════════════════════════════════════════
+   MAP VIEW — Shows matched properties on an interactive map
+   ════════════════════════════════════════════════════════════════════ */
+const MapView = ({ results }) => {
+  const mapRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [selectedPin, setSelectedPin] = useState(null);
+
+  // Collect coordinates from results
+  const pins = results.map((m, i) => {
+    const h = m.house;
+    // Use real coordinates if available, otherwise estimate from city
+    const cityCoords = {
+      'cork': [51.8985, -8.4756], 'lourinhã': [39.2417, -9.3133], 'london': [51.5074, -0.1278],
+      'manchester': [53.4808, -2.2426], 'birmingham': [52.4862, -1.8904], 'leeds': [53.8008, -1.5491],
+      'bristol': [51.4545, -2.5879], 'edinburgh': [55.9533, -3.1883], 'cardiff': [51.4816, -3.1791],
+      'newcastle': [54.9783, -1.6178], 'cambridge': [52.2053, 0.1218], 'bath': [51.3758, -2.3599],
+      'brighton': [50.8225, -0.1372],
+    };
+    const cityKey = (h.city || '').toLowerCase();
+    const base = cityCoords[cityKey] || [51.9, -8.47];
+    // Offset each pin slightly so they don't stack
+    const lat = h.latitude || (base[0] + (Math.random() - 0.5) * 0.03);
+    const lng = h.longitude || (base[1] + (Math.random() - 0.5) * 0.03);
+    return { ...m, lat, lng, rank: i + 1 };
+  }).filter(p => p.lat && p.lng);
+
+  useEffect(() => {
+    if (!mapRef.current || mapReady) return;
+    // Load Leaflet CSS
+    if (!document.querySelector('link[href*="leaflet"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+    // Load Leaflet JS
+    if (!window.L) {
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = () => setMapReady(true);
+      document.head.appendChild(script);
+    } else {
+      setMapReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mapReady || !window.L || !mapRef.current || pins.length === 0) return;
+    // Clean up previous map
+    if (mapRef.current._leaflet_id) {
+      mapRef.current.innerHTML = '';
+      mapRef.current._leaflet_id = null;
+    }
+    const map = window.L.map(mapRef.current, { scrollWheelZoom: true, zoomControl: true });
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(map);
+
+    const markers = [];
+    pins.forEach(p => {
+      const h = p.house;
+      const cur = h.currency === 'EUR' ? '€' : '£';
+      const priceStr = h.price >= 1e6 ? `${cur}${(h.price/1e6).toFixed(1)}M` : `${cur}${(h.price/1e3).toFixed(0)}K`;
+      const scoreColor = p.pct >= 85 ? '#2E8B57' : p.pct >= 70 ? '#F5921B' : '#6B7D8E';
+      const icon = window.L.divIcon({
+        className: '',
+        html: `<div style="background:${scoreColor};color:#fff;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:16px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.2);border:2px solid #fff;display:flex;align-items:center;gap:3px;cursor:pointer"><span>${p.pct}%</span><span style="font-weight:500;font-size:10px">${priceStr}</span></div>`,
+        iconSize: [80, 28],
+        iconAnchor: [40, 14],
+      });
+      const marker = window.L.marker([p.lat, p.lng], { icon }).addTo(map);
+      marker.on('click', () => setSelectedPin(p));
+      markers.push(marker);
+    });
+
+    // Fit bounds
+    if (markers.length > 0) {
+      const group = window.L.featureGroup(markers);
+      map.fitBounds(group.getBounds().pad(0.15));
+    }
+  }, [mapReady, pins.length]);
+
+  const cur = selectedPin ? (selectedPin.house.currency === 'EUR' ? '€' : '£') : '';
+
+  return (
+    <div style={{borderRadius:14,overflow:"hidden",border:`1px solid ${B.border}`,background:B.white}}>
+      <div ref={mapRef} style={{height:400,width:"100%",background:B.grayL}}/>
+      {!mapReady && <div style={{textAlign:"center",padding:40,color:B.gray,fontSize:13}}>Loading map...</div>}
+      {selectedPin && (
+        <div style={{padding:16,borderTop:`1px solid ${B.border}`,animation:"fadeSlide 0.25s ease-out"}}>
+          <div style={{display:"flex",gap:14,alignItems:"flex-start"}}>
+            {selectedPin.house.image_urls?.[0] ? (
+              <img src={selectedPin.house.image_urls[0]} style={{width:90,height:65,borderRadius:10,objectFit:"cover",flexShrink:0}} onError={e=>{e.target.style.display='none'}}/>
+            ) : (
+              <PropertyImage style={selectedPin.house.style || "traditional"} size={90}/>
+            )}
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+                <div>
+                  <div style={{fontSize:14,fontWeight:700,color:B.dark,fontFamily:"'Outfit',sans-serif"}}>{selectedPin.house.name}</div>
+                  <div style={{fontSize:12,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>{selectedPin.house.city} · {selectedPin.house.beds} bed · {selectedPin.house.sqm}m²</div>
+                </div>
+                <div style={{background:selectedPin.pct>=85?'#e8f5e9':selectedPin.pct>=70?'#FFF4E5':B.grayL,color:selectedPin.pct>=85?'#2E8B57':selectedPin.pct>=70?B.orange:B.gray,padding:"4px 10px",borderRadius:12,fontSize:13,fontWeight:700,fontFamily:"'Outfit',sans-serif",whiteSpace:"nowrap"}}>{selectedPin.pct}% match</div>
+              </div>
+              <div style={{fontSize:16,fontWeight:800,color:B.dark,fontFamily:"'Outfit',sans-serif",marginTop:4}}>{cur}{selectedPin.house.price?.toLocaleString()}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>
+                {(selectedPin.reasons || []).slice(0,3).map((r,i) => (
+                  <span key={i} style={{fontSize:10,color:B.dark,background:B.grayL,padding:"2px 8px",borderRadius:12,fontFamily:"'Outfit',sans-serif"}}>{r}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+const ContactModal=({agent,house,onClose})=>{
   const[cn,setCn]=useState("");
   const[ce,setCe]=useState("");
   const[cm,setCm]=useState("Hi " + agent.name + ", I found " + house.name + " on homeAImatch and would love to arrange a viewing.");
   const[sent,setSent]=useState(false);
+  const[consent,setConsent]=useState(false);
   const F2 = "'Outfit',sans-serif";
+  const canSend = cn && ce.includes("@") && consent;
   if(sent)return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:16,animation:"fadeSlide 0.3s ease-out"}} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} style={{background:B.white,borderRadius:18,padding:32,maxWidth:400,width:"100%",textAlign:"center"}}>
@@ -482,13 +589,17 @@ const ContactModal=({agent,house,onClose,buyerAnswers})=>{
           <input value={cn} onChange={e=>setCn(e.target.value)} placeholder="Your name" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <input value={ce} onChange={e=>setCe(e.target.value)} placeholder="Your email" type="email" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <textarea value={cm} onChange={e=>setCm(e.target.value)} rows={4} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark,resize:"vertical",lineHeight:1.5}}/>
+          <label style={{display:"flex",gap:8,alignItems:"flex-start",cursor:"pointer",fontSize:11.5,color:B.gray,lineHeight:1.5,fontFamily:F2}}>
+            <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{marginTop:2,flexShrink:0,accentColor:B.blue}}/>
+            <span>I agree to share my name, email, and message with the agent. I have read the <a href="legal.html#privacy" target="_blank" style={{color:B.blue}}>Privacy Policy</a> and <a href="legal.html#tos" target="_blank" style={{color:B.blue}}>Terms of Service</a>.</span>
+          </label>
           <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>{if(cn&&ce.includes("@")){
-              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null,buyer_profile:buyerAnswers||null}).then(()=>setSent(true)).catch(()=>{
+            <button onClick={()=>{if(canSend){
+              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null}).then(()=>setSent(true)).catch(()=>{
                 // Fallback to Formspree
                 fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);
               });
-            }}} disabled={!cn||!ce.includes("@")} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:cn&&ce.includes("@")?"pointer":"not-allowed",fontFamily:F2,background:cn&&ce.includes("@")?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
+            }}} disabled={!canSend} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:canSend?"pointer":"not-allowed",fontFamily:F2,background:canSend?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
             {agent.phone&&<a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>}
           </div>
         </div>
@@ -716,7 +827,7 @@ function HomeAIMatch() {
     <div style={{minHeight:"100vh",background:"#fafbfc",fontFamily:"'Outfit',sans-serif",display:"flex",flexDirection:"column"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');@keyframes fadeSlide{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}}*{box-sizing:border-box;margin:0;padding:0;}body{background:#fafbfc;}input::placeholder{color:#b0bec5;}::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#d0d8e0;border-radius:3px;}`}</style>
 
-      {contactHouse&&contactHouse.agent&&<ContactModal agent={contactHouse.agent} house={contactHouse} onClose={()=>setContactHouse(null)} buyerAnswers={answers}/>}
+      {contactHouse&&contactHouse.agent&&<ContactModal agent={contactHouse.agent} house={contactHouse} onClose={()=>setContactHouse(null)}/>}
       {/* Header */}
       <div style={{background:B.white,borderBottom:`1px solid ${B.border}`,padding:"11px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
         <LogoFull/>
@@ -750,9 +861,9 @@ function HomeAIMatch() {
           <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:11}}>
             {persona&&(<div style={{background:`linear-gradient(135deg,${B.dark} 0%,${B.blueD} 100%)`,borderRadius:14,padding:"18px 20px",color:"#f0f4f8",animation:"fadeSlide 0.5s ease-out",marginBottom:2}}><div style={{fontSize:24,marginBottom:3}}>{persona.emoji}</div><div style={{fontSize:16,fontWeight:700,letterSpacing:"-0.02em",marginBottom:2}}>{persona.title}</div><div style={{fontSize:12.5,opacity:0.85,lineHeight:1.5}}>{persona.desc}</div></div>)}
             <div style={{display:"flex",gap:0,background:B.grayL,borderRadius:8,padding:2,alignSelf:"flex-start"}}>
-              {["cards","compare"].map(m=><button key={m} onClick={()=>setViewMode(m)} style={{padding:"6px 14px",borderRadius:6,fontSize:11.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",border:"none",background:viewMode===m?B.white:"transparent",color:viewMode===m?B.dark:B.gray,boxShadow:viewMode===m?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{m==="cards"?"📋 Cards":"📊 Compare"}</button>)}
+              {["cards","compare","map"].map(m=><button key={m} onClick={()=>setViewMode(m)} style={{padding:"6px 14px",borderRadius:6,fontSize:11.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",border:"none",background:viewMode===m?B.white:"transparent",color:viewMode===m?B.dark:B.gray,boxShadow:viewMode===m?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{m==="cards"?"📋 Cards":m==="compare"?"📊 Compare":"🗺️ Map"}</button>)}
             </div>
-            {viewMode==="compare"?<CompTable results={results}/>:(
+            {viewMode==="map"?<MapView results={results}/>:viewMode==="compare"?<CompTable results={results}/>:(
               <>{results.map((m,i)=><Card key={m.house.id} match={m} rank={i} expanded={expandedCard===m.house.id} onToggle={()=>setExpandedCard(expandedCard===m.house.id?null:m.house.id)} saved={!!saved[m.house.id]} onSave={id=>setSaved(p=>({...p,[id]:!p[id]}))} onContact={h=>setContactHouse(h)}/>)}</>
             )}
             <div style={{textAlign:"center",padding:"18px 0 10px",fontSize:11.5,color:"#b0bec5",lineHeight:1.6}}>
