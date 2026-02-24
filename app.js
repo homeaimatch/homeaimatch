@@ -60,8 +60,6 @@ function adaptMatch(m) {
       tagline: p.tagline || `${p.property_type || 'Property'} in ${p.city}`,
       desc: p.description || '',
       source_url: p.source_url,
-      latitude: p.latitude || null,
-      longitude: p.longitude || null,
       image_urls: p.image_urls || [],
       agent: p.agent ? {
         name: p.agent.name,
@@ -441,22 +439,15 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
 /* ════════════════════════════════════════════════════════════════════
    MAP VIEW — Shows matched properties on an interactive map
    ════════════════════════════════════════════════════════════════════ */
-// Stable hash from string → number between 0 and 1 (deterministic, never changes)
-function stableHash(str, salt = 0) {
-  let h = salt;
-  for (let i = 0; i < str.length; i++) { h = ((h << 5) - h + str.charCodeAt(i)) | 0; }
-  return ((h & 0x7fffffff) % 10000) / 10000;
-}
-
 const MapView = ({ results }) => {
   const mapRef = useRef(null);
   const [mapReady, setMapReady] = useState(false);
   const [selectedPin, setSelectedPin] = useState(null);
-  const mapInstance = useRef(null);
 
-  // Collect coordinates — use real lat/lng, fall back to stable offset from city center
+  // Collect coordinates from results
   const pins = results.map((m, i) => {
     const h = m.house;
+    // Use real coordinates if available, otherwise estimate from city
     const cityCoords = {
       'cork': [51.8985, -8.4756], 'lourinhã': [39.2417, -9.3133], 'london': [51.5074, -0.1278],
       'manchester': [53.4808, -2.2426], 'birmingham': [52.4862, -1.8904], 'leeds': [53.8008, -1.5491],
@@ -466,21 +457,22 @@ const MapView = ({ results }) => {
     };
     const cityKey = (h.city || '').toLowerCase();
     const base = cityCoords[cityKey] || [51.9, -8.47];
-    const id = h.id || `prop-${i}`;
-    // Use real coordinates if available, otherwise deterministic offset from property ID
-    const lat = h.latitude || (base[0] + (stableHash(id, 1) - 0.5) * 0.04);
-    const lng = h.longitude || (base[1] + (stableHash(id, 2) - 0.5) * 0.04);
+    // Offset each pin slightly so they don't stack
+    const lat = h.latitude || (base[0] + (Math.random() - 0.5) * 0.03);
+    const lng = h.longitude || (base[1] + (Math.random() - 0.5) * 0.03);
     return { ...m, lat, lng, rank: i + 1 };
   }).filter(p => p.lat && p.lng);
 
   useEffect(() => {
     if (!mapRef.current || mapReady) return;
+    // Load Leaflet CSS
     if (!document.querySelector('link[href*="leaflet"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
       document.head.appendChild(link);
     }
+    // Load Leaflet JS
     if (!window.L) {
       const script = document.createElement('script');
       script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
@@ -493,15 +485,15 @@ const MapView = ({ results }) => {
 
   useEffect(() => {
     if (!mapReady || !window.L || !mapRef.current || pins.length === 0) return;
-    // Properly destroy previous map instance
-    if (mapInstance.current) {
-      mapInstance.current.remove();
-      mapInstance.current = null;
+    // Clean up previous map
+    if (mapRef.current._leaflet_id) {
+      mapRef.current.innerHTML = '';
+      mapRef.current._leaflet_id = null;
     }
     const map = window.L.map(mapRef.current, { scrollWheelZoom: true, zoomControl: true });
-    mapInstance.current = map;
     window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap', maxZoom: 18,
+      attribution: '© OpenStreetMap',
+      maxZoom: 18,
     }).addTo(map);
 
     const markers = [];
@@ -513,18 +505,19 @@ const MapView = ({ results }) => {
       const icon = window.L.divIcon({
         className: '',
         html: `<div style="background:${scoreColor};color:#fff;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:16px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.2);border:2px solid #fff;display:flex;align-items:center;gap:3px;cursor:pointer"><span>${p.pct}%</span><span style="font-weight:500;font-size:10px">${priceStr}</span></div>`,
-        iconSize: [80, 28], iconAnchor: [40, 14],
+        iconSize: [80, 28],
+        iconAnchor: [40, 14],
       });
       const marker = window.L.marker([p.lat, p.lng], { icon }).addTo(map);
       marker.on('click', () => setSelectedPin(p));
       markers.push(marker);
     });
+
+    // Fit bounds
     if (markers.length > 0) {
       const group = window.L.featureGroup(markers);
       map.fitBounds(group.getBounds().pad(0.15));
     }
-    return () => { if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; } };
-  }, [mapReady, pins.length]);
   }, [mapReady, pins.length]);
 
   const cur = selectedPin ? (selectedPin.house.currency === 'EUR' ? '€' : '£') : '';
