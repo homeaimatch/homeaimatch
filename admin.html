@@ -326,17 +326,18 @@ function renderAgents() {
   return `
     <div class="card fade-in">
       <h3>All Agents (${agents.length})</h3>
+      ${agents.length === 0 ? '<div style="text-align:center;padding:30px;color:var(--gray)">No agents found. Check Supabase RLS policies.</div>' : `
       <div class="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Joined</th></tr></thead>
+        <thead><tr><th>Name</th><th>Email</th><th>Agency</th><th>Joined</th></tr></thead>
         <tbody>
         ${agents.map(a => `<tr>
           <td style="font-weight:600">${a.name || '—'}</td>
-          <td style="font-size:11px;color:var(--gray)">${a.email}</td>
-          <td><span class="badge" style="background:${a.subscription_tier==='unlimited'?'var(--blue-l)':a.subscription_tier==='paid'?'#fff8e1':'var(--gray-l)'};color:${a.subscription_tier==='unlimited'?'var(--blue)':a.subscription_tier==='paid'?'#f59e0b':'var(--gray)'}">${a.subscription_tier || 'free'}</span></td>
+          <td style="font-size:11px"><a href="mailto:${a.email||''}" style="color:var(--blue)">${a.email || '—'}</a></td>
+          <td style="font-size:11px;color:var(--gray)">${a.agency_id ? a.agency_id.slice(0,8)+'…' : '—'}</td>
           <td style="font-size:11px;color:var(--gray)">${timeAgo(a.created_at)}</td>
         </tr>`).join('')}
         </tbody>
-      </table></div>
+      </table></div>`}
     </div>
   `;
 }
@@ -380,14 +381,22 @@ function renderContacts() {
       <div class="table-wrap"><table>
         <thead><tr><th>Status</th><th>Name</th><th>Email</th><th>Type</th><th>Message</th><th>Received</th></tr></thead>
         <tbody>
-        ${msgs.map(m => `<tr>
+        ${msgs.map((m, idx) => {
+          const msgId = 'msg-' + idx;
+          const shortMsg = m.message.length > 80 ? m.message.substring(0, 80) + '…' : m.message;
+          const isLong = m.message.length > 80;
+          return `<tr>
           <td><span class="badge badge-${m.is_read?'read':'unread'}">${m.is_read?'read':'new'}</span></td>
           <td style="font-weight:600">${m.name}</td>
           <td style="font-size:11px"><a href="mailto:${m.email}" style="color:var(--blue)">${m.email}</a></td>
           <td style="font-size:11px;color:var(--gray)">${m.type || '—'}</td>
-          <td style="font-size:11px;color:var(--gray);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.message}</td>
-          <td style="font-size:11px;color:var(--gray)">${timeAgo(m.created_at)}</td>
-        </tr>`).join('')}
+          <td style="font-size:11px;color:var(--gray);max-width:400px">
+            <span id="${msgId}-short">${shortMsg}</span>
+            ${isLong ? `<span id="${msgId}-full" style="display:none;white-space:pre-wrap;word-break:break-word">${m.message}</span>
+            <button onclick="toggleMsg('${msgId}')" id="${msgId}-btn" style="background:none;border:none;color:var(--blue);font-size:10px;font-weight:600;cursor:pointer;padding:2px 0;font-family:'Outfit',sans-serif">Show more ▾</button>` : ''}
+          </td>
+          <td style="font-size:11px;color:var(--gray);white-space:nowrap">${timeAgo(m.created_at)}</td>
+        </tr>`}).join('')}
         </tbody>
       </table></div>`}
     </div>
@@ -453,6 +462,16 @@ function initMap() {
 }
 
 // ── INIT ──
+function toggleMsg(id) {
+  const short = document.getElementById(id + '-short');
+  const full = document.getElementById(id + '-full');
+  const btn = document.getElementById(id + '-btn');
+  if (full.style.display === 'none') {
+    short.style.display = 'none'; full.style.display = 'inline'; btn.textContent = 'Show less ▴';
+  } else {
+    short.style.display = 'inline'; full.style.display = 'none'; btn.textContent = 'Show more ▾';
+  }
+}
 loadData();
 // Auto-refresh every 60 seconds
 setInterval(loadData, 60000);
