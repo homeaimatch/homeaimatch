@@ -157,27 +157,30 @@ async function submitContact(e) {
   const email = document.getElementById('c-email').value.trim();
   const type = document.getElementById('c-type').value;
   const message = document.getElementById('c-message').value.trim();
+  const btn = e.target.querySelector('button[type="submit"]');
 
   if (!name || !email || !message) return;
 
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
   try {
-    // Try sending to backend API (subscribe endpoint as a contact message)
-    await fetch(API_URL + '/api/subscribe', {
+    const resp = await fetch(API_URL + '/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, source: 'contact_form', name, type, message })
+      body: JSON.stringify({ name, email, type, message })
     });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Failed to send');
+
+    // Show success
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('success-msg').classList.add('show');
   } catch (err) {
-    console.log('API error, falling back');
+    btn.disabled = false;
+    btn.textContent = 'Send Message';
+    alert('Sorry, something went wrong. Please email us directly at hello@homeaimatch.com');
   }
-
-  // Also send via mailto link as backup
-  const subject = encodeURIComponent(`[homeAImatch Contact] ${type} — ${name}`);
-  const body = encodeURIComponent(`From: ${name} (${email})\nType: ${type}\n\n${message}`);
-
-  // Show success
-  document.getElementById('contact-form').style.display = 'none';
-  document.getElementById('success-msg').classList.add('show');
 }
 </script>
 </body>
