@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>homeAImatch — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--blue:#1E96D1;--blue-d:#1578A8;--blue-l:#E8F4FB;--orange:#F5921B;--orange-d:#D97E15;
+      --green:#2E8B57;--green-l:#e8f5e9;--red:#e74c3c;--red-l:#fbe9e7;
+      --dark:#1A2B3C;--gray:#6B7D8E;--gray-l:#f4f6f8;--border:#E4E9EE;--white:#fff}
+    body{font-family:'Outfit',sans-serif;color:var(--dark);background:#f0f2f5;min-height:100vh}
+
+    /* LAYOUT */
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:220px;background:var(--dark);color:#fff;position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column}
+    .main{flex:1;margin-left:220px;min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+    .topbar h2{font-size:16px;font-weight:700}
+    .content{padding:24px 28px;max-width:1400px}
+
+    /* SIDEBAR */
+    .sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .sidebar-logo span{font-size:16px;font-weight:800;color:#fff}
+    .sidebar-logo small{display:block;font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;text-transform:uppercase;letter-spacing:0.1em}
+    .sidebar-nav{flex:1;padding:12px 10px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:rgba(255,255,255,0.5);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;margin-bottom:2px}
+    .nav-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+    .nav-item.active{background:rgba(30,150,209,0.2);color:#fff;font-weight:600}
+    .nav-item .icon{font-size:16px;width:22px;text-align:center}
+
+    /* STAT CARDS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+    .stat-card{background:var(--white);border-radius:14px;padding:18px;border:1px solid var(--border)}
+    .stat-card .label{font-size:10.5px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+    .stat-card .value{font-size:28px;font-weight:800;color:var(--dark)}
+    .stat-card .sub{font-size:11px;color:var(--gray);margin-top:3px}
+    .stat-card.highlight{background:linear-gradient(135deg,var(--blue),var(--blue-d))}
+    .stat-card.highlight .label,.stat-card.highlight .sub{color:rgba(255,255,255,0.7)}
+    .stat-card.highlight .value{color:#fff}
+
+    /* CARDS */
+    .card{background:var(--white);border-radius:14px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,0.04);border:1px solid var(--border);margin-bottom:16px}
+    .card h3{font-size:14px;font-weight:700;color:var(--dark);margin-bottom:14px}
+
+    /* GRID */
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid-3{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+
+    /* TABLE */
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th{text-align:left;font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.06em;padding:8px 10px;border-bottom:1.5px solid var(--border)}
+    td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:hover td{background:var(--gray-l)}
+
+    /* BADGE */
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+    .badge-new{background:var(--blue-l);color:var(--blue)}
+    .badge-contacted{background:#fff8e1;color:#f59e0b}
+    .badge-viewing_booked{background:var(--green-l);color:var(--green)}
+    .badge-closed{background:var(--gray-l);color:var(--gray)}
+    .badge-unread{background:var(--orange);color:#fff}
+    .badge-read{background:var(--gray-l);color:var(--gray)}
+
+    /* MAP */
+    #admin-map{height:400px;border-radius:10px;z-index:1}
+
+    /* LOADING */
+    .loading{text-align:center;padding:60px;color:var(--gray);font-size:14px}
+
+    /* MOBILE */
+    @media(max-width:768px){
+      .sidebar{width:56px}
+      .sidebar .nav-label,.sidebar-logo span,.sidebar-logo small{display:none}
+      .main{margin-left:56px}
+      .content{padding:16px}
+      .grid-2,.grid-3{grid-template-columns:1fr}
+      .stats-grid{grid-template-columns:1fr 1fr}
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn 0.3s ease-out}
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <span>🏠 homeAImatch</span>
+      <small>Admin Console</small>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="switchTab('overview')"><span class="icon">📊</span><span class="nav-label">Overview</span></div>
+      <div class="nav-item" onclick="switchTab('properties')"><span class="icon">🏘️</span><span class="nav-label">Properties</span></div>
+      <div class="nav-item" onclick="switchTab('agents')"><span class="icon">👤</span><span class="nav-label">Agents</span></div>
+      <div class="nav-item" onclick="switchTab('leads')"><span class="icon">📬</span><span class="nav-label">Leads</span></div>
+      <div class="nav-item" onclick="switchTab('contacts')"><span class="icon">✉️</span><span class="nav-label">Messages</span></div>
+      <div class="nav-item" onclick="switchTab('map')"><span class="icon">🗺️</span><span class="nav-label">Property Map</span></div>
+    </div>
+    <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08)">
+      <div style="font-size:12px;font-weight:600;color:#fff">Admin</div>
+      <a href="agent-dashboard" style="font-size:10px;color:rgba(255,255,255,0.4);text-decoration:none">← Agent Dashboard</a>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2 id="page-title">Overview</h2>
+      <div style="font-size:11px;color:var(--gray)" id="last-updated">Loading...</div>
+    </div>
+    <div class="content" id="main-content">
+      <div class="loading">Loading dashboard data...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://homeaimatch-backend-production.up.railway.app';
+let DATA = null;
+let currentTab = 'overview';
+let mapInstance = null;
+
+async function loadData() {
+  try {
+    const resp = await fetch(API + '/api/admin/stats');
+    DATA = await resp.json();
+    document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+    render();
+  } catch (err) {
+    document.getElementById('main-content').innerHTML = '<div class="loading">Failed to load data. Check server connection.</div>';
+  }
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-item').forEach((n, i) => {
+    const tabs = ['overview','properties','agents','leads','contacts','map'];
+    n.classList.toggle('active', tabs[i] === tab);
+  });
+  const titles = {overview:'Overview',properties:'Properties',agents:'Agents',leads:'Leads',contacts:'Contact Messages',map:'Property Map'};
+  document.getElementById('page-title').textContent = titles[tab] || tab;
+  render();
+}
+
+function render() {
+  if (!DATA) return;
+  const el = document.getElementById('main-content');
+  switch (currentTab) {
+    case 'overview': el.innerHTML = renderOverview(); initCharts(); break;
+    case 'properties': el.innerHTML = renderProperties(); break;
+    case 'agents': el.innerHTML = renderAgents(); break;
+    case 'leads': el.innerHTML = renderLeads(); break;
+    case 'contacts': el.innerHTML = renderContacts(); break;
+    case 'map': el.innerHTML = renderMap(); setTimeout(initMap, 100); break;
+  }
+}
+
+function timeAgo(d) {
+  const s = Math.floor((Date.now() - new Date(d)) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  if (s < 604800) return Math.floor(s/86400) + 'd ago';
+  return new Date(d).toLocaleDateString();
+}
+
+function trendByDay(items, days = 30) {
+  const counts = {};
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now); d.setDate(d.getDate() - i);
+    counts[d.toISOString().split('T')[0]] = 0;
+  }
+  (items || []).forEach(item => {
+    const d = (item.created_at || '').split('T')[0];
+    if (counts[d] !== undefined) counts[d]++;
+  });
+  return { labels: Object.keys(counts).map(d => d.slice(5)), values: Object.values(counts) };
+}
+
+// ── OVERVIEW ──
+function renderOverview() {
+  const p = DATA.properties, a = DATA.agents, l = DATA.leads, s = DATA.subscribers, c = DATA.contacts;
+  const newLeads = (l.data || []).filter(x => x.status === 'new').length;
+  const unreadMsgs = (c.data || []).filter(x => !x.is_read).length;
+
+  return `
+    <div class="stats-grid fade-in">
+      <div class="stat-card highlight">
+        <div class="label">Total Properties</div>
+        <div class="value">${p.count}</div>
+        <div class="sub">${(p.data||[]).filter(x=>x.listing_status==='active').length} active</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Agents</div>
+        <div class="value">${a.count}</div>
+        <div class="sub">${(a.data||[]).filter(x=>{const d=new Date(x.created_at);return(Date.now()-d)<7*86400000}).length} this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Leads</div>
+        <div class="value">${l.count}</div>
+        <div class="sub">${newLeads} new</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Subscribers</div>
+        <div class="value">${s.count}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Contact Messages</div>
+        <div class="value">${c.count}</div>
+        <div class="sub">${unreadMsgs} unread</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card fade-in">
+        <h3>📈 Properties Added (Last 30 Days)</h3>
+        <canvas id="chart-properties" height="200"></canvas>
+      </div>
+      <div class="card fade-in">
+        <h3>📬 Leads Created (Last 30 Days)</h3>
+        <canvas id="chart-leads" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:0">
+      <div class="card fade-in">
+        <h3>👤 Agent Signups (Last 30 Days)</h3>
+        <canvas id="chart-agents" height="200"></canvas>
+      </div>
+      <div class="card fade-in">
+        <h3>🏘️ Properties by City</h3>
+        <canvas id="chart-cities" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="card fade-in">
+      <h3>Recent Leads</h3>
+      ${renderLeadsTable((l.data||[]).slice(0, 8))}
+    </div>
+  `;
+}
+
+function initCharts() {
+  if (typeof Chart === 'undefined') return;
+  const propTrend = trendByDay(DATA.properties.data);
+  const leadTrend = trendByDay(DATA.leads.data);
+  const agentTrend = trendByDay(DATA.agents.data);
+
+  const chartOpts = (label, color) => ({
+    type: 'bar',
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { maxRotation: 0, maxTicksLimit: 10, font: { size: 9 } } } }
+    }
+  });
+
+  new Chart(document.getElementById('chart-properties'), {
+    ...chartOpts(),
+    type: 'bar',
+    data: { labels: propTrend.labels, datasets: [{ label: 'Properties', data: propTrend.values, backgroundColor: 'rgba(30,150,209,0.6)', borderRadius: 4 }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { maxRotation: 0, maxTicksLimit: 10, font: { size: 9 } } } } }
+  });
+
+  new Chart(document.getElementById('chart-leads'), {
+    type: 'bar',
+    data: { labels: leadTrend.labels, datasets: [{ label: 'Leads', data: leadTrend.values, backgroundColor: 'rgba(245,146,27,0.6)', borderRadius: 4 }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { maxRotation: 0, maxTicksLimit: 10, font: { size: 9 } } } } }
+  });
+
+  new Chart(document.getElementById('chart-agents'), {
+    type: 'bar',
+    data: { labels: agentTrend.labels, datasets: [{ label: 'Agents', data: agentTrend.values, backgroundColor: 'rgba(46,139,87,0.6)', borderRadius: 4 }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { maxRotation: 0, maxTicksLimit: 10, font: { size: 9 } } } } }
+  });
+
+  // Cities pie chart
+  const cities = {};
+  (DATA.properties.data || []).forEach(p => { const c = p.city || 'Unknown'; cities[c] = (cities[c] || 0) + 1; });
+  const cityLabels = Object.keys(cities);
+  const cityValues = Object.values(cities);
+  const colors = ['#1E96D1','#F5921B','#2E8B57','#e74c3c','#9b59b6','#1abc9c','#f39c12','#34495e'];
+
+  new Chart(document.getElementById('chart-cities'), {
+    type: 'doughnut',
+    data: { labels: cityLabels, datasets: [{ data: cityValues, backgroundColor: colors.slice(0, cityLabels.length) }] },
+    options: { responsive: true, plugins: { legend: { position: 'right', labels: { font: { size: 11, family: "'Outfit'" } } } } }
+  });
+}
+
+// ── PROPERTIES ──
+function renderProperties() {
+  const props = DATA.properties.data || [];
+  return `
+    <div class="card fade-in">
+      <h3>All Properties (${props.length})</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>City</th><th>Region</th><th>Price</th><th>Status</th><th>Agent</th><th>Has Coords</th><th>Added</th></tr></thead>
+        <tbody>
+        ${props.map(p => `<tr>
+          <td style="font-weight:600">${p.city || '—'}</td>
+          <td>${p.region || '—'}</td>
+          <td>€${(p.price||0).toLocaleString()}</td>
+          <td><span class="badge badge-${p.listing_status||'active'}" style="background:${p.listing_status==='active'?'var(--green-l)':'var(--gray-l)'};color:${p.listing_status==='active'?'var(--green)':'var(--gray)'}">${p.listing_status||'active'}</span></td>
+          <td style="font-size:11px;color:var(--gray)">${p.agent_id ? p.agent_id.slice(0,8)+'…' : 'none'}</td>
+          <td>${p.latitude && p.longitude ? '✅' : '❌'}</td>
+          <td style="font-size:11px;color:var(--gray)">${timeAgo(p.created_at)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ── AGENTS ──
+function renderAgents() {
+  const agents = DATA.agents.data || [];
+  return `
+    <div class="card fade-in">
+      <h3>All Agents (${agents.length})</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Joined</th></tr></thead>
+        <tbody>
+        ${agents.map(a => `<tr>
+          <td style="font-weight:600">${a.name || '—'}</td>
+          <td style="font-size:11px;color:var(--gray)">${a.email}</td>
+          <td><span class="badge" style="background:${a.subscription_tier==='unlimited'?'var(--blue-l)':a.subscription_tier==='paid'?'#fff8e1':'var(--gray-l)'};color:${a.subscription_tier==='unlimited'?'var(--blue)':a.subscription_tier==='paid'?'#f59e0b':'var(--gray)'}">${a.subscription_tier || 'free'}</span></td>
+          <td style="font-size:11px;color:var(--gray)">${timeAgo(a.created_at)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ── LEADS ──
+function renderLeads() {
+  const leads = DATA.leads.data || [];
+  return `
+    <div class="card fade-in">
+      <h3>All Leads (${leads.length})</h3>
+      ${renderLeadsTable(leads)}
+    </div>
+  `;
+}
+
+function renderLeadsTable(leads) {
+  if (leads.length === 0) return '<div style="text-align:center;padding:30px;color:var(--gray)">No leads yet</div>';
+  return `
+    <div class="table-wrap"><table>
+      <thead><tr><th>Status</th><th>Score</th><th>Has Profile</th><th>Property</th><th>Created</th></tr></thead>
+      <tbody>
+      ${leads.map(l => `<tr>
+        <td><span class="badge badge-${l.status||'new'}">${l.status || 'new'}</span></td>
+        <td style="font-weight:600">${l.match_score ? l.match_score + '%' : '—'}</td>
+        <td>${l.buyer_profile ? '✅' : '❌'}</td>
+        <td style="font-size:11px;color:var(--gray)">${l.property_id ? l.property_id.slice(0,8)+'…' : '—'}</td>
+        <td style="font-size:11px;color:var(--gray)">${timeAgo(l.created_at)}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table></div>
+  `;
+}
+
+// ── CONTACTS ──
+function renderContacts() {
+  const msgs = DATA.contacts.data || [];
+  return `
+    <div class="card fade-in">
+      <h3>Contact Messages (${msgs.length})</h3>
+      ${msgs.length === 0 ? '<div style="text-align:center;padding:30px;color:var(--gray)">No messages yet</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Status</th><th>Name</th><th>Email</th><th>Type</th><th>Message</th><th>Received</th></tr></thead>
+        <tbody>
+        ${msgs.map(m => `<tr>
+          <td><span class="badge badge-${m.is_read?'read':'unread'}">${m.is_read?'read':'new'}</span></td>
+          <td style="font-weight:600">${m.name}</td>
+          <td style="font-size:11px"><a href="mailto:${m.email}" style="color:var(--blue)">${m.email}</a></td>
+          <td style="font-size:11px;color:var(--gray)">${m.type || '—'}</td>
+          <td style="font-size:11px;color:var(--gray);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.message}</td>
+          <td style="font-size:11px;color:var(--gray)">${timeAgo(m.created_at)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table></div>`}
+    </div>
+  `;
+}
+
+// ── MAP ──
+function renderMap() {
+  const props = DATA.properties.data || [];
+  const withCoords = props.filter(p => p.latitude && p.longitude).length;
+  return `
+    <div class="stats-grid fade-in" style="margin-bottom:16px">
+      <div class="stat-card">
+        <div class="label">Total Properties</div>
+        <div class="value">${props.length}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">With Coordinates</div>
+        <div class="value">${withCoords}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Missing Coordinates</div>
+        <div class="value">${props.length - withCoords}</div>
+      </div>
+    </div>
+    <div class="card fade-in">
+      <h3>🗺️ All Properties on Map</h3>
+      <div id="admin-map"></div>
+    </div>
+  `;
+}
+
+function initMap() {
+  const el = document.getElementById('admin-map');
+  if (!el || !window.L) return;
+  if (mapInstance) { mapInstance.remove(); mapInstance = null; }
+
+  mapInstance = L.map(el, { scrollWheelZoom: true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap', maxZoom: 18
+  }).addTo(mapInstance);
+
+  const props = (DATA.properties.data || []).filter(p => p.latitude && p.longitude);
+  if (props.length === 0) { mapInstance.setView([51.9, -8.47], 8); return; }
+
+  const markers = [];
+  props.forEach(p => {
+    const color = p.listing_status === 'active' ? '#2E8B57' : '#6B7D8E';
+    const priceStr = p.price >= 1e6 ? `€${(p.price/1e6).toFixed(1)}M` : `€${(p.price/1e3).toFixed(0)}K`;
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="background:${color};color:#fff;font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;padding:3px 7px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.2);border:2px solid #fff;cursor:pointer">${priceStr}</div>`,
+      iconSize: [60, 24], iconAnchor: [30, 12],
+    });
+    const marker = L.marker([p.latitude, p.longitude], { icon }).addTo(mapInstance);
+    marker.bindPopup(`<strong>${p.city || 'Unknown'}</strong><br/>€${(p.price||0).toLocaleString()}<br/>${p.listing_status || 'active'}<br/><small>Region: ${p.region || '—'}</small>`);
+    markers.push(marker);
+  });
+
+  if (markers.length > 0) {
+    mapInstance.fitBounds(L.featureGroup(markers).getBounds().pad(0.15));
+  }
+}
+
+// ── INIT ──
+loadData();
+// Auto-refresh every 60 seconds
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>
