@@ -199,24 +199,23 @@ function getQuestions(market, lang) {
   var p = lang==="pt";
   return [
     { id:"greeting",field:null,type:"single",text:lang==="pt"?"Bem-vindo ao homeAImatch! Vou descobrir o que \xe9 importante para si e encontrar os im\xf3veis perfeitos. Qual regi\xe3o?":"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which region?",options:["Cork, Ireland","Lourinhã, Portugal"]},
-    { id:"purpose",field:"purpose",type:"single",text:p?"Primeiro \u2014 para que \xe9 este im\xf3vel?":"First things first \u2014 what\u2019s this property for?",options:["Primary home","Holiday home","Investment property","Relocation from abroad"]},
-    { id:"mortgage",field:"mortgage",type:"single",text:p?"Qual \xe9 a sua situa\xe7\xe3o de cr\xe9dito?":"What\u2019s your mortgage situation?",options:["Pre-approved mortgage","Will need a mortgage","Cash buyer \u2014 no mortgage needed","Not sure yet"]},
-    { id:"intent",field:"intent",type:"single",text:p?"Qu\xe3o pronto est\xe1 para comprar?":"How ready are you to buy?",options:["Ready to buy now","Actively searching","Just exploring"]},
-    { id:"timeline",field:"timeline",type:"single",text:p?"Qual \xe9 o seu prazo?":"What\u2019s your timeline?",options:["Within 3 months","3-6 months","6-12 months","No rush"]},
     { id:"location",field:"location",type:"search",text:p?"Qual cidade ou zona lhe interessa?":"Which city or area interests you?",options:cities,placeholder:p?"Escreva uma cidade...":"Type a city..."},
     { id:"radius",field:"radius",type:"single",text:p?"Que distância do centro consideraria?":"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
     { id:"budget",field:"budget",type:"single",text:p?"Orçamento máximo?":"Budget ceiling?",options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
-    { id:"workFromHome",field:"workFromHome",type:"single",text:p?"Qual é a sua situação de trabalho?":"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
-
     { id:"lifestyle",field:"lifestyle",type:"single",text:p?"Que ambiente prefere?":"What setting feels right?",options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
     { id:"family",field:"family",type:"single",text:p?"Quem vai viver na casa?":"Who's moving in?",options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
+    { id:"workFromHome",field:"workFromHome",type:"single",text:p?"Qual é a sua situação de trabalho?":"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
     { id:"condition",field:"condition",type:"single",text:p?"E quanto a renovações?":"How about renovation?",options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
     { id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:p?"Personalidade do bairro? Escolha todas.":"What neighbourhood personality? Pick all that fit.",options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
     { id:"pets",field:"pets",type:"single",text:p?"Tem companheiros de quatro patas?":"Any furry companions?",options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
     { id:"parking",field:"parking",type:"multi",text:p?"Estacionamento?":"Parking needs?",options:["Garage must-have","Driveway fine","Street ok","EV charging","No car"]},
     { id:"mustHave",field:"mustHave",type:"freetext",text:p?"Algo essencial na sua nova casa? (ex: jardim, garagem, vista mar)":"Anything essential in your new home? (e.g. garden, garage, sea view)",placeholder:p?"Escreva aqui...":"Type here...",maxLen:100},
     { id:"priorities",field:"priorities",type:"multi",text:p?"Quase a terminar! 3 prioridades?":"Nearly done! Top 3 priorities?",options:["Short commute","Great schools","Outdoor space","Modern finishes","Walkable area","Home office","Energy efficient","Great views"]},
-    { id:"vibe",field:"vibe",type:"single",text:p?"Última — estilo de sonho?":"Last one — dream style?",options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
+    { id:"vibe",field:"vibe",type:"single",text:p?"Qual é o seu estilo de sonho?":"What’s your dream style?",options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
+    { id:"purpose",field:"purpose",type:"single",text:p?"Primeiro \u2014 para que \xe9 este im\xf3vel?":"First things first \u2014 what\u2019s this property for?",options:["Primary home","Holiday home","Investment property","Relocation from abroad"]},
+    { id:"mortgage",field:"mortgage",type:"single",text:p?"Qual \xe9 a sua situa\xe7\xe3o de cr\xe9dito?":"What\u2019s your mortgage situation?",options:["Pre-approved mortgage","Will need a mortgage","Cash buyer \u2014 no mortgage needed","Not sure yet"]},
+    { id:"intent",field:"intent",type:"single",text:p?"Qu\xe3o pronto est\xe1 para comprar?":"How ready are you to buy?",options:["Ready to buy now","Actively searching","Just exploring"]},
+    { id:"timeline",field:"timeline",type:"single",text:p?"Qual \xe9 o seu prazo?":"What\u2019s your timeline?",options:["Within 3 months","3-6 months","6-12 months","No rush"]},
   ];
 }
 
@@ -377,7 +376,7 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
         <div style={{display:"flex",alignItems:"center",gap:10}}><LogoFull/><div style={{display:"flex",gap:2,background:"#f0f2f5",borderRadius:8,padding:2}}><button onClick={function(){setLang("en")}} style={{fontSize:11,padding:"3px 8px",borderRadius:6,border:"none",background:lang==="en"?"#1a2b3c":"transparent",color:lang==="en"?"#fff":"#6b7d8e",fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>EN</button><button onClick={function(){setLang("pt")}} style={{fontSize:11,padding:"3px 8px",borderRadius:6,border:"none",background:lang==="pt"?"#1a2b3c":"transparent",color:lang==="pt"?"#fff":"#6b7d8e",fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>PT</button></div></div>
         <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap"}}>
           <span onClick={onPricing} style={{fontSize:13,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>{T.pricing}</span>
-          <a href="for-agents.html" style={{fontSize:13,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>{T.forAgents}</a>
+          <a href={lang==="pt"?"para-agentes.html":"for-agents.html"} style={{fontSize:13,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>{T.forAgents}</a>
           <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"8px 18px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em",whiteSpace:"nowrap"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>{T.findHome}</button>
         </div>
       </nav>
@@ -655,7 +654,7 @@ const PricingPage=({onBack,onStart,lang})=>{
     <div style={{minHeight:"100vh",background:B.white,fontFamily:F2}}>
       <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 24px",maxWidth:1060,margin:"0 auto"}}>
         <div onClick={onBack} style={{cursor:"pointer"}}><LogoFull/></div>
-        <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"10px 24px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:F2}}>Find My Home</button>
+        <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"10px 24px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:F2}}>{T.findHome}</button>
       </nav>
       <section style={{maxWidth:1060,margin:"0 auto",padding:"40px 24px 10px",textAlign:"center"}}>
         <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10}}>Pricing</div>

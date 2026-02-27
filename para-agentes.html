@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>homeAImatch para Agentes — Leads Qualificados por IA para Profissionais Imobiliários</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --blue:#1E96D1;--blue-d:#1578A8;--blue-l:#E8F4FB;
+      --orange:#F5921B;--orange-d:#D97E15;--orange-l:#FFF5E9;
+      --dark:#1A2B3C;--dark2:#0f1a24;--gray:#6B7D8E;--gray-l:#f4f6f8;
+      --border:#E4E9EE;--white:#ffffff;--green:#2E8B57;
+    }
+    body{font-family:'Outfit',sans-serif;color:var(--dark);background:#fff;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+
+    /* NAV */
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:16px 32px;max-width:1140px;margin:0 auto}
+    .nav-logo{font-size:20px;font-weight:800;color:var(--dark);display:flex;align-items:center;gap:8px}
+    .nav-links{display:flex;gap:24px;align-items:center}
+    .nav-links a{font-size:14px;font-weight:500;color:var(--gray);transition:color 0.2s}
+    .nav-links a:hover{color:var(--dark)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 26px;border-radius:28px;font-family:'Outfit';font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
+    .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff}
+    .btn-orange{background:linear-gradient(135deg,var(--orange),var(--orange-d));color:#fff}
+    .btn-outline{background:transparent;border:2px solid var(--blue);color:var(--blue)}
+    .btn-outline:hover{background:var(--blue-l)}
+    .btn-white{background:#fff;color:var(--dark);box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+    .btn-lg{padding:15px 36px;font-size:16px;border-radius:32px}
+
+    /* HERO */
+    .hero{background:linear-gradient(160deg,var(--dark2) 0%,#162535 50%,#1a3040 100%);color:#fff;padding:80px 32px 100px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(30,150,209,0.12) 0%,transparent 70%)}
+    .hero::after{content:'';position:absolute;bottom:-150px;left:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(245,146,27,0.08) 0%,transparent 70%)}
+    .hero-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;gap:60px;position:relative;z-index:1}
+    .hero-text{flex:1;min-width:300px}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,146,27,0.15);color:var(--orange);font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;margin-bottom:20px;letter-spacing:0.04em;text-transform:uppercase}
+    .hero h1{font-size:52px;font-weight:900;line-height:1.08;letter-spacing:-0.04em;margin-bottom:18px}
+    .hero h1 span{background:linear-gradient(135deg,var(--orange),#ffb347);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:18px;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:32px;max-width:480px}
+    .hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+    .hero-visual{flex:1;min-width:320px;max-width:500px}
+    .hero-mockup{background:var(--white);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,0.3);overflow:hidden;transform:perspective(800px) rotateY(-4deg) rotateX(2deg);transition:transform 0.4s}
+    .hero-mockup:hover{transform:perspective(800px) rotateY(0deg) rotateX(0deg)}
+    .mockup-topbar{height:36px;background:var(--gray-l);display:flex;align-items:center;gap:6px;padding:0 14px}
+    .mockup-dot{width:9px;height:9px;border-radius:50%}
+    .mockup-body{padding:20px}
+    .mockup-stat{display:flex;gap:12px;margin-bottom:14px}
+    .mockup-stat-card{flex:1;background:var(--gray-l);border-radius:10px;padding:14px}
+    .mockup-stat-card.hl{background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff}
+    .mockup-stat-card .n{font-size:24px;font-weight:800}
+    .mockup-stat-card .l{font-size:10px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:0.04em}
+    .mockup-stat-card.hl .l{color:rgba(255,255,255,0.7)}
+    .mockup-lead{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;border:1px solid var(--border);margin-bottom:8px}
+    .mockup-avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--blue);flex-shrink:0}
+    .mockup-lead-info{flex:1;min-width:0}
+    .mockup-lead-name{font-size:12px;font-weight:600;color:var(--dark)}
+    .mockup-lead-sub{font-size:10px;color:var(--gray)}
+    .mockup-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--orange-l);color:var(--orange)}
+
+    /* SOCIAL PROOF BAR */
+    .proof-bar{background:var(--gray-l);border-top:1px solid var(--border);padding:28px 32px}
+    .proof-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
+    .proof-item{font-size:14px;color:var(--gray);font-weight:500;display:flex;align-items:center;gap:8px}
+    .proof-item strong{color:var(--dark);font-weight:800;font-size:18px}
+
+    /* SECTIONS */
+    .section{padding:80px 32px}
+    .section-inner{max-width:1140px;margin:0 auto}
+    .section-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--orange);margin-bottom:10px}
+    .section h2{font-size:36px;font-weight:800;color:var(--dark);letter-spacing:-0.03em;line-height:1.15;margin-bottom:14px}
+    .section .subtitle{font-size:16px;color:var(--gray);line-height:1.6;max-width:560px;margin-bottom:40px}
+
+    /* FEATURES GRID */
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .feature-card{padding:28px;border-radius:16px;border:1px solid var(--border);background:var(--white);transition:all 0.25s}
+    .feature-card:hover{border-color:var(--blue);box-shadow:0 8px 30px rgba(30,150,209,0.08);transform:translateY(-3px)}
+    .feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+    .feature-card h3{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .feature-card p{font-size:13.5px;color:var(--gray);line-height:1.6}
+
+    /* HOW IT WORKS */
+    .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;counter-reset:step}
+    .how-step{position:relative;padding:32px 24px 28px;border-radius:16px;background:var(--white);border:1px solid var(--border)}
+    .how-step::before{counter-increment:step;content:counter(step);position:absolute;top:-18px;left:24px;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-d));color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center}
+    .how-step h3{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:8px;margin-top:4px}
+    .how-step p{font-size:13px;color:var(--gray);line-height:1.6}
+
+    /* DASHBOARD PREVIEW */
+    .dash-preview{background:var(--dark2);border-radius:20px;padding:4px;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;margin-top:40px}
+    .dash-preview img{width:100%;border-radius:16px;display:block}
+    .dash-screenshot{width:100%;background:var(--gray-l);border-radius:16px;min-height:340px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+
+    /* PRICING */
+    .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;align-items:start}
+    .price-card{border-radius:18px;border:1px solid var(--border);background:var(--white);overflow:hidden;transition:all 0.25s}
+    .price-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.06)}
+    .price-card.pop{border:2px solid var(--blue);box-shadow:0 12px 40px rgba(30,150,209,0.12)}
+    .price-card .pop-badge{background:var(--blue);color:#fff;text-align:center;padding:7px;font-size:11px;font-weight:700;letter-spacing:0.06em}
+    .price-card-body{padding:28px}
+    .price-card .tier{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+    .price-card .amount{font-size:42px;font-weight:900;color:var(--dark);letter-spacing:-0.03em}
+    .price-card .per{font-size:14px;color:var(--gray);margin-left:4px}
+    .price-card .desc{font-size:13px;color:var(--gray);margin:8px 0 22px}
+    .price-card .feat{font-size:13px;color:var(--dark);padding:6px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+    .price-card .feat .check{color:var(--green);font-weight:700;flex-shrink:0}
+    .price-card .feat.off{color:#b0bec5}
+    .price-card .feat.off .check{color:#d0d7de}
+
+    /* TESTIMONIAL */
+    .testimonial-section{background:var(--gray-l)}
+    .testimonial-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+    .testimonial{padding:28px;border-radius:16px;background:var(--white);border:1px solid var(--border)}
+    .testimonial .quote{font-size:14px;color:var(--dark);line-height:1.7;margin-bottom:16px;font-style:italic}
+    .testimonial .author{display:flex;align-items:center;gap:10px}
+    .testimonial .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+    .testimonial .name{font-size:13px;font-weight:700;color:var(--dark)}
+    .testimonial .role{font-size:11px;color:var(--gray)}
+
+    /* FAQ */
+    .faq-list{max-width:700px}
+    .faq-item{border-bottom:1px solid var(--border);padding:18px 0}
+    .faq-q{font-size:15px;font-weight:700;color:var(--dark);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+    .faq-q .arrow{transition:transform 0.2s;color:var(--gray)}
+    .faq-a{font-size:13.5px;color:var(--gray);line-height:1.7;max-height:0;overflow:hidden;transition:max-height 0.3s,padding 0.3s}
+    .faq-item.open .faq-a{max-height:200px;padding-top:10px}
+    .faq-item.open .arrow{transform:rotate(180deg)}
+
+    /* CTA */
+    .cta-section{background:linear-gradient(160deg,var(--dark2),#162535);color:#fff;text-align:center;padding:80px 32px}
+    .cta-section h2{font-size:38px;font-weight:900;letter-spacing:-0.03em;margin-bottom:14px}
+    .cta-section p{font-size:16px;color:rgba(255,255,255,0.6);margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.6}
+
+    /* FOOTER */
+    .footer{padding:28px 32px;text-align:center;font-size:12px;color:var(--gray);border-top:1px solid var(--border)}
+
+    /* ANIMATIONS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{opacity:0;animation:fadeUp 0.6s ease-out forwards}
+    .d1{animation-delay:0.1s}.d2{animation-delay:0.2s}.d3{animation-delay:0.3s}.d4{animation-delay:0.4s}.d5{animation-delay:0.5s}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){
+      .hero-inner{flex-direction:column;text-align:center}
+      .hero h1{font-size:36px}
+      .hero p{margin:0 auto 28px}
+      .hero-ctas{justify-content:center}
+      .hero-visual{max-width:400px}
+      .features-grid,.how-grid{grid-template-columns:1fr}
+      .pricing-grid{grid-template-columns:1fr 1fr}
+      .testimonial-grid{grid-template-columns:1fr}
+      .nav-links a.hide-mobile{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">🏠 homeAImatch</a>
+  <div class="nav-links">
+    <a href="#features">Funcionalidades</a>
+    <a href="#pricing" class="hide-mobile">Preços</a>
+    <a href="agent-dashboard.html" class="btn btn-primary">Login Agente →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text fade-up">
+      <div class="hero-badge">🚀 Para Profissionais Imobiliários</div>
+      <h1>Receba <span>leads qualificados</span> por IA diretamente para si</h1>
+      <p>O homeAImatch usa IA para fazer correspondência entre compradores sérios e imóveis com base no estilo de vida, não apenas filtros. Os seus imóveis chegam a compradores que realmente os querem.</p>
+      <div class="hero-ctas">
+        <a href="agent-dashboard.html" class="btn btn-orange btn-lg">Criar Conta Grátis →</a>
+        <a href="#how" class="btn btn-white btn-lg">Ver Como Funciona</a>
+      </div>
+    </div>
+    <div class="hero-visual fade-up d2">
+      <div class="hero-mockup">
+        <div class="mockup-topbar">
+          <div class="mockup-dot" style="background:#ff5f57"></div>
+          <div class="mockup-dot" style="background:#febd2e"></div>
+          <div class="mockup-dot" style="background:#27c840"></div>
+          <span style="flex:1;text-align:center;font-size:10px;color:var(--gray);font-weight:500">Painel do Agente</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-stat">
+            <div class="mockup-stat-card hl"><div class="l">Novos Leads</div><div class="n">12</div></div>
+            <div class="mockup-stat-card"><div class="l">Imóveis</div><div class="n">8</div></div>
+            <div class="mockup-stat-card"><div class="l">Visualizações</div><div class="n">347</div></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px">Leads Recentes</div>
+          <div class="mockup-lead">
+            <div class="mockup-avatar">SM</div>
+            <div class="mockup-lead-info"><div class="mockup-lead-name">Sarah Murphy</div><div class="mockup-lead-sub">T3 em Banda, Douglas · 94% match</div></div>
+            <div class="mockup-badge">Novo</div>
+          </div>
+          <div class="mockup-lead">
+            <div class="mockup-avatar">JC</div>
+            <div class="mockup-lead-info"><div class="mockup-lead-name">João Costa</div><div class="mockup-lead-sub">Moradia, Lourinhã · 89% match</div></div>
+            <div class="mockup-badge">Novo</div>
+          </div>
+          <div class="mockup-lead">
+            <div class="mockup-avatar" style="background:#e8f5e9;color:var(--green)">KO</div>
+            <div class="mockup-lead-info"><div class="mockup-lead-name">Kevin O'Brien</div><div class="mockup-lead-sub">T4 Geminada, Ballincollig · 91% match</div></div>
+            <div style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:var(--green)">Visita</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<div class="proof-bar">
+  <div class="proof-inner">
+    <div class="proof-item"><strong>AI-Powered</strong> motor de correspondência</div>
+    <div class="proof-item">·</div>
+    <div class="proof-item"><strong>94%</strong> score médio de match</div>
+    <div class="proof-item">·</div>
+    <div class="proof-item"><strong>Cork</strong> & <strong>Portugal</strong> mercados</div>
+    <div class="proof-item">·</div>
+    <div class="proof-item"><strong>Grátis</strong> para começar</div>
+  </div>
+</div>
+
+<!-- THE PROBLEM -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">O Problema</div>
+    <h2>Os portais tradicionais enviam-lhe leads não qualificados</h2>
+    <p class="subtitle">Daft.ie e Idealista enviam todos os curiosos. Perde horas a responder a leads que não dão em nada. O homeAImatch é diferente.</p>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:var(--orange-l)">🎯</div>
+        <h3>Compradores Pré-Qualificados</h3>
+        <p>Cada lead completa o nosso quiz de estilo de vida antes de o contactar. Sabe o orçamento, prazo, preferências e o que realmente procuram — antes de atender o telefone.</p>
+      </div>
+      <div class="feature-card fade-up d1">
+        <div class="feature-icon" style="background:var(--blue-l)">🧠</div>
+        <h3>Scores de Match por IA</h3>
+        <p>A nossa IA avalia cada correspondência comprador-imóvel em mais de 10 critérios. Um match de 92% é um lead quente genuinamente interessado, não alguém a navegar por curiosidade.</p>
+      </div>
+      <div class="feature-card fade-up d2">
+        <div class="feature-icon" style="background:#e8f5e9">📊</div>
+        <h3>Perfis Completos do Comprador</h3>
+        <p>Cada lead inclui a persona gerada por IA: prioridades de estilo de vida, essenciais, eliminatórios, e porquê a correspondência com o seu imóvel especificamente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features" style="background:var(--gray-l)">
+  <div class="section-inner">
+    <div class="section-tag">Agent Dashboard</div>
+    <h2>Tudo o que precisa, num só lugar</h2>
+    <p class="subtitle">O seu painel para gerir imóveis, acompanhar leads e fazer crescer o negócio. Sem folhas de cálculo, sem caos.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--blue-l)">📩</div>
+        <h3>Lead Management</h3>
+        <p>See all enquiries with buyer profiles. Update status from New → Contacted → Viewing → Closed. Never lose track of a lead again.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--orange-l)">🏘️</div>
+        <h3>Listing Management</h3>
+        <p>Add, edit, and manage your properties with our visual editor. Image previews, neighbourhood scoring, feature chips — everything the AI needs to match well.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#e8f5e9">🔗</div>
+        <h3>Claim Listings</h3>
+        <p>Properties already on homeAImatch? Claim them with one click. Your contact details replace the placeholder and leads flow directly to you.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#f3e5f5">🔔</div>
+        <h3>Instant Notifications</h3>
+        <p>Get notified the moment a buyer matches with your property. Fast response times = more viewings booked.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fff8e1">📈</div>
+        <h3>Performance Analytics</h3>
+        <p>See which properties get the most views, which generate the most leads, and your conversion rates. Data-driven decisions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:var(--blue-l)">👤</div>
+        <h3>Agent Profile</h3>
+        <p>Build your professional profile. Buyers see your name, agency, and specialties on every matching property. Build your brand.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="section-inner">
+    <div class="section-tag">Como Funciona</div>
+    <h2>Live in 5 minutes</h2>
+    <p class="subtitle">Getting started is fast and free. No contracts, no credit card, no commitment.</p>
+    <div class="how-grid">
+      <div class="how-step fade-up">
+        <h3>Create your free account</h3>
+        <p>Sign up with your name, email, and agency. Takes 30 seconds. You're immediately in the dashboard.</p>
+      </div>
+      <div class="how-step fade-up d1">
+        <h3>Add or claim your listings</h3>
+        <p>Either add new properties with our visual editor, or search for your existing listings and claim them with one click.</p>
+      </div>
+      <div class="how-step fade-up d2">
+        <h3>Receive AI-matched leads</h3>
+        <p>When a buyer's lifestyle profile matches your property, they can contact you directly. You see their full profile and match score.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="background:var(--gray-l)">
+  <div class="section-inner">
+    <div class="section-tag">Preços</div>
+    <h2>Only pay when it works</h2>
+    <p class="subtitle">Start free with 3 leads. Buy lead packs when you need more, or go unlimited for a flat monthly rate. You only pay for results.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-card-body">
+          <div class="tier" style="color:var(--gray)">Free</div>
+          <div><span class="amount">€0</span></div>
+          <div class="desc">Try it — no card required</div>
+          <a href="agent-dashboard.html" class="btn btn-outline" style="width:100%;justify-content:center;margin-bottom:20px">Começar</a>
+          <div class="feat"><span class="check">✓</span> Up to 3 listings</div>
+          <div class="feat"><span class="check">✓</span> <strong>3 leads grátis</strong> included</div>
+          <div class="feat"><span class="check">✓</span> Full buyer profiles</div>
+          <div class="feat"><span class="check">✓</span> Claim existing listings</div>
+          <div class="feat"><span class="check">✓</span> Agent profile</div>
+          <div class="feat off"><span class="check">—</span> Priority placement</div>
+          <div class="feat off"><span class="check">—</span> Featured badge</div>
+        </div>
+      </div>
+      <div class="price-card">
+        <div class="price-card-body">
+          <div class="tier" style="color:var(--blue)">10 Lead Pack</div>
+          <div><span class="amount">€99</span><span class="per">one-time</span></div>
+          <div class="desc">€9.90 per lead</div>
+          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Buy Pack</a>
+          <div class="feat"><span class="check">✓</span> <strong>10 leads</strong> — use anytime</div>
+          <div class="feat"><span class="check">✓</span> Up to 10 listings</div>
+          <div class="feat"><span class="check">✓</span> Full buyer profiles</div>
+          <div class="feat"><span class="check">✓</span> Lead management tools</div>
+          <div class="feat"><span class="check">✓</span> Analytics dashboard</div>
+          <div class="feat off"><span class="check">—</span> Priority placement</div>
+          <div class="feat off"><span class="check">—</span> Featured badge</div>
+        </div>
+      </div>
+      <div class="price-card">
+        <div class="price-card-body">
+          <div class="tier" style="color:var(--blue)">25 Lead Pack</div>
+          <div><span class="amount">€199</span><span class="per">one-time</span></div>
+          <div class="desc">€7.96 per lead — save 20%</div>
+          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Buy Pack</a>
+          <div class="feat"><span class="check">✓</span> <strong>25 leads</strong> — use anytime</div>
+          <div class="feat"><span class="check">✓</span> Unlimited listings</div>
+          <div class="feat"><span class="check">✓</span> Full buyer profiles</div>
+          <div class="feat"><span class="check">✓</span> Lead management tools</div>
+          <div class="feat"><span class="check">✓</span> Priority listing placement</div>
+          <div class="feat"><span class="check">✓</span> Featured agent badge</div>
+          <div class="feat off"><span class="check">—</span> White-label quiz</div>
+        </div>
+      </div>
+      <div class="price-card pop">
+        <div class="pop-badge">BEST VALUE</div>
+        <div class="price-card-body">
+          <div class="tier" style="color:var(--orange)">Unlimited</div>
+          <div><span class="amount">€99</span><span class="per">/month</span></div>
+          <div class="desc">6-month minimum · unlimited leads</div>
+          <a href="agent-dashboard.html" class="btn btn-orange" style="width:100%;justify-content:center;margin-bottom:20px">Go Unlimited</a>
+          <div class="feat"><span class="check">✓</span> <strong>Leads ilimitados</strong></div>
+          <div class="feat"><span class="check">✓</span> Unlimited listings</div>
+          <div class="feat"><span class="check">✓</span> Full buyer profiles & personas</div>
+          <div class="feat"><span class="check">✓</span> Priority listing placement</div>
+          <div class="feat"><span class="check">✓</span> Featured agent badge</div>
+          <div class="feat"><span class="check">✓</span> Advanced analytics</div>
+          <div class="feat"><span class="check">✓</span> Priority support</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:24px;font-size:13px;color:var(--gray);line-height:1.7;max-width:620px;margin-left:auto;margin-right:auto">
+      <strong>How lead credits work:</strong> Every time a buyer contacts you through homeAImatch, one lead credit is used. You always see that a new lead came in — but once your credits run out, the buyer's contact details are hidden until you top up or upgrade. No leads are ever lost.
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS / EARLY ADOPTER -->
+<section class="section testimonial-section">
+  <div class="section-inner">
+    <div class="section-tag">Early Adopters</div>
+    <h2>Built with agents, for agents</h2>
+    <p class="subtitle">We're working closely with agencies in Cork and Portugal to build exactly what you need.</p>
+    <div class="testimonial-grid">
+      <div class="testimonial">
+        <div class="quote">"The buyer profiles are a game-changer. Instead of 'I'm interested in this property', I get a full picture of who they are, what they need, and why they matched. I can prepare for the viewing before they even walk in."</div>
+        <div class="author">
+          <div class="avatar">SO</div>
+          <div><div class="name">Sarah O'Brien</div><div class="role">Senior Negotiator, Cork</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="quote">"We were getting 50+ Daft enquiries a week but only converting 3-4. With homeAImatch, every lead comes with a match score. The 90%+ matches almost always book a viewing. Much less time wasted."</div>
+        <div class="author">
+          <div class="avatar">RC</div>
+          <div><div class="name">Rodrigo Almeida</div><div class="role">Agency Owner, Lourinhã</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">FAQ</div>
+    <h2>Common questions</h2>
+    <div class="faq-list" style="margin-top:24px">
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Is it really free to start?<span class="arrow">▾</span></div>
+        <div class="faq-a">Yes. You get 3 listings and 3 full leads completely free — no credit card, no trial period, no catch. It's enough to see the quality of buyer enquiries homeAImatch delivers before you spend a cent.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What happens when I run out of lead credits?<span class="arrow">▾</span></div>
+        <div class="faq-a">You'll still see that a new lead came in and which property they're interested in — but the buyer's name, email, phone, and message will be hidden behind an upgrade prompt. This means no leads are ever lost. As soon as you buy a lead pack or upgrade to Unlimited, all pending leads are instantly unlocked and you can contact them.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Do unused lead credits expire?<span class="arrow">▾</span></div>
+        <div class="faq-a">No. Lead packs (10 or 25 credits) never expire. Use them at your own pace. The Unlimited plan gives you unlimited leads for as long as your subscription is active.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How do buyers find my properties?<span class="arrow">▾</span></div>
+        <div class="faq-a">Buyers take our 2-minute lifestyle quiz on homeaimatch.com. Our AI scores every property against their preferences across 10+ criteria including commute, neighbourhood vibe, schools, pet-friendliness, and more. If your property is a strong match, the buyer sees it in their results and can contact you directly.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What counts as a "lead"?<span class="arrow">▾</span></div>
+        <div class="faq-a">A lead is counted when a buyer fills out the contact form on one of your properties. Each unique buyer enquiry uses one credit. If the same buyer contacts you about a different property, that's a separate lead. Spam or clearly invalid enquiries are filtered and don't count against your credits.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What information do I get about each lead?<span class="arrow">▾</span></div>
+        <div class="faq-a">Name, email, phone (if provided), their message, and their AI-generated buyer profile — including budget, lifestyle priorities, must-haves, dealbreakers, and their match score with your specific property. It's like having a dossier before the first call.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What's the commitment on the Unlimited plan?<span class="arrow">▾</span></div>
+        <div class="faq-a">The Unlimited plan has a 6-month minimum commitment at €99/month (€594 total). After 6 months, it continues month-to-month and you can cancel anytime. If you're getting 10+ leads a month, Unlimited is cheaper than buying packs.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Can I claim listings already on the platform?<span class="arrow">▾</span></div>
+        <div class="faq-a">Yes! If your properties are already listed on homeAImatch, search for them in your dashboard and claim them with one click. Your contact details replace the placeholder and leads flow directly to your account.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What markets do you cover?<span class="arrow">▾</span></div>
+        <div class="faq-a">Currently Cork, Ireland and the Silver Coast / Lourinhã region of Portugal. We're expanding to more European markets throughout 2026. Interested in a different market? Contact us — early adopters get priority access.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section">
+  <h2>Pronto para receber melhores leads?</h2>
+  <p>Join homeAImatch for free and start receiving AI-matched buyer enquiries for your properties.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a href="agent-dashboard.html" class="btn btn-orange btn-lg">Criar Conta Grátis →</a>
+    <a href="/cdn-cgi/l/email-protection#8fe7eae3e3e0cfe7e0e2eaeee6e2eefbece7a1ece0e2b0fcfaede5eaecfbb2e7e0e2eacec6e2eefbece7afcbeae2e0afddeafefaeafcfb" class="btn btn-white btn-lg">Book a Demo</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>© 2026 homeAImatch · <a href="index.html" style="color:var(--blue)">homeaimatch.com</a> · Cork, Ireland · <a href="legal.html" style="color:var(--gray)">Terms</a> · <a href="legal.html#privacy" style="color:var(--gray)">Privacy</a></p>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Scroll-triggered fade-in
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { 
