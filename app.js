@@ -529,7 +529,7 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
       {/* How it works */}
       <section style={{background:B.dark,padding:"56px 24px",marginTop:30}}>
         <div style={{maxWidth:1000,margin:"0 auto"}}>
-          <h2 style={{fontSize:28,fontWeight:800,color:B.white,letterSpacing:"-0.03em",marginBottom:8,textAlign:"center"}}{L.howTitle}</h2>
+          <h2 style={{fontSize:28,fontWeight:800,color:B.white,letterSpacing:"-0.03em",marginBottom:8,textAlign:"center"}}>{L.howTitle}</h2>
           <p style={{fontSize:15,color:"#8899aa",textAlign:"center",marginBottom:40}}>Three simple steps to your dream home.</p>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))",gap:24}}>
             {steps.map((s,i)=>(
@@ -545,8 +545,8 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
 
       {/* CTA */}
       <section style={{textAlign:"center",padding:"56px 24px"}}>
-        <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:12}}{L.ctaTitle}</h2>
-        <p style={{fontSize:15,color:B.gray,marginBottom:20}}{L.ctaSub}</p>
+        <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:12}}>{L.ctaTitle}</h2>
+        <p style={{fontSize:15,color:B.gray,marginBottom:20}}>{L.ctaSub}</p>
         <button onClick={onStart} style={{padding:"16px 40px",borderRadius:32,fontSize:16,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"'Outfit',sans-serif",background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",boxShadow:`0 6px 24px rgba(30,150,209,0.25)`,transition:"transform 0.2s"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>
           Take the 2-Minute Quiz →
         </button>
@@ -809,7 +809,7 @@ const PricingPage=({onBack,onStart})=>{
       </section>
 
       <section style={{maxWidth:700,margin:"0 auto",padding:"10px 24px 50px"}}>
-        <h2 style={{fontSize:24,fontWeight:800,color:B.dark,textAlign:"center",marginBottom:24}}{L.faq}</h2>
+        <h2 style={{fontSize:24,fontWeight:800,color:B.dark,textAlign:"center",marginBottom:24}}>{L.faq}</h2>
         {[{q:L.faqQ1,a:L.faqA1},{q:L.faqQ2,a:L.faqA2},{q:L.faqQ3,a:L.faqA3},{q:L.faqQ4,a:L.faqA4},{q:L.faqQ5,a:L.faqA5},{q:L.faqQ6,a:L.faqA6}].map((f,i)=>(
           <div key={i} style={{borderBottom:"1px solid "+B.border,padding:"16px 0"}}><div style={{fontSize:14,fontWeight:700,color:B.dark,marginBottom:6}}>{f.q}</div><div style={{fontSize:13,color:B.gray,lineHeight:1.6}}>{f.a}</div></div>))}
       </section>
@@ -902,7 +902,7 @@ function HomeAIMatch() {
         return qq;
       }));
       setIsTyping(true);
-      setTimeout(()=>{setMessages(p=>[...p,{text:questions[2].text,isUser:false}]);setIsTyping(false);setCurrentQ(2);setTimeout(()=>setShowOpts(true),200);},600);
+      setTimeout(()=>{setMessages(p=>[...p,{text:questions[1].text,isUser:false}]);setIsTyping(false);setCurrentQ(1);setTimeout(()=>setShowOpts(true),200);},600);
       return;
     }
 
