@@ -1,8 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
-/* ═══════ LANGUAGE / i18n — manual toggle, independent from market ═══════ */
+/* ═══════ LANGUAGE / i18n ═══════ */
 const _initLang = new URLSearchParams(window.location.search).get('lang') || 'en';
-
 const OPT_PT = {
   "Cork, Ireland":"Cork, Irlanda","Lourinhã, Portugal":"Lourinhã, Portugal",
   "Primary home":"Residência principal","Holiday home":"Casa de férias","Investment property":"Investimento","Relocation from abroad":"Mudança do estrangeiro",
@@ -13,7 +12,7 @@ const OPT_PT = {
   "Fully remote":"Totalmente remoto","Hybrid (2-3 days office)":"Híbrido (2-3 dias escritório)","Full-time in office":"Tempo inteiro no escritório","Retired / not working":"Reformado / sem trabalho",
   "City centre":"Centro da cidade","Tech hub / business park":"Parque tecnológico","Airport area":"Zona do aeroporto","Multiple locations":"Vários locais",
   "Under 15 min":"Menos de 15 min","Under 30 min":"Menos de 30 min","Under 45 min":"Menos de 45 min","Don't mind":"Tanto faz",
-  "City buzz — walkable & alive":"Cidade vibrante — a pé","Suburban — space with access":"Suburbano — espaço com acesso","Countryside — nature & peace":"Campo — natureza e paz","Flexible — wherever suits":"Flexível — onde for melhor",
+  "City buzz — walkable & alive":"Cidade vibrante","Suburban — space with access":"Suburbano","Countryside — nature & peace":"Campo","Flexible — wherever suits":"Flexível",
   "Just me":"Só eu","Me and a partner":"Eu e parceiro/a","Small family (1-2 kids)":"Família pequena (1-2 filhos)","Larger family (3+ kids)":"Família maior (3+ filhos)","Housemates":"Colegas de casa",
   "Under €200K":"Até €200K","€200K – €400K":"€200K – €400K","€400K – €600K":"€400K – €600K","€600K – €800K":"€600K – €800K","€800K+":"€800K+",
   "Move-in ready only":"Pronto a habitar","Light cosmetic work ok":"Pequenas obras ok","Big project — bring it on!":"Grande projeto — aceito!","Don't care":"Não me importo",
@@ -23,61 +22,10 @@ const OPT_PT = {
   "Short commute":"Deslocação curta","Great schools":"Boas escolas","Outdoor space":"Espaço exterior","Modern finishes":"Acabamentos modernos","Walkable area":"Zona pedonal","Home office":"Escritório em casa","Energy efficient":"Eficiência energética","Great views":"Boas vistas",
   "Cosy & warm":"Acolhedor","Sleek & modern":"Elegante e moderno","Rustic & charming":"Rústico e encantador","Luxurious & refined":"Luxuoso e refinado","Simple & practical":"Simples e prático",
 };
-const OPT_EN = Object.fromEntries(Object.entries(OPT_PT).map(([k,v])=>[v,k]));
-function optText(v, lang) { return lang === 'pt' ? (OPT_PT[v] || v) : v; }
-
-const UI = {
-  en: {
-    pricing:"Pricing",forAgents:"For Agents",findHome:"Find My Home →",seePricing:"See pricing",
-    heroTag:"AI-Powered Property Matching",heroH1a:"Find the home that",heroH1b:"fits ",heroH1c:"your life",
-    heroP:"Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit — now live in Cork, Ireland and West Portugal.",
-    heroSub:"Free · No signup required · 2 min quiz",
-    notAvg:"Not your average property search",notAvgSub:"We match your lifestyle, not just your filter criteria.",
-    feat1t:"AI-Powered Matching",feat1d:"Our algorithm scores properties across 10+ criteria tailored to your unique lifestyle.",
-    feat2t:"Lifestyle-First Approach",feat2d:"We don't just match bedrooms and budget — we match your commute, pets, neighbourhood vibe, and more.",
-    feat3t:"Cork & West Portugal",feat3d:"Live now in Cork, Ireland and the Lourinhã coast of Portugal. More regions coming soon.",
-    feat4t:"2-Minute Quiz",feat4d:"Answer a few conversational questions and get your personalised top matches instantly.",
-    howTitle:"How it works",
-    s1t:"Tell us about you",s1d:"Quick chat about your lifestyle, family, budget, and preferences.",
-    s2t:"Our AI does the work",s2d:"We score every listing across 10 weighted criteria unique to you.",
-    s3t:"Get your matches",s3d:"Receive your top matches with detailed comparisons, save & share.",
-    ctaTitle:"Ready to find your perfect home?",ctaSub:"Live now in Cork, Ireland & Lourinhã coast, Portugal.",
-    ctaBtn:"Take the 2-Minute Quiz →",ctaPricing:"pricing",faq:"FAQs",
-    cards:"📋 Cards",compare:"📊 Compare",mapView:"🗺️ Map",matched:"Matched from real listings · AI-powered scoring",
-    step:"STEP",continueBtn:"Continue →",
-    faqQ1:"Is the free search really free?",faqA1:"Yes. Take the quiz and see your top matches with basic info, completely free. No card required.",
-    faqQ2:"What do I get in a Full Report?",faqA2:"Every property scored against your lifestyle. AI-powered reasoning, neighbourhood data, commute times, school ratings, and direct agent contact.",
-    faqQ3:"Do searches expire?",faqA3:"No. Buy a search or a subscription and use them whenever you like.",
-    faqQ4:"How does agent pricing work?",faqA4:"Agents start free with listings. After that, choose a plan for qualified buyer leads with full profiles.",
-    faqQ5:"What happens when an agent runs out of lead credits?",faqA5:"You'll still see new leads came in, but buyer details are hidden until you upgrade. No leads are ever lost.",
-    faqQ6:"What areas do you cover?",faqA6:"Currently Cork, Ireland and the Silver Coast / Lourinhã region of Portugal. More European markets coming in 2026.",
-  },
-  pt: {
-    pricing:"Preços",forAgents:"Para Agentes",findHome:"Encontrar Casa →",seePricing:"Ver preços",
-    heroTag:"Correspondência de Imóveis com IA",heroH1a:"Encontre a casa que",heroH1b:"combina com ",heroH1c:"a sua vida",
-    heroP:"Pare de percorrer centenas de anúncios. Responda a algumas perguntas sobre o seu estilo de vida e a nossa IA encontrará os imóveis perfeitos — disponível em Cork, Irlanda e Oeste de Portugal.",
-    heroSub:"Grátis · Sem registo · Quiz de 2 minutos",
-    notAvg:"Não é uma pesquisa de imóveis comum",notAvgSub:"Fazemos correspondência pelo estilo de vida, não apenas por filtros.",
-    feat1t:"Correspondência com IA",feat1d:"O nosso algoritmo avalia imóveis em mais de 10 critérios adaptados ao seu estilo de vida.",
-    feat2t:"Estilo de Vida em Primeiro",feat2d:"Não fazemos só correspondência por quartos e orçamento — consideramos deslocações, animais, bairro e mais.",
-    feat3t:"Cork e Oeste de Portugal",feat3d:"Disponível em Cork, Irlanda e na costa de Lourinhã. Mais regiões em breve.",
-    feat4t:"Quiz de 2 Minutos",feat4d:"Responda a perguntas simples e receba as melhores correspondências instantaneamente.",
-    howTitle:"Como funciona",
-    s1t:"Fale-nos sobre si",s1d:"Conversa rápida sobre estilo de vida, família, orçamento e preferências.",
-    s2t:"A nossa IA faz o trabalho",s2d:"Avaliamos cada imóvel em 10 critérios ponderados, únicos para si.",
-    s3t:"Receba os resultados",s3d:"Receba o seu top com comparações detalhadas, guarde e partilhe.",
-    ctaTitle:"Pronto para encontrar a sua casa?",ctaSub:"Disponível em Cork, Irlanda e costa de Lourinhã, Portugal.",
-    ctaBtn:"Faça o Quiz de 2 Minutos →",ctaPricing:"preços",faq:"Perguntas Frequentes",
-    cards:"📋 Fichas",compare:"📊 Comparar",mapView:"🗺️ Mapa",matched:"Correspondência com imóveis reais · Avaliação por IA",
-    step:"PASSO",continueBtn:"Continuar →",
-    faqQ1:"A pesquisa é mesmo grátis?",faqA1:"Sim. Faça o quiz e veja as suas melhores correspondências com info básica, grátis. Sem cartão.",
-    faqQ2:"O que recebo no Relatório Completo?",faqA2:"Todos os imóveis avaliados para o seu estilo de vida. Análise por IA, dados do bairro, deslocações, escolas e contacto com agente.",
-    faqQ3:"As pesquisas expiram?",faqA3:"Não. Compre uma pesquisa ou subscrição e use quando quiser.",
-    faqQ4:"Preço para agentes?",faqA4:"Agentes começam grátis. Depois escolhem plano para leads qualificados com perfil completo.",
-    faqQ5:"Sem créditos de leads?",faqA5:"Continua a ver novos leads, mas dados ficam ocultos até upgrade. Nenhum lead se perde.",
-    faqQ6:"Que áreas cobrem?",faqA6:"Cork, Irlanda e Costa de Prata / Lourinhã. Mais mercados europeus em 2026.",
-  }
-};
+function optText(v,lang){return lang==='pt'?(OPT_PT[v]||v):v;}
+const UI_EN = {pricing:"Pricing",forAgents:"For Agents",findHome:"Find My Home \u2192",seePricing:"See pricing",heroTag:"AI-Powered Property Matching",heroH1a:"Find the home that",heroH1b:"fits ",heroH1c:"your life",heroP:"Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit \u2014 now live in Cork, Ireland and West Portugal.",heroSub:"Free \u00b7 No signup required \u00b7 2 min quiz",notAvg:"Not your average property search",notAvgSub:"We match your lifestyle, not just your filter criteria.",feat1t:"AI-Powered Matching",feat1d:"Our algorithm scores properties across 10+ criteria tailored to your unique lifestyle.",feat2t:"Lifestyle-First Approach",feat2d:"We don\u2019t just match bedrooms and budget \u2014 we match your commute, pets, neighbourhood vibe, and more.",feat3t:"Cork & West Portugal",feat3d:"Live now in Cork, Ireland and the Lourinh\u00e3 coast of Portugal. More regions coming soon.",feat4t:"2-Minute Quiz",feat4d:"Answer a few conversational questions and get your personalised top matches instantly.",howTitle:"How it works",s1t:"Tell us about you",s1d:"Quick chat about your lifestyle, family, budget, and preferences.",s2t:"Our AI does the work",s2d:"We score every listing across 10 weighted criteria unique to you.",s3t:"Get your matches",s3d:"Receive your top matches with detailed comparisons, save & share.",ctaTitle:"Ready to find your perfect home?",ctaSub:"Live now in Cork, Ireland & Lourinh\u00e3 coast, Portugal.",ctaBtn:"Take the 2-Minute Quiz \u2192",ctaPricing:"pricing",faq:"FAQs",cards:"\ud83d\udccb Cards",compare:"\ud83d\udcca Compare",mapV:"\ud83d\uddfa\ufe0f Map",matched:"Matched from real listings \u00b7 AI-powered scoring",step:"STEP",contBtn:"Continue \u2192",faqQ1:"Is the free search really free?",faqA1:"Yes. Take the quiz and see your top matches with basic info, completely free. No card required.",faqQ2:"What do I get in a Full Report?",faqA2:"Every property scored against your lifestyle. AI-powered reasoning, neighbourhood data, commute times, school ratings, and direct agent contact.",faqQ3:"Do searches expire?",faqA3:"No. Buy a search or a subscription and use them whenever you like.",faqQ4:"How does agent pricing work?",faqA4:"Agents start free with listings. After that, choose a plan for qualified buyer leads with full profiles.",faqQ5:"What happens when an agent runs out of lead credits?",faqA5:"You\u2019ll still see new leads came in, but buyer details are hidden until you upgrade. No leads are ever lost.",faqQ6:"What areas do you cover?",faqA6:"Currently Cork, Ireland and the Silver Coast / Lourinh\u00e3 region of Portugal. More European markets coming in 2026."};
+const UI_PT = {pricing:"Pre\u00e7os",forAgents:"Para Agentes",findHome:"Encontrar Casa \u2192",seePricing:"Ver pre\u00e7os",heroTag:"Correspond\u00eancia de Im\u00f3veis com IA",heroH1a:"Encontre a casa que",heroH1b:"combina com ",heroH1c:"a sua vida",heroP:"Pare de percorrer centenas de an\u00fancios. Responda a algumas perguntas sobre o seu estilo de vida e a nossa IA encontrar\u00e1 os im\u00f3veis perfeitos \u2014 dispon\u00edvel em Cork, Irlanda e Oeste de Portugal.",heroSub:"Gr\u00e1tis \u00b7 Sem registo \u00b7 Quiz de 2 minutos",notAvg:"N\u00e3o \u00e9 uma pesquisa de im\u00f3veis comum",notAvgSub:"Fazemos correspond\u00eancia pelo estilo de vida, n\u00e3o apenas por filtros.",feat1t:"Correspond\u00eancia com IA",feat1d:"O nosso algoritmo avalia im\u00f3veis em mais de 10 crit\u00e9rios adaptados ao seu estilo de vida.",feat2t:"Estilo de Vida em Primeiro",feat2d:"N\u00e3o fazemos s\u00f3 correspond\u00eancia por quartos e or\u00e7amento \u2014 consideramos desloca\u00e7\u00f5es, animais, bairro e mais.",feat3t:"Cork e Oeste de Portugal",feat3d:"Dispon\u00edvel em Cork, Irlanda e na costa de Lourinh\u00e3. Mais regi\u00f5es em breve.",feat4t:"Quiz de 2 Minutos",feat4d:"Responda a perguntas simples e receba as melhores correspond\u00eancias instantaneamente.",howTitle:"Como funciona",s1t:"Fale-nos sobre si",s1d:"Conversa r\u00e1pida sobre estilo de vida, fam\u00edlia, or\u00e7amento e prefer\u00eancias.",s2t:"A nossa IA faz o trabalho",s2d:"Avaliamos cada im\u00f3vel em 10 crit\u00e9rios ponderados, \u00fanicos para si.",s3t:"Receba os resultados",s3d:"Receba o seu top com compara\u00e7\u00f5es detalhadas, guarde e partilhe.",ctaTitle:"Pronto para encontrar a sua casa?",ctaSub:"Dispon\u00edvel em Cork, Irlanda e costa de Lourinh\u00e3, Portugal.",ctaBtn:"Fa\u00e7a o Quiz de 2 Minutos \u2192",ctaPricing:"pre\u00e7os",faq:"Perguntas Frequentes",cards:"\ud83d\udccb Fichas",compare:"\ud83d\udcca Comparar",mapV:"\ud83d\uddfa\ufe0f Mapa",matched:"Correspond\u00eancia com im\u00f3veis reais \u00b7 Avalia\u00e7\u00e3o por IA",step:"PASSO",contBtn:"Continuar \u2192",faqQ1:"A pesquisa \u00e9 mesmo gr\u00e1tis?",faqA1:"Sim. Fa\u00e7a o quiz e veja correspond\u00eancias com info b\u00e1sica, gr\u00e1tis. Sem cart\u00e3o.",faqQ2:"O que recebo no Relat\u00f3rio Completo?",faqA2:"Todos os im\u00f3veis avaliados para o seu estilo de vida. An\u00e1lise por IA, dados do bairro, desloca\u00e7\u00f5es, escolas e contacto com agente.",faqQ3:"As pesquisas expiram?",faqA3:"N\u00e3o. Compre uma pesquisa ou subscri\u00e7\u00e3o e use quando quiser.",faqQ4:"Pre\u00e7o para agentes?",faqA4:"Agentes come\u00e7am gr\u00e1tis. Depois escolhem plano para leads qualificados com perfil completo.",faqQ5:"Sem cr\u00e9ditos de leads?",faqA5:"Continua a ver novos leads, mas dados ficam ocultos at\u00e9 upgrade. Nenhum lead se perde.",faqQ6:"Que \u00e1reas cobrem?",faqA6:"Cork, Irlanda e Costa de Prata / Lourinh\u00e3. Mais mercados europeus em 2026."};
+function _L(lang){return lang==='pt'?UI_PT:UI_EN;}
 
 /* ════════════════════════════════════════════════════════════════════
    API CONFIGURATION
@@ -257,28 +205,28 @@ const HOUSES_UK = [
    QUESTIONS
    ════════════════════════════════════════════════════════════════════ */
 function getQuestions(market, lang) {
-  const cities = market ? MARKETS[market].cities : [];
-  const t = UI[lang || 'en'] || UI.en;
+  var cities = market ? MARKETS[market].cities : [];
+  var p = lang==='pt';
   return [
-    { id:"greeting",field:null,type:"single",text:(lang==='pt'?"Bem-vindo ao homeAImatch! Vou descobrir o que é importante para si e encontrar os imóveis perfeitos. Qual região?":"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which region?"),options:["Cork, Ireland","Lourinhã, Portugal"]},
-    { id:"purpose",field:"purpose",type:"single",text:(lang==='pt'?"Primeiro — para que é este imóvel?":"First things first — what's this property for?"),options:["Primary home","Holiday home","Investment property","Relocation from abroad"]},
-    { id:"mortgage",field:"mortgage",type:"single",text:(lang==='pt'?"Qual é a sua situação de crédito?":"What's your mortgage situation?"),options:["Pre-approved mortgage","Will need a mortgage","Cash buyer — no mortgage needed","Not sure yet"]},
-    { id:"intent",field:"intent",type:"single",text:(lang==='pt'?"Quão pronto está para comprar?":"How ready are you to buy?"),options:["Ready to buy now","Actively searching","Just exploring"]},
-    { id:"timeline",field:"timeline",type:"single",text:(lang==='pt'?"Qual é o seu prazo?":"What's your timeline?"),options:["Within 3 months","3-6 months","6-12 months","No rush"]},
-    { id:"location",field:"location",type:"search",text:(lang==='pt'?"Qual cidade ou zona lhe interessa?":"Which city or area interests you?"),options:cities,placeholder:(lang==='pt'?"Escreva uma cidade...":"Type a city...")},
-    { id:"radius",field:"radius",type:"single",text:(lang==='pt'?"Que distância do centro consideraria?":"How far from the city centre would you consider?"),options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
-    { id:"budget",field:"budget",type:"single",text:(lang==='pt'?"Orçamento máximo?":"Budget ceiling?"),options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
-    { id:"workFromHome",field:"workFromHome",type:"single",text:(lang==='pt'?"Qual é a sua situação de trabalho?":"What's your work setup?"),options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
-    { id:"commuteTo",field:"commuteTo",type:"single",text:(lang==='pt'?"Destino da deslocação?":"Where's your commute destination?"),options:["City centre","Tech hub / business park","Airport area","Multiple locations"],showIf:a=>a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"},
-    { id:"commuteMax",field:"commuteMax",type:"single",text:(lang==='pt'?"Tempo máximo (ida)?":"Maximum one-way commute?"),options:["Under 15 min","Under 30 min","Under 45 min","Don't mind"],showIf:a=>a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"},
-    { id:"lifestyle",field:"lifestyle",type:"single",text:(lang==='pt'?"Que ambiente prefere?":"What setting feels right?"),options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
-    { id:"family",field:"family",type:"single",text:(lang==='pt'?"Quem vai viver na casa?":"Who's moving in?"),options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
-    { id:"condition",field:"condition",type:"single",text:(lang==='pt'?"E quanto a renovações?":"How about renovation?"),options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
-    { id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:(lang==='pt'?"Personalidade do bairro? Escolha todas.":"What neighbourhood personality? Pick all that fit."),options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
-    { id:"pets",field:"pets",type:"single",text:(lang==='pt'?"Tem companheiros de quatro patas?":"Any furry companions?"),options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
-    { id:"parking",field:"parking",type:"multi",text:(lang==='pt'?"Estacionamento?":"Parking needs?"),options:["Garage must-have","Driveway fine","Street ok","EV charging","No car"]},
-    { id:"priorities",field:"priorities",type:"multi",text:(lang==='pt'?"Quase a terminar! 3 prioridades?":"Nearly done! Top 3 priorities?"),options:["Short commute","Great schools","Outdoor space","Modern finishes","Walkable area","Home office","Energy efficient","Great views"]},
-    { id:"vibe",field:"vibe",type:"single",text:(lang==='pt'?"Última — estilo de sonho?":"Last one — dream style?"),options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
+    {id:"greeting",field:null,type:"single",text:p?"Bem-vindo ao homeAImatch! Vou descobrir o que é importante para si e encontrar os imóveis perfeitos. Qual região?":"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which region?",options:["Cork, Ireland","Lourinhã, Portugal"]},
+    {id:"purpose",field:"purpose",type:"single",text:p?"Primeiro — para que é este imóvel?":"First things first — what's this property for?",options:["Primary home","Holiday home","Investment property","Relocation from abroad"]},
+    {id:"mortgage",field:"mortgage",type:"single",text:p?"Qual é a sua situação de crédito?":"What's your mortgage situation?",options:["Pre-approved mortgage","Will need a mortgage","Cash buyer — no mortgage needed","Not sure yet"]},
+    {id:"intent",field:"intent",type:"single",text:p?"Quão pronto está para comprar?":"How ready are you to buy?",options:["Ready to buy now","Actively searching","Just exploring"]},
+    {id:"timeline",field:"timeline",type:"single",text:p?"Qual é o seu prazo?":"What's your timeline?",options:["Within 3 months","3-6 months","6-12 months","No rush"]},
+    {id:"location",field:"location",type:"search",text:p?"Qual cidade ou zona lhe interessa?":"Which city or area interests you?",options:cities,placeholder:p?"Escreva uma cidade...":"Type a city..."},
+    {id:"radius",field:"radius",type:"single",text:p?"Que distância do centro consideraria?":"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
+    {id:"budget",field:"budget",type:"single",text:p?"Orçamento máximo?":"Budget ceiling?",options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
+    {id:"workFromHome",field:"workFromHome",type:"single",text:p?"Qual é a sua situação de trabalho?":"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
+    {id:"commuteTo",field:"commuteTo",type:"single",text:p?"Destino da deslocação?":"Where's your commute destination?",options:["City centre","Tech hub / business park","Airport area","Multiple locations"],showIf:function(a){return a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office";}},
+    {id:"commuteMax",field:"commuteMax",type:"single",text:p?"Tempo máximo (ida)?":"Maximum one-way commute?",options:["Under 15 min","Under 30 min","Under 45 min","Don't mind"],showIf:function(a){return a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office";}},
+    {id:"lifestyle",field:"lifestyle",type:"single",text:p?"Que ambiente prefere?":"What setting feels right?",options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
+    {id:"family",field:"family",type:"single",text:p?"Quem vai viver na casa?":"Who's moving in?",options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
+    {id:"condition",field:"condition",type:"single",text:p?"E quanto a renovações?":"How about renovation?",options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
+    {id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:p?"Personalidade do bairro? Escolha todas.":"What neighbourhood personality? Pick all that fit.",options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
+    {id:"pets",field:"pets",type:"single",text:p?"Tem companheiros de quatro patas?":"Any furry companions?",options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
+    {id:"parking",field:"parking",type:"multi",text:p?"Estacionamento?":"Parking needs?",options:["Garage must-have","Driveway fine","Street ok","EV charging","No car"]},
+    {id:"priorities",field:"priorities",type:"multi",text:p?"Quase a terminar! 3 prioridades?":"Nearly done! Top 3 priorities?",options:["Short commute","Great schools","Outdoor space","Modern finishes","Walkable area","Home office","Energy efficient","Great views"]},
+    {id:"vibe",field:"vibe",type:"single",text:p?"Última — estilo de sonho?":"Last one — dream style?",options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
   ];
 }
 
@@ -317,7 +265,7 @@ function getPersona(a){
    ════════════════════════════════════════════════════════════════════ */
 const Dots = () => <div style={{display:"flex",gap:5,padding:"8px 0"}}>{[0,1,2].map(i=><div key={i} style={{width:7,height:7,borderRadius:"50%",background:"#a8b5c4",animation:`bounce 1.2s infinite ${i*.15}s`}}/>)}</div>;
 
-const Progress = ({cur,tot,lang:lg}) => {const p=Math.round((cur/tot)*100);const _L=(UI[lg]||UI.en);return(<div style={{position:"sticky",top:61,zIndex:9,background:B.white,padding:"10px 24px 7px",borderBottom:`1px solid ${B.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:10,fontWeight:600,color:B.gray,letterSpacing:"0.08em",fontFamily:"'Outfit',sans-serif"}}>{_L.step} {cur} / {tot}</span><span style={{fontSize:10,fontWeight:700,color:B.dark,fontFamily:"'Outfit',sans-serif"}}>{p}%</span></div><div style={{height:3,background:B.grayL,borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",background:`linear-gradient(90deg,${B.blue},${B.orange})`,borderRadius:3,width:`${p}%`,transition:"width 0.5s cubic-bezier(0.4,0,0.2,1)"}}/></div></div>);};
+const Progress = ({cur,tot,lang:_lg}) => {const p=Math.round((cur/tot)*100);return(<div style={{position:"sticky",top:61,zIndex:9,background:B.white,padding:"10px 24px 7px",borderBottom:`1px solid ${B.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:10,fontWeight:600,color:B.gray,letterSpacing:"0.08em",fontFamily:"'Outfit',sans-serif"}}>{(_L(_lg)).step} {cur} / {tot}</span><span style={{fontSize:10,fontWeight:700,color:B.dark,fontFamily:"'Outfit',sans-serif"}}>{p}%</span></div><div style={{height:3,background:B.grayL,borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",background:`linear-gradient(90deg,${B.blue},${B.orange})`,borderRadius:3,width:`${p}%`,transition:"width 0.5s cubic-bezier(0.4,0,0.2,1)"}}/></div></div>);};
 
 const Bubble = ({text,isUser,children}) => <div style={{display:"flex",justifyContent:isUser?"flex-end":"flex-start",marginBottom:9,animation:"fadeSlide 0.35s ease-out"}}>{!isUser&&<div style={{width:26,height:26,marginRight:7,flexShrink:0,marginTop:4}}><LogoIcon size={26}/></div>}<div style={{maxWidth:"78%",padding:"12px 16px",fontSize:13.5,lineHeight:1.6,borderRadius:isUser?"18px 18px 4px 18px":"18px 18px 18px 4px",background:isUser?B.dark:B.white,color:isUser?"#f0f4f8":B.dark,fontFamily:"'Outfit',sans-serif",whiteSpace:"pre-line",boxShadow:isUser?"none":"0 1px 3px rgba(0,0,0,0.04)",border:isUser?"none":`1px solid ${B.border}`}}>{text}{children}</div></div>;
 
@@ -420,54 +368,48 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
    LANDING PAGE
    ════════════════════════════════════════════════════════════════════ */
 const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEmailSubmit, lang, setLang}) => {
-  const L = UI[lang] || UI.en;
+  var T = _L(lang);
   const features = [
-    {icon:"🧠",title:L.feat1t,desc:L.feat1d},
-    {icon:"🎯",title:L.feat2t,desc:L.feat2d},
-    {icon:"🇮🇪🇵🇹",title:L.feat3t,desc:L.feat3d},
-    {icon:"⚡",title:L.feat4t,desc:L.feat4d},
+    {icon:"🧠",title:T.feat1t,desc:T.feat1d},
+    {icon:"🎯",title:T.feat2t,desc:T.feat2d},
+    {icon:"🇮🇪🇵🇹",title:T.feat3t,desc:T.feat3d},
+    {icon:"⚡",title:T.feat4t,desc:T.feat4d},
   ];
   const steps = [
-    {n:"01",title:L.s1t,desc:L.s1d},
-    {n:"02",title:L.s2t,desc:L.s2d},
-    {n:"03",title:L.s3t,desc:L.s3d},
+    {n:"01",title:T.s1t,desc:T.s1d},
+    {n:"02",title:T.s2t,desc:T.s2d},
+    {n:"03",title:T.s3t,desc:T.s3d},
   ];
   return(
     <div style={{minHeight:"100vh",background:B.white,fontFamily:"'Outfit',sans-serif"}}>
       {/* Nav */}
       <nav style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",maxWidth:1000,margin:"0 auto",flexWrap:"wrap",gap:8}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <LogoFull/>
-          <div style={{display:"flex",gap:2,background:"#f0f2f5",borderRadius:8,padding:2}}>
-            <button onClick={()=>setLang('en')} style={{fontSize:11,padding:"3px 8px",borderRadius:6,border:"none",background:lang==='en'?'#1a2b3c':'transparent',color:lang==='en'?'#fff':'#6b7d8e',fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>EN</button>
-            <button onClick={()=>setLang('pt')} style={{fontSize:11,padding:"3px 8px",borderRadius:6,border:"none",background:lang==='pt'?'#1a2b3c':'transparent',color:lang==='pt'?'#fff':'#6b7d8e',fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>PT</button>
-          </div>
-        </div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}><LogoFull/><div style={{display:"flex",gap:2,background:"#f0f2f5",borderRadius:8,padding:2}}><button onClick={function(){setLang("en");}} style={{fontSize:11,padding:"3px 8px",borderRadius:6,border:"none",background:lang==="en"?"#1a2b3c":"transparent",color:lang==="en"?"#fff":"#6b7d8e",fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>EN</button><button onClick={function(){setLang("pt");}} style={{fontSize:11,padding:"3px 8px",borderRadius:6,border:"none",background:lang==="pt"?"#1a2b3c":"transparent",color:lang==="pt"?"#fff":"#6b7d8e",fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>PT</button></div></div>
         <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap"}}>
-          <span onClick={onPricing} style={{fontSize:13,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>{L.pricing}</span>
-          <a href="for-agents.html" style={{fontSize:13,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>{L.forAgents}</a>
-          <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"8px 18px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em",whiteSpace:"nowrap"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}}>{L.findHome}</button>
+          <span onClick={onPricing} style={{fontSize:13,color:B.dark,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>{T.pricing}</span>
+          <a href="for-agents.html" style={{fontSize:13,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",textDecoration:"none"}}>{T.forAgents}</a>
+          <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"8px 18px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"transform 0.2s",letterSpacing:"0.01em",whiteSpace:"nowrap"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}}>{T.findHome}</button>
         </div>
       </nav>
 
       {/* Hero */}
       <section style={{maxWidth:1000,margin:"0 auto",padding:"60px 24px 40px",display:"flex",alignItems:"center",gap:50,flexWrap:"wrap"}}>
         <div style={{flex:1,minWidth:280}}>
-          <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:12}}>{L.heroTag}</div>
+          <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:12}}>{T.heroTag}</div>
           <h1 style={{fontSize:42,fontWeight:800,color:B.dark,lineHeight:1.12,letterSpacing:"-0.035em",marginBottom:16}}>
-            {L.heroH1a}<br/>{L.heroH1b}<span style={{color:B.blue}}>{L.heroH1c}</span>
+            {T.heroH1a}<br/>{T.heroH1b}<span style={{color:B.blue}}>{T.heroH1c}</span>
           </h1>
           <p style={{fontSize:16,color:B.gray,lineHeight:1.65,marginBottom:28,maxWidth:420}}>
-            {L.heroP}
+            {T.heroP}
           </p>
           {/* Direct CTA — no email friction */}
           <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
             <button onClick={onStart} style={{padding:"16px 36px",borderRadius:14,fontSize:16,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"'Outfit',sans-serif",background:`linear-gradient(135deg,${B.orange},${B.orangeD})`,color:"#fff",boxShadow:"0 4px 16px rgba(245,146,27,0.3)",transition:"transform 0.2s",letterSpacing:"0.01em"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>
-              {L.findHome}
+              {T.findHome}
             </button>
-            <span onClick={onPricing} style={{fontSize:13.5,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>{L.seePricing}</span>
+            <span onClick={onPricing} style={{fontSize:13.5,color:B.blue,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>{T.seePricing}</span>
           </div>
-          <p style={{fontSize:11.5,color:"#b0bec5",marginTop:12}}>{L.heroSub}</p>
+          <p style={{fontSize:11.5,color:"#b0bec5",marginTop:12}}>{T.heroSub}</p>
         </div>
         {/* Hero Visual */}
         <div style={{flex:1,minWidth:280,display:"flex",justifyContent:"center"}}>
@@ -483,8 +425,8 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
       {/* Features */}
       <section style={{maxWidth:1000,margin:"0 auto",padding:"50px 24px"}}>
         <div style={{textAlign:"center",marginBottom:40}}>
-          <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:8}}>{L.notAvg}</h2>
-          <p style={{fontSize:15,color:B.gray}}>{L.notAvgSub}</p>
+          <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:8}}>{T.notAvg}</h2>
+          <p style={{fontSize:15,color:B.gray}}>{T.notAvgSub}</p>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))",gap:20}}>
           {features.map((f,i)=>(
@@ -500,7 +442,7 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
       {/* How it works */}
       <section style={{background:B.dark,padding:"56px 24px",marginTop:30}}>
         <div style={{maxWidth:1000,margin:"0 auto"}}>
-          <h2 style={{fontSize:28,fontWeight:800,color:B.white,letterSpacing:"-0.03em",marginBottom:8,textAlign:"center"}}>{L.howTitle}</h2>
+          <h2 style={{fontSize:28,fontWeight:800,color:B.white,letterSpacing:"-0.03em",marginBottom:8,textAlign:"center"}}>{T.howTitle}</h2>
           <p style={{fontSize:15,color:"#8899aa",textAlign:"center",marginBottom:40}}>Three simple steps to your dream home.</p>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(220px, 1fr))",gap:24}}>
             {steps.map((s,i)=>(
@@ -516,12 +458,12 @@ const LandingPage = ({onStart, onPricing, email, setEmail, emailSubmitted, onEma
 
       {/* CTA */}
       <section style={{textAlign:"center",padding:"56px 24px"}}>
-        <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:12}}>{L.ctaTitle}</h2>
-        <p style={{fontSize:15,color:B.gray,marginBottom:20}}>{L.ctaSub}</p>
+        <h2 style={{fontSize:28,fontWeight:800,color:B.dark,letterSpacing:"-0.03em",marginBottom:12}}>{T.ctaTitle}</h2>
+        <p style={{fontSize:15,color:B.gray,marginBottom:20}}>{T.ctaSub}</p>
         <button onClick={onStart} style={{padding:"16px 40px",borderRadius:32,fontSize:16,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"'Outfit',sans-serif",background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",boxShadow:`0 6px 24px rgba(30,150,209,0.25)`,transition:"transform 0.2s"}} onMouseOver={e=>e.target.style.transform="scale(1.04)"} onMouseOut={e=>e.target.style.transform="scale(1)"}>
-          {L.ctaBtn}
+          {T.ctaBtn}
         </button>
-        <p style={{fontSize:14,color:B.gray,marginBottom:16,marginTop:16}}>Or see <span onClick={onPricing} style={{color:B.blue,cursor:"pointer",fontWeight:600}}>{L.ctaPricing}</span> for agencies.</p>
+        <p style={{fontSize:14,color:B.gray,marginBottom:16,marginTop:16}}>Or see <span onClick={onPricing} style={{color:B.blue,cursor:"pointer",fontWeight:600}}>{T.ctaPricing}</span> for agencies.</p>
         <p style={{fontSize:12,color:"#b0bec5",marginTop:8}}>homeaimatch.com · <a href="contact.html" style={{color:"#90a4ae",textDecoration:"none"}}>Contact</a> · <a href="legal.html" style={{color:"#90a4ae",textDecoration:"none"}}>Terms</a> · <a href="legal.html#privacy" style={{color:"#90a4ae",textDecoration:"none"}}>Privacy</a></p>
       </section>
     </div>
@@ -780,8 +722,8 @@ const PricingPage=({onBack,onStart})=>{
       </section>
 
       <section style={{maxWidth:700,margin:"0 auto",padding:"10px 24px 50px"}}>
-        <h2 style={{fontSize:24,fontWeight:800,color:B.dark,textAlign:"center",marginBottom:24}}>{L.faq}</h2>
-        {[{q:L.faqQ1,a:L.faqA1},{q:L.faqQ2,a:L.faqA2},{q:L.faqQ3,a:L.faqA3},{q:L.faqQ4,a:L.faqA4},{q:L.faqQ5,a:L.faqA5},{q:L.faqQ6,a:L.faqA6}].map((f,i)=>(
+        <h2 style={{fontSize:24,fontWeight:800,color:B.dark,textAlign:"center",marginBottom:24}}>{T.faq}</h2>
+        {[{q:T.faqQ1,a:T.faqA1},{q:T.faqQ2,a:T.faqA2},{q:T.faqQ3,a:T.faqA3},{q:T.faqQ4,a:T.faqA4},{q:T.faqQ5,a:T.faqA5},{q:T.faqQ6,a:T.faqA6}].map((f,i)=>(
           <div key={i} style={{borderBottom:"1px solid "+B.border,padding:"16px 0"}}><div style={{fontSize:14,fontWeight:700,color:B.dark,marginBottom:6}}>{f.q}</div><div style={{fontSize:13,color:B.gray,lineHeight:1.6}}>{f.a}</div></div>))}
       </section>
       <div style={{textAlign:"center",padding:"20px 0 40px",fontSize:12,color:"#b0bec5"}}>homeaimatch.com</div>
@@ -812,9 +754,8 @@ function HomeAIMatch() {
   const [lang, setLangState] = useState(_initLang);
   const [questions, setQuestions] = useState(getQuestions(null, _initLang));
   const scrollRef = useRef(null);
-  const L = UI[lang] || UI.en;
-
-  function handleSetLang(l) { setLangState(l); setQuestions(getQuestions(null, l)); }
+  var T = _L(lang);
+  function handleSetLang(l){setLangState(l);setQuestions(getQuestions(null,l));}
 
   const totQ = questions.filter((q,i)=>i>0&&(!q.showIf||q.showIf(answers))).length;
 
@@ -865,16 +806,11 @@ function HomeAIMatch() {
       nA.location = isIreland ? "Cork" : isPortugal ? "Lourinhã" : ans;
       nA.currency = (isIreland || isPortugal) ? "EUR" : "GBP";
       setAnswers(nA);setAnswered(p=>p+1);
-      // Update questions with correct cities for selected market
-      const mkt = nA.market;
-      const cities = MARKETS[mkt] ? MARKETS[mkt].cities : [];
-      setQuestions(prev => prev.map(qq => {
-        if (qq.id === "location") return {...qq, options: cities};
-        return qq;
-      }));
+      // Update location options for selected market
+      var mkt=nA.market;var cities=MARKETS[mkt]?MARKETS[mkt].cities:[];
+      setQuestions(function(prev){return prev.map(function(qq){if(qq.id==="location")return Object.assign({},qq,{options:cities});return qq;});});
       setIsTyping(true);
-      // Skip to question index 1 (purpose) — the new questions flow naturally from there
-      setTimeout(()=>{setMessages(p=>[...p,{text:questions[1].text,isUser:false}]);setIsTyping(false);setCurrentQ(1);setTimeout(()=>setShowOpts(true),200);},600);
+      setTimeout(function(){setMessages(function(p){return[].concat(p,[{text:questions[1].text,isUser:false}]);});setIsTyping(false);setCurrentQ(1);setTimeout(function(){setShowOpts(true);},200);},600);
       return;
     }
 
@@ -905,7 +841,7 @@ function HomeAIMatch() {
     }
   }
 
-  function reset(){setMessages([]);setCurrentQ(0);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null, lang));setPage("landing");}
+  function reset(){setMessages([]);setCurrentQ(0);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
 
   const cQ=questions[currentQ];
   const filtC=cQ?.type==="search"?(cQ.options||[]).filter(c=>c.toLowerCase().includes(searchText.toLowerCase())):[];
@@ -950,10 +886,10 @@ function HomeAIMatch() {
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
               {(cQ.type==="search"?filtC:cQ.options).map((opt,i)=>{
                 const sel=cQ.type==="multi"&&multiSel.includes(opt);
-                return <button key={i} onClick={()=>cQ.type==="search"?proceed(opt):handleAnswer(opt)} style={{background:sel?B.dark:"#fff",color:sel?"#f0f4f8":B.dark,border:sel?`1.5px solid ${B.dark}`:`1.5px solid ${B.border}`,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}>{optText(opt, lang)}</button>;
+                return <button key={i} onClick={()=>cQ.type==="search"?proceed(opt):handleAnswer(opt)} style={{background:sel?B.dark:"#fff",color:sel?"#f0f4f8":B.dark,border:sel?`1.5px solid ${B.dark}`:`1.5px solid ${B.border}`,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}>{optText(opt,lang)}</button>;
               })}
             </div>
-            {cQ.type==="multi"&&multiSel.length>0&&<button onClick={()=>proceed(multiSel)} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"9px 22px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:"pointer",marginTop:7}}>{L.continueBtn}</button>}
+            {cQ.type==="multi"&&multiSel.length>0&&<button onClick={()=>proceed(multiSel)} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"9px 22px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:"pointer",marginTop:7}}>{T.contBtn}</button>}
           </div>
         )}
 
@@ -961,13 +897,13 @@ function HomeAIMatch() {
           <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:11}}>
             {persona&&(<div style={{background:`linear-gradient(135deg,${B.dark} 0%,${B.blueD} 100%)`,borderRadius:14,padding:"18px 20px",color:"#f0f4f8",animation:"fadeSlide 0.5s ease-out",marginBottom:2}}><div style={{fontSize:24,marginBottom:3}}>{persona.emoji}</div><div style={{fontSize:16,fontWeight:700,letterSpacing:"-0.02em",marginBottom:2}}>{persona.title}</div><div style={{fontSize:12.5,opacity:0.85,lineHeight:1.5}}>{persona.desc}</div></div>)}
             <div style={{display:"flex",gap:0,background:B.grayL,borderRadius:8,padding:2,alignSelf:"flex-start"}}>
-              {["cards","compare","map"].map(m=><button key={m} onClick={()=>setViewMode(m)} style={{padding:"6px 14px",borderRadius:6,fontSize:11.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",border:"none",background:viewMode===m?B.white:"transparent",color:viewMode===m?B.dark:B.gray,boxShadow:viewMode===m?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{m==="cards"?L.cards:m==="compare"?L.compare:L.mapView}</button>)}
+              {["cards","compare","map"].map(m=><button key={m} onClick={()=>setViewMode(m)} style={{padding:"6px 14px",borderRadius:6,fontSize:11.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",border:"none",background:viewMode===m?B.white:"transparent",color:viewMode===m?B.dark:B.gray,boxShadow:viewMode===m?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{m==="cards"?T.cards:m==="compare"?T.compare:T.mapV}</button>)}
             </div>
             {viewMode==="map"?<MapView results={results}/>:viewMode==="compare"?<CompTable results={results}/>:(
               <>{results.map((m,i)=><Card key={m.house.id} match={m} rank={i} expanded={expandedCard===m.house.id} onToggle={()=>setExpandedCard(expandedCard===m.house.id?null:m.house.id)} saved={!!saved[m.house.id]} onSave={id=>setSaved(p=>({...p,[id]:!p[id]}))} onContact={h=>setContactHouse(h)}/>)}</>
             )}
             <div style={{textAlign:"center",padding:"18px 0 10px",fontSize:11.5,color:"#b0bec5",lineHeight:1.6}}>
-              {L.matched}<br/>
+              {T.matched}<br/>
               <span style={{fontSize:10.5,opacity:0.7}}>homeaimatch.com</span>
             </div>
           </div>
