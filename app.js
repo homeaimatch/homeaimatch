@@ -166,6 +166,14 @@ const MARKETS = {
   uk: {
     flag: "🇬🇧", label: "United Kingdom",
     cities: ["London","Manchester","Birmingham","Leeds","Bristol","Liverpool","Edinburgh","Glasgow","Cardiff","Newcastle","Sheffield","Nottingham","Cambridge","Oxford","Bath","Brighton","York"]
+  },
+  ie: {
+    flag: "🇮🇪", label: "Ireland",
+    cities: ["Cork","Dublin","Limerick","Galway","Waterford","Killarney","Kinsale","Cobh","Midleton","Mallow","Bandon","Clonakilty","Fermoy","Youghal","Carrigaline"]
+  },
+  pt: {
+    flag: "🇵🇹", label: "Portugal",
+    cities: ["Lourinhã","Peniche","Torres Vedras","Óbidos","Caldas da Rainha","Ericeira","Mafra","Sintra","Cascais","Nazaré","Alcobaça","Bombarral","Cadaval","Atouguia da Baleia","Areia Branca","São Martinho do Porto"]
   }
 };
 const HOUSES_UK = [
@@ -195,20 +203,20 @@ function getQuestions(market, lang) {
     { id:"mortgage",field:"mortgage",type:"single",text:p?"Qual \xe9 a sua situa\xe7\xe3o de cr\xe9dito?":"What\u2019s your mortgage situation?",options:["Pre-approved mortgage","Will need a mortgage","Cash buyer \u2014 no mortgage needed","Not sure yet"]},
     { id:"intent",field:"intent",type:"single",text:p?"Qu\xe3o pronto est\xe1 para comprar?":"How ready are you to buy?",options:["Ready to buy now","Actively searching","Just exploring"]},
     { id:"timeline",field:"timeline",type:"single",text:p?"Qual \xe9 o seu prazo?":"What\u2019s your timeline?",options:["Within 3 months","3-6 months","6-12 months","No rush"]},
-    { id:"location",field:"location",type:"search",text:`Which city or area interests you?`,options:cities,placeholder:"Type a city..."},
-    { id:"radius",field:"radius",type:"single",text:"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
-    { id:"workFromHome",field:"workFromHome",type:"single",text:"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
-    { id:"commuteTo",field:"commuteTo",type:"single",text:"Where's your commute destination?",options:["City centre","Tech hub / business park","Airport area","Multiple locations"],showIf:a=>a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"},
-    { id:"commuteMax",field:"commuteMax",type:"single",text:"Maximum one-way commute?",options:["Under 15 min","Under 30 min","Under 45 min","Don't mind"],showIf:a=>a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"},
-    { id:"lifestyle",field:"lifestyle",type:"single",text:"What setting feels right?",options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
-    { id:"family",field:"family",type:"single",text:"Who's moving in?",options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
-    { id:"budget",field:"budget",type:"single",text:"Budget ceiling?",options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
-    { id:"condition",field:"condition",type:"single",text:"How about renovation?",options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
-    { id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:"What neighbourhood personality? Pick all that fit.",options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
-    { id:"pets",field:"pets",type:"single",text:"Any furry companions?",options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
-    { id:"parking",field:"parking",type:"multi",text:"Parking needs?",options:["Garage must-have","Driveway fine","Street ok","EV charging","No car"]},
-    { id:"priorities",field:"priorities",type:"multi",text:"Nearly done! Top 3 priorities?",options:["Short commute","Great schools","Outdoor space","Modern finishes","Walkable area","Home office","Energy efficient","Great views"]},
-    { id:"vibe",field:"vibe",type:"single",text:"Last one — dream style?",options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
+    { id:"location",field:"location",type:"search",text:p?"Qual cidade ou zona lhe interessa?":"Which city or area interests you?",options:cities,placeholder:p?"Escreva uma cidade...":"Type a city..."},
+    { id:"radius",field:"radius",type:"single",text:p?"Que distância do centro consideraria?":"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
+    { id:"budget",field:"budget",type:"single",text:p?"Orçamento máximo?":"Budget ceiling?",options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
+    { id:"workFromHome",field:"workFromHome",type:"single",text:p?"Qual é a sua situação de trabalho?":"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
+
+    { id:"lifestyle",field:"lifestyle",type:"single",text:p?"Que ambiente prefere?":"What setting feels right?",options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
+    { id:"family",field:"family",type:"single",text:p?"Quem vai viver na casa?":"Who's moving in?",options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
+    { id:"condition",field:"condition",type:"single",text:p?"E quanto a renovações?":"How about renovation?",options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
+    { id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:p?"Personalidade do bairro? Escolha todas.":"What neighbourhood personality? Pick all that fit.",options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
+    { id:"pets",field:"pets",type:"single",text:p?"Tem companheiros de quatro patas?":"Any furry companions?",options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
+    { id:"parking",field:"parking",type:"multi",text:p?"Estacionamento?":"Parking needs?",options:["Garage must-have","Driveway fine","Street ok","EV charging","No car"]},
+    { id:"mustHave",field:"mustHave",type:"freetext",text:p?"Algo essencial na sua nova casa? (ex: jardim, garagem, vista mar)":"Anything essential in your new home? (e.g. garden, garage, sea view)",placeholder:p?"Escreva aqui...":"Type here...",maxLen:100},
+    { id:"priorities",field:"priorities",type:"multi",text:p?"Quase a terminar! 3 prioridades?":"Nearly done! Top 3 priorities?",options:["Short commute","Great schools","Outdoor space","Modern finishes","Walkable area","Home office","Energy efficient","Great views"]},
+    { id:"vibe",field:"vibe",type:"single",text:p?"Última — estilo de sonho?":"Last one — dream style?",options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
   ];
 }
 
@@ -219,7 +227,7 @@ function scoreHouse(h, a) {
   let s=0,mx=0,r=[],ci=null;
   mx+=25;if(a.location){const l=a.location.toLowerCase();if(h.city.toLowerCase()===l||h.region?.toLowerCase().includes(l)){s+=25;r.push(`In ${h.region||h.city}`);}}
   mx+=25;const bM={"Under €200K":[0,2e5],"€200K – €400K":[2e5,4e5],"€400K – €600K":[4e5,6e5],"€600K – €800K":[6e5,8e5],"€800K+":[8e5,Infinity],"Under £200K":[0,2e5],"£200K – £400K":[2e5,4e5],"£400K – £600K":[4e5,6e5],"£600K – £800K":[6e5,8e5],"£800K+":[8e5,Infinity]};const[bN,bX]=bM[a.budget]||[0,Infinity];if(h.price>=bN&&h.price<=bX){s+=25;r.push("Within budget");}else if(h.price>=bN*.85&&h.price<=bX*1.15){s+=12;r.push("Near budget range");}
-  mx+=20;const nc=a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office";if(nc&&a.commuteTo){const ck={"City centre":"cityCenter","Tech hub / business park":"techHub","Airport area":"airport","Multiple locations":"cityCenter"}[a.commuteTo]||"cityCenter";const m=h.commuteMins[ck]||40;ci={mins:m,to:a.commuteTo};const mm={"Under 15 min":15,"Under 30 min":30,"Under 45 min":45,"Don't mind":90}[a.commuteMax]||45;if(m<=mm){s+=20;r.push(`${m} min commute`);}else if(m<=mm*1.3){s+=10;r.push(`${m} min (slightly over)`);};}else if(a.workFromHome==="Fully remote"){if(h.features.some(f=>f.includes("office")||f.includes("coworking"))){s+=20;r.push("Workspace included");}else if(h.sqm>=140){s+=12;r.push("Room for office");}else s+=6;}else s+=10;
+  mx+=20;if(a.workFromHome==="Fully remote"){if(h.features.some(f=>f.includes("office")||f.includes("coworking"))){s+=20;r.push("Workspace included");}else if(h.sqm>=140){s+=12;r.push("Room for office");}else s+=6;}else if(a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"){var cm=h.commuteMins?h.commuteMins.cityCenter||30:30;ci={mins:cm,to:"City centre"};if(cm<=30){s+=20;r.push(cm+" min to centre");}else if(cm<=45){s+=10;r.push(cm+" min to centre");}else s+=5;}else s+=10;
   mx+=15;const fb={"Just me":1,"Me and a partner":1,"Small family (1-2 kids)":3,"Larger family (3+ kids)":4,"Housemates":3};const mb=fb[a.family]||1;if(h.beds>=mb){s+=15;r.push(`${h.beds} bedrooms`);}else if(h.beds>=mb-1)s+=7;
   mx+=15;const cp={"Move-in ready only":["move-in"],"Light cosmetic work ok":["move-in","renovation-light"],"Big project — bring it on!":["renovation-major","renovation-light"],"Don't care":["move-in","renovation-light","renovation-major"]};if((cp[a.condition]||[]).includes(h.condition)){s+=15;r.push({"move-in":"Move-in ready","renovation-light":"Light reno","renovation-major":"Reno project"}[h.condition]);}
   mx+=12;const lM={"City buzz — walkable & alive":"urban","Suburban — space with access":"suburban","Countryside — nature & peace":"rural","Flexible — wherever suits":null};const lp=lM[a.lifestyle];if(lp===null)s+=8;else if(h.neighborhood===lp){s+=12;r.push(`${lp.charAt(0).toUpperCase()+lp.slice(1)} area`);}
@@ -629,7 +637,8 @@ const ContactModal=({agent,house,onClose})=>{
 };
 
 
-const PricingPage=({onBack,onStart})=>{
+const PricingPage=({onBack,onStart,lang})=>{
+  var T=_T(lang);
   const F2="'Outfit',sans-serif";
   const buyerPlans=[
     {name:"Free Search",price:"Free",per:"",desc:"See if homeAImatch is right for you",color:B.gray,pop:false,cta:"Try Free",feat:["AI lifestyle quiz","Top 3 matches (basic info)","Match score percentage","Buyer persona","-Full property details","-AI reasoning & insights","-Neighbourhood data","-Agent contact"]},
@@ -832,7 +841,7 @@ function HomeAIMatch() {
 
   if(page==="pricing") return(
     <div><style>{CSS_UK}</style>
-    <PricingPage onBack={()=>setPage("landing")} onStart={startQuiz}/></div>
+    <PricingPage onBack={()=>setPage("landing")} onStart={startQuiz} lang={lang}/></div>
   );
 
   if(page==="landing") return(
@@ -863,9 +872,10 @@ function HomeAIMatch() {
 
         {showOpts&&!results&&cQ&&(
           <div style={{animation:"fadeSlide 0.35s ease-out",marginTop:5,marginBottom:8,marginLeft:34}}>
-            {cQ.type==="search"&&<input type="text" value={searchText} onChange={e=>setSearchText(e.target.value)} placeholder={cQ.placeholder} style={{width:"100%",padding:"10px 14px",borderRadius:10,border:`1.5px solid ${B.border}`,fontSize:13.5,fontFamily:"'Outfit',sans-serif",outline:"none",background:"#fff",color:B.dark,marginBottom:7}} onFocus={e=>e.target.style.borderColor=B.blue} onBlur={e=>e.target.style.borderColor=B.border}/>}
+            {(cQ.type==="search"||cQ.type==="freetext")&&<input type="text" value={searchText} onChange={e=>setSearchText(e.target.value.slice(0,cQ.maxLen||200))} placeholder={cQ.placeholder} style={{width:"100%",padding:"10px 14px",borderRadius:10,border:`1.5px solid ${B.border}`,fontSize:13.5,fontFamily:"'Outfit',sans-serif",outline:"none",background:"#fff",color:B.dark,marginBottom:7}} onFocus={e=>e.target.style.borderColor=B.blue} onBlur={e=>e.target.style.borderColor=B.border} onKeyDown={e=>{if(e.key==="Enter"&&cQ.type==="freetext"&&searchText.trim())proceed(searchText.trim());}}/>}
+            {cQ.type==="freetext"&&<div style={{display:"flex",gap:6,marginBottom:4}}><button onClick={function(){if(searchText.trim())proceed(searchText.trim());}} style={{background:searchText.trim()?B.blue:"#ccc",color:"#fff",border:"none",padding:"8px 18px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:searchText.trim()?"pointer":"default"}}>{(_T(lang)).contBtn}</button><button onClick={function(){proceed("No preference");}} style={{background:"#fff",color:B.gray,border:"1.5px solid "+B.border,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer"}}>{lang==="pt"?"Sem preferência":"No preference"}</button></div>}
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-              {(cQ.type==="search"?filtC:cQ.options).map((opt,i)=>{
+              {(cQ.type==="freetext"?[]:(cQ.type==="search"?filtC:cQ.options)).map((opt,i)=>{
                 const sel=cQ.type==="multi"&&multiSel.includes(opt);
                 return <button key={i} onClick={()=>cQ.type==="search"?proceed(opt):handleAnswer(opt)} style={{background:sel?B.dark:"#fff",color:sel?"#f0f4f8":B.dark,border:sel?`1.5px solid ${B.dark}`:`1.5px solid ${B.border}`,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}>{optText(opt,lang)}</button>;
               })}
