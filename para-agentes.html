@@ -21,6 +21,7 @@
     .nav-logo{font-size:20px;font-weight:800;color:var(--dark);display:flex;align-items:center;gap:8px}
     .nav-links{display:flex;gap:24px;align-items:center}
     .nav-links a{font-size:14px;font-weight:500;color:var(--gray);transition:color 0.2s}
+    .nav-links a.btn{color:#fff}
     .nav-links a:hover{color:var(--dark)}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 26px;border-radius:28px;font-family:'Outfit';font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s}
     .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
@@ -160,7 +161,7 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <a href="index.html" class="nav-logo">🏠 homeAImatch</a>
+  <a href="index.html" class="nav-logo"><svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="22" fill="#F5F7FA"/><path d="M50 18L18 42v40h24V58h16v24h24V42L50 18z" fill="#1E96D1" stroke="#1A2B3C" stroke-width="3"/><circle cx="50" cy="45" r="8" fill="#F5921B"/><path d="M42 82V58h16v24" stroke="#1A2B3C" stroke-width="2.5"/><path d="M18 42L50 18l32 24" stroke="#1A2B3C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> <span>home<span style="color:var(--blue)">AI</span>match</span></a>
   <div class="nav-links">
     <a href="#features">Funcionalidades</a>
     <a href="#pricing" class="hide-mobile">Preços</a>
@@ -432,39 +433,39 @@
     <div class="faq-list" style="margin-top:24px">
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">É mesmo grátis para começar?<span class="arrow">▾</span></div>
-        <div class="faq-a">Yes. You get 3 listings and 3 full leads completely free — no credit card, no trial period, no catch. It's enough to see the quality of buyer enquiries homeAImatch delivers before you spend a cent.</div>
+        <div class="faq-a">Sim. Pode adicionar imóveis ilimitados e receber leads sem qualquer custo — sem cartão de crédito, sem período de teste. Os leads do plano grátis incluem o nome, email e mensagem do comprador. Para aceder ao perfil completo do comprador (orçamento, prazos, preferências, score de match), pode atualizar para um plano pago a qualquer momento.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">O que acontece quando fico sem créditos de leads?<span class="arrow">▾</span></div>
-        <div class="faq-a">You'll still see that a new lead came in and which property they're interested in — but the buyer's name, email, phone, and message will be hidden behind an upgrade prompt. This means no leads are ever lost. As soon as you buy a lead pack or upgrade to Unlimited, all pending leads are instantly unlocked and you can contact them.</div>
+        <div class="faq-q">Qual é a diferença entre leads básicos e premium?<span class="arrow">▾</span></div>
+        <div class="faq-a">No plano grátis recebe leads básicos: nome, email e mensagem do comprador. Nos planos pagos, cada lead é premium e inclui o perfil completo gerado por IA — orçamento, tamanho da família, estilo de vida, prioridades — e tags de intenção que mostram se o comprador tem crédito pré-aprovado, se está à procura ativa, e qual é o prazo. É como ter um dossier antes da primeira chamada.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">Os créditos de leads não usados expiram?<span class="arrow">▾</span></div>
-        <div class="faq-a">No. Lead packs (10 or 25 credits) never expire. Use them at your own pace. The Unlimited plan gives you unlimited leads for as long as your subscription is active.</div>
+        <div class="faq-q">O que são as tags de intenção do comprador?<span class="arrow">▾</span></div>
+        <div class="faq-a">São indicadores automáticos baseados nas respostas do comprador ao quiz. Mostram informação crítica como: crédito pré-aprovado ou não, se está pronto para comprar agora ou só a explorar, prazo de compra (3 meses, 6 meses, etc.), e se é residência principal, férias ou investimento. Permite-lhe priorizar os leads mais sérios imediatamente.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">O que é o perfil de comprador ideal por imóvel?<span class="arrow">▾</span></div>
+        <div class="faq-a">Disponível nos planos pagos. Quando adiciona ou reivindica um imóvel, a nossa IA analisa as características do imóvel e gera um perfil do comprador ideal — o tipo de pessoa mais provável de querer essa propriedade. Também mostramos quantos utilizadores ativos já correspondem a mais de 90% com o seu imóvel, para que saiba imediatamente o potencial de procura.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">Como é que os compradores encontram os meus imóveis?<span class="arrow">▾</span></div>
-        <div class="faq-a">Buyers take our 2-minute lifestyle quiz on homeaimatch.com. Our AI scores every property against their preferences across 10+ criteria including commute, neighbourhood vibe, schools, pet-friendliness, and more. If your property is a strong match, the buyer sees it in their results and can contact you directly.</div>
+        <div class="faq-a">Os compradores fazem o nosso quiz de estilo de vida de 2 minutos no homeaimatch.com. A nossa IA avalia cada imóvel em mais de 10 critérios — incluindo localização, orçamento, estilo de vida, família, animais de estimação, e ambiente de bairro. Se o seu imóvel for uma boa correspondência, o comprador vê-o nos resultados e pode contactá-lo diretamente.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">O que conta como um "lead"?<span class="arrow">▾</span></div>
-        <div class="faq-a">A lead is counted when a buyer fills out the contact form on one of your properties. Each unique buyer enquiry uses one credit. If the same buyer contacts you about a different property, that's a separate lead. Spam or clearly invalid enquiries are filtered and don't count against your credits.</div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">Que informação recebo sobre cada lead?<span class="arrow">▾</span></div>
-        <div class="faq-a">Name, email, phone (if provided), their message, and their AI-generated buyer profile — including budget, lifestyle priorities, must-haves, dealbreakers, and their match score with your specific property. It's like having a dossier before the first call.</div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">Qual é o compromisso no plano Ilimitado?<span class="arrow">▾</span></div>
-        <div class="faq-a">The Unlimited plan has a 6-month minimum commitment at €99/month (€594 total). After 6 months, it continues month-to-month and you can cancel anytime. If you're getting 10+ leads a month, Unlimited is cheaper than buying packs.</div>
+        <div class="faq-q">Qual é a diferença entre os planos Starter, Pro e Enterprise?<span class="arrow">▾</span></div>
+        <div class="faq-a">Todos os planos pagos incluem as mesmas funcionalidades premium (leads completos, tags de intenção, perfil de agente premium, análise, perfil de comprador ideal). A diferença é o número máximo de imóveis reivindicados: Starter permite até 50, Pro até 120 e Enterprise até 200. Os planos Pro e Enterprise incluem também selo de destaque, posicionamento prioritário e suporte dedicado.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">Posso reivindicar imóveis já na plataforma?<span class="arrow">▾</span></div>
-        <div class="faq-a">Yes! If your properties are already listed on homeAImatch, search for them in your dashboard and claim them with one click. Your contact details replace the placeholder and leads flow directly to your account.</div>
+        <div class="faq-a">Sim! Se os seus imóveis já estão listados no homeAImatch, procure-os no seu painel e reivindique-os com um clique. Os seus dados de contacto substituem o placeholder e todos os futuros leads vão diretamente para a sua conta. Isto conta para o limite de imóveis do seu plano.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">O que é a API / White-Label?<span class="arrow">▾</span></div>
+        <div class="faq-a">Brevemente disponível. Com a API, poderá integrar o quiz de correspondência por IA diretamente no website da sua agência. Os compradores fazem o quiz no seu site, com a sua marca, e os leads chegam com o perfil completo. Contacte-nos se tiver interesse — os primeiros utilizadores terão acesso prioritário.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">Que mercados cobrem?<span class="arrow">▾</span></div>
-        <div class="faq-a">Atualmente Cork, Irlanda e a Costa de Prata / região de Lourinhã em Portugal. Estamos a expandir para mais mercados europeus ao longo de 2026. Interested in a different market? Contact us — early adopters get priority access.</div>
+        <div class="faq-a">Atualmente Cork, Irlanda e a Costa de Prata / região de Lourinhã em Portugal. Estamos a expandir para mais mercados europeus ao longo de 2026. Interessado num mercado diferente? Contacte-nos — os primeiros utilizadores têm acesso prioritário.</div>
       </div>
     </div>
   </div>
@@ -473,16 +474,16 @@
 <!-- FINAL CTA -->
 <section class="cta-section">
   <h2>Pronto para receber melhores leads?</h2>
-  <p>Join homeAImatch for free and start receiving AI-matched buyer enquiries for your properties.</p>
+  <p>Junte-se ao homeAImatch gratuitamente e comece a receber contactos de compradores qualificados por IA para os seus imóveis.</p>
   <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
     <a href="agent-dashboard.html" class="btn btn-orange btn-lg">Criar Conta Grátis →</a>
-    <a href="/cdn-cgi/l/email-protection#8fe7eae3e3e0cfe7e0e2eaeee6e2eefbece7a1ece0e2b0fcfaede5eaecfbb2e7e0e2eacec6e2eefbece7afcbeae2e0afddeafefaeafcfb" class="btn btn-white btn-lg">Book a Demo</a>
+    <a href="mailto:hello@homeaimatch.com" class="btn btn-white btn-lg">Agendar Demo</a>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
-  <p>© 2026 homeAImatch · <a href="index.html" style="color:var(--blue)">homeaimatch.com</a> · Cork, Ireland · <a href="legal.html" style="color:var(--gray)">Terms</a> · <a href="legal.html#privacy" style="color:var(--gray)">Privacy</a></p>
+  <p>© 2026 homeAImatch · <a href="index.html" style="color:var(--blue)">homeaimatch.com</a> · Cork, Irlanda · <a href="legal.html" style="color:var(--gray)">Termos</a> · <a href="legal.html#privacy" style="color:var(--gray)">Privacidade</a></p>
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
