@@ -21,6 +21,7 @@
     .nav-logo{font-size:20px;font-weight:800;color:var(--dark);display:flex;align-items:center;gap:8px}
     .nav-links{display:flex;gap:24px;align-items:center}
     .nav-links a{font-size:14px;font-weight:500;color:var(--gray);transition:color 0.2s}
+    .nav-links a.btn{color:#fff}
     .nav-links a:hover{color:var(--dark)}
     .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 26px;border-radius:28px;font-family:'Outfit';font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s}
     .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
@@ -160,7 +161,7 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <a href="index.html" class="nav-logo">🏠 homeAImatch</a>
+  <a href="index.html" class="nav-logo"><img src="logo-full.png" alt="homeAImatch" style="height:40px"></a>
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#pricing" class="hide-mobile">Pricing</a>
@@ -275,7 +276,7 @@
       <div class="feature-card">
         <div class="feature-icon" style="background:#e8f5e9">🔗</div>
         <h3>Claim Listings</h3>
-        <p>Properties already on homeAImatch? Claim them with one click. Your contact details replace the placeholder and leads flow directly to you.</p>
+        <p>Imóveis já no homeAImatch? Reivindique-os através de validação e receba leads de elevado valor. Full buyer profile from quiz, tags de intenção (crédito, prazo, urgência) e identificação automática do comprador ideal por imóvel.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon" style="background:#f3e5f5">🔔</div>
@@ -323,73 +324,78 @@
 <section class="section" id="pricing" style="background:var(--gray-l)">
   <div class="section-inner">
     <div class="section-tag">Pricing</div>
-    <h2>Only pay when it works</h2>
-    <p class="subtitle">Start free with 3 leads. Buy lead packs when you need more, or go unlimited for a flat monthly rate. You only pay for results.</p>
+    <h2>Unlimited leads. Always.</h2>
+    <p class="subtitle">All plans include unlimited leads. Choose the plan that fits the size of your property portfolio.</p>
     <div class="pricing-grid">
       <div class="price-card">
         <div class="price-card-body">
-          <div class="tier" style="color:var(--gray)">Free</div>
+          <div class="tier" style="color:var(--gray)">FREE</div>
           <div><span class="amount">€0</span></div>
-          <div class="desc">Try it — no card required</div>
-          <a href="agent-dashboard.html" class="btn btn-outline" style="width:100%;justify-content:center;margin-bottom:20px">Get Started</a>
-          <div class="feat"><span class="check">✓</span> Up to 3 listings</div>
-          <div class="feat"><span class="check">✓</span> <strong>3 free leads</strong> included</div>
-          <div class="feat"><span class="check">✓</span> Full buyer profiles</div>
-          <div class="feat"><span class="check">✓</span> Claim existing listings</div>
-          <div class="feat"><span class="check">✓</span> Agent profile</div>
-          <div class="feat off"><span class="check">—</span> Priority placement</div>
-          <div class="feat off"><span class="check">—</span> Featured badge</div>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="price-card-body">
-          <div class="tier" style="color:var(--blue)">10 Lead Pack</div>
-          <div><span class="amount">€99</span><span class="per">one-time</span></div>
-          <div class="desc">€9.90 per lead</div>
-          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Buy Pack</a>
-          <div class="feat"><span class="check">✓</span> <strong>10 leads</strong> — use anytime</div>
-          <div class="feat"><span class="check">✓</span> Up to 10 listings</div>
-          <div class="feat"><span class="check">✓</span> Full buyer profiles</div>
-          <div class="feat"><span class="check">✓</span> Lead management tools</div>
-          <div class="feat"><span class="check">✓</span> Analytics dashboard</div>
-          <div class="feat off"><span class="check">—</span> Priority placement</div>
-          <div class="feat off"><span class="check">—</span> Featured badge</div>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="price-card-body">
-          <div class="tier" style="color:var(--blue)">25 Lead Pack</div>
-          <div><span class="amount">€199</span><span class="per">one-time</span></div>
-          <div class="desc">€7.96 per lead — save 20%</div>
-          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Buy Pack</a>
-          <div class="feat"><span class="check">✓</span> <strong>25 leads</strong> — use anytime</div>
+          <div class="desc">Forever · no card needed</div>
+          <a href="agent-dashboard.html" class="btn btn-outline" style="width:100%;justify-content:center;margin-bottom:20px">Get Started Free</a>
+          <div class="feat"><span class="check">✓</span> <strong>Unlimited leads</strong> (basic)</div>
           <div class="feat"><span class="check">✓</span> Unlimited listings</div>
-          <div class="feat"><span class="check">✓</span> Full buyer profiles</div>
-          <div class="feat"><span class="check">✓</span> Lead management tools</div>
-          <div class="feat"><span class="check">✓</span> Priority listing placement</div>
-          <div class="feat"><span class="check">✓</span> Featured agent badge</div>
-          <div class="feat off"><span class="check">—</span> White-label quiz</div>
+          <div class="feat"><span class="check">✓</span> Basic lead: name, email, message</div>
+          <div class="feat off"><span class="check">—</span> Claim existing listings </div>
+          <div class="feat off"><span class="check">—</span> Premium agent profile</div>
+          <div class="feat off"><span class="check">—</span> Full buyer profile</div>
+          <div class="feat off"><span class="check">—</span> Buyer intent tags</div>
+          <div class="feat off"><span class="check">—</span> Ideal buyer profile per listing</div>
         </div>
       </div>
       <div class="price-card pop">
-        <div class="pop-badge">BEST VALUE</div>
+        <div class="pop-badge">MOST POPULAR</div>
         <div class="price-card-body">
-          <div class="tier" style="color:var(--orange)">Unlimited</div>
+          <div class="tier" style="color:var(--blue)">STARTER</div>
           <div><span class="amount">€99</span><span class="per">/month</span></div>
-          <div class="desc">6-month minimum · unlimited leads</div>
-          <a href="agent-dashboard.html" class="btn btn-orange" style="width:100%;justify-content:center;margin-bottom:20px">Go Unlimited</a>
-          <div class="feat"><span class="check">✓</span> <strong>Unlimited leads</strong></div>
-          <div class="feat"><span class="check">✓</span> Unlimited listings</div>
-          <div class="feat"><span class="check">✓</span> Full buyer profiles & personas</div>
-          <div class="feat"><span class="check">✓</span> Priority listing placement</div>
+          <div class="desc">Up to 50 claimed listings</div>
+          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
+          <div class="feat"><span class="check">✓</span> <strong>Unlimited leads</strong> (premium)</div>
+          <div class="feat"><span class="check">✓</span> Up to <strong>50 listings</strong></div>
+          <div class="feat"><span class="check">✓</span> Claim existing listings</div>
+          <div class="feat"><span class="check">✓</span> Full buyer profile from quiz</div>
+          <div class="feat"><span class="check">✓</span> Intent tags: mortgage, timeline, urgency</div>
+          <div class="feat"><span class="check">✓</span> Ideal buyer profile per listing</div>
+          <div class="feat"><span class="check">✓</span> Active buyers notified when listing added</div>
+          <div class="feat"><span class="check">✓</span> Premium agent profile com foto</div>
+          <div class="feat"><span class="check">✓</span> Analytics dashboard</div>
+        </div>
+      </div>
+      <div class="price-card">
+        <div class="price-card-body">
+          <div class="tier" style="color:var(--blue)">PRO</div>
+          <div><span class="amount">€199</span><span class="per">/month</span></div>
+          <div class="desc">Up to 120 claimed listings</div>
+          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
+          <div class="feat"><span class="check">✓</span> Everything in Starter +</div>
+          <div class="feat"><span class="check">✓</span> Up to <strong>120 listings</strong></div>
           <div class="feat"><span class="check">✓</span> Featured agent badge</div>
-          <div class="feat"><span class="check">✓</span> Advanced analytics</div>
           <div class="feat"><span class="check">✓</span> Priority support</div>
         </div>
       </div>
+      <div class="price-card">
+        <div class="price-card-body">
+          <div class="tier" style="color:var(--blue)">ENTERPRISE</div>
+          <div><span class="amount">€299</span><span class="per">/month</span></div>
+          <div class="desc">Up to 200 claimed listings</div>
+          <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
+          <div class="feat"><span class="check">✓</span> Everything in Pro +</div>
+          <div class="feat"><span class="check">✓</span> Up to <strong>200 listings</strong></div>
+          <div class="feat"><span class="check">✓</span> Dedicated account manager</div>
+          <div class="feat"><span class="check">✓</span> Custom integrations</div>
+          <div class="feat"><span class="check">✓</span> Advanced reporting</div>
+        </div>
+      </div>
+    </div>
+    <!-- API / White-label -->
+    <div style="margin-top:28px;background:#fff;border:2px dashed var(--border);border-radius:16px;padding:28px 32px;text-align:center;max-width:680px;margin-left:auto;margin-right:auto">
+      <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">🔌 API / White-Label</div>
+      <div style="font-size:22px;font-weight:800;color:var(--dark);margin-bottom:6px">Embed the quiz on your website</div>
+      <p style="font-size:14px;color:var(--gray);margin-bottom:14px;line-height:1.6">Add the AI matching quiz directly to your agency's website. Buyers take the quiz on your site and leads arrive with full profiles.</p>
+      <span style="display:inline-block;background:var(--orange-l);color:var(--orange);font-weight:700;font-size:13px;padding:8px 20px;border-radius:20px">Coming Soon · Contact us to learn more</span>
     </div>
     <div style="text-align:center;margin-top:24px;font-size:13px;color:var(--gray);line-height:1.7;max-width:620px;margin-left:auto;margin-right:auto">
-      <strong>How lead credits work:</strong> Every time a buyer contacts you through homeAImatch, one lead credit is used. You always see that a new lead came in — but once your credits run out, the buyer's contact details are hidden until you top up or upgrade. No leads are ever lost.
+      <strong>How it works:</strong> All plans include unlimited leads. The difference is lead quality and features. On the free plan, you get the buyer's name, email, and message. On paid plans, each lead includes the full buyer profile, intent tags (mortgage status, timeline, urgency level), and match score with your property.
     </div>
   </div>
 </section>
@@ -423,39 +429,39 @@
 <section class="section">
   <div class="section-inner">
     <div class="section-tag">FAQ</div>
-    <h2>Common questions</h2>
+    <h2>Perguntas comuns</h2>
     <div class="faq-list" style="margin-top:24px">
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">Is it really free to start?<span class="arrow">▾</span></div>
-        <div class="faq-a">Yes. You get 3 listings and 3 full leads completely free — no credit card, no trial period, no catch. It's enough to see the quality of buyer enquiries homeAImatch delivers before you spend a cent.</div>
+        <div class="faq-a">Yes. You can add unlimited listings and receive leads at no cost — no credit card, no trial period. Free plan leads include the buyer's name, email, and message. To access the full buyer profile (budget, timeline, preferences, match score), you can upgrade to a paid plan at any time.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">What happens when I run out of lead credits?<span class="arrow">▾</span></div>
-        <div class="faq-a">You'll still see that a new lead came in and which property they're interested in — but the buyer's name, email, phone, and message will be hidden behind an upgrade prompt. This means no leads are ever lost. As soon as you buy a lead pack or upgrade to Unlimited, all pending leads are instantly unlocked and you can contact them.</div>
+        <div class="faq-q">What's the difference between basic and premium leads?<span class="arrow">▾</span></div>
+        <div class="faq-a">On the free plan you get basic leads: buyer's name, email, and message. On paid plans, every lead is premium and includes the full AI-generated profile — budget, family size, lifestyle, priorities — plus intent tags showing whether the buyer has mortgage pre-approval, is actively searching, and their timeline. It's like having a dossier before the first call.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">Do unused lead credits expire?<span class="arrow">▾</span></div>
-        <div class="faq-a">No. Lead packs (10 or 25 credits) never expire. Use them at your own pace. The Unlimited plan gives you unlimited leads for as long as your subscription is active.</div>
+        <div class="faq-q">What are buyer intent tags?<span class="arrow">▾</span></div>
+        <div class="faq-a">Automatic indicators based on the buyer's quiz answers. They show critical information like: mortgage pre-approved or not, ready to buy now or just exploring, purchase timeline (3 months, 6 months, etc.), and whether it's a primary home, holiday home, or investment. Lets you prioritise the most serious leads immediately.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What is the ideal buyer profile per listing?<span class="arrow">▾</span></div>
+        <div class="faq-a">Available on paid plans. When you add or claim a listing, our AI analyses the property's characteristics and generates an ideal buyer profile — the type of person most likely to want that property. We also show how many active users already match above 90% with your listing, so you know the demand potential immediately.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">How do buyers find my properties?<span class="arrow">▾</span></div>
-        <div class="faq-a">Buyers take our 2-minute lifestyle quiz on homeaimatch.com. Our AI scores every property against their preferences across 10+ criteria including commute, neighbourhood vibe, schools, pet-friendliness, and more. If your property is a strong match, the buyer sees it in their results and can contact you directly.</div>
+        <div class="faq-a">Buyers take our 2-minute lifestyle quiz on homeaimatch.com. Our AI scores every property against their preferences across 10+ criteria — including location, budget, lifestyle, family, pets, and neighbourhood vibe. If your property is a strong match, the buyer sees it in their results and can contact you directly.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">What counts as a "lead"?<span class="arrow">▾</span></div>
-        <div class="faq-a">A lead is counted when a buyer fills out the contact form on one of your properties. Each unique buyer enquiry uses one credit. If the same buyer contacts you about a different property, that's a separate lead. Spam or clearly invalid enquiries are filtered and don't count against your credits.</div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">What information do I get about each lead?<span class="arrow">▾</span></div>
-        <div class="faq-a">Name, email, phone (if provided), their message, and their AI-generated buyer profile — including budget, lifestyle priorities, must-haves, dealbreakers, and their match score with your specific property. It's like having a dossier before the first call.</div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">What's the commitment on the Unlimited plan?<span class="arrow">▾</span></div>
-        <div class="faq-a">The Unlimited plan has a 6-month minimum commitment at €99/month (€594 total). After 6 months, it continues month-to-month and you can cancel anytime. If you're getting 10+ leads a month, Unlimited is cheaper than buying packs.</div>
+        <div class="faq-q">What's the difference between Starter, Pro, and Enterprise?<span class="arrow">▾</span></div>
+        <div class="faq-a">All paid plans include the same premium features (full leads, intent tags, premium agent profile, analytics, ideal buyer profile). The difference is the maximum number of claimed listings: Starter allows up to 50, Pro up to 120, and Enterprise up to 200. Pro and Enterprise also include a featured badge, priority placement, and dedicated support.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">Can I claim listings already on the platform?<span class="arrow">▾</span></div>
-        <div class="faq-a">Yes! If your properties are already listed on homeAImatch, search for them in your dashboard and claim them with one click. Your contact details replace the placeholder and leads flow directly to your account.</div>
+        <div class="faq-a">Yes! If your properties are already listed on homeAImatch, search for them in your dashboard and claim them with one click. Your contact details replace the placeholder and all future leads go directly to your account. This counts towards your plan's listing limit.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What is the API / White-Label?<span class="arrow">▾</span></div>
+        <div class="faq-a">Coming soon. With the API, you'll be able to embed the AI matching quiz directly on your agency's website. Buyers take the quiz on your site, under your brand, and leads arrive with full profiles. Contact us if you're interested — early adopters get priority access.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-q">What markets do you cover?<span class="arrow">▾</span></div>
@@ -471,7 +477,7 @@
   <p>Join homeAImatch for free and start receiving AI-matched buyer enquiries for your properties.</p>
   <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
     <a href="agent-dashboard.html" class="btn btn-orange btn-lg">Create Free Account →</a>
-    <a href="/cdn-cgi/l/email-protection#8fe7eae3e3e0cfe7e0e2eaeee6e2eefbece7a1ece0e2b0fcfaede5eaecfbb2e7e0e2eacec6e2eefbece7afcbeae2e0afddeafefaeafcfb" class="btn btn-white btn-lg">Book a Demo</a>
+    <a href="/cdn-cgi/l/email-protection#dfb7bab3b3b09fb7b0b2babeb6b2beabbcb7f1bcb0b2" class="btn btn-white btn-lg">Book a Demo</a>
   </div>
 </section>
 
@@ -480,7 +486,4 @@
   <p>© 2026 homeAImatch · <a href="index.html" style="color:var(--blue)">homeaimatch.com</a> · Cork, Ireland · <a href="legal.html" style="color:var(--gray)">Terms</a> · <a href="legal.html#privacy" style="color:var(--gray)">Privacy</a></p>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// Scroll-triggered fade-in
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { 
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
