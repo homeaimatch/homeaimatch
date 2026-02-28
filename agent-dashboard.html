@@ -1156,6 +1156,13 @@ function renderAddProperty() {
       <div class="form-group"><label>Original Listing URL</label><input id="ap-source" placeholder="https://daft.ie/..."/></div>
     </div>
 
+    <div class="card" style="margin-top:12px;border-left:3px solid var(--blue)">
+      <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:12px;color:var(--dark);line-height:1.6">
+        <input type="checkbox" id="ap-consent" style="margin-top:3px;flex-shrink:0;accent-color:var(--blue)"/>
+        <span>I confirm that I am <strong>authorised to list this property</strong> on homeAImatch and that the information provided is accurate. I agree that homeAImatch may display this listing to potential buyers, include it in AI matching results, and share my contact details with matched buyers. I have read the <a href="legal.html#tos" target="_blank" style="color:var(--blue)">Terms of Service</a> and <a href="legal.html#privacy" target="_blank" style="color:var(--blue)">Privacy Policy</a>.</span>
+      </label>
+    </div>
+
     <div style="display:flex;gap:10px;margin-top:8px">
       <button class="btn btn-primary" onclick="submitAgentProperty(false)">✓ Add Property</button>
       <button class="btn btn-orange" onclick="submitAgentProperty(true)">✓ Add & Start New</button>
@@ -1240,6 +1247,13 @@ function getApChips(containerId) {
 async function submitAgentProperty(andNew = false) {
   const val = id => document.getElementById(id)?.value?.trim();
   const num = id => val(id) ? parseFloat(val(id)) : null;
+
+  // Check listing consent
+  if (!document.getElementById('ap-consent')?.checked) {
+    showToast('Please confirm you are authorised to list this property', 'error');
+    document.getElementById('ap-consent')?.focus();
+    return;
+  }
 
   const property = {
     title: val('ap-title'),

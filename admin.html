@@ -88,7 +88,19 @@
 </head>
 <body>
 
-<div class="app">
+<!-- Admin Login Gate -->
+<div id="admin-login-gate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f0f2f5;font-family:'Outfit',sans-serif">
+  <div style="background:#fff;border-radius:16px;padding:40px;max-width:380px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.08);text-align:center">
+    <div style="font-size:28px;margin-bottom:8px">🔒</div>
+    <h2 style="font-size:20px;font-weight:800;color:#1a2b3c;margin-bottom:4px">Admin Console</h2>
+    <p style="font-size:13px;color:#6b7d8e;margin-bottom:24px">homeAImatch — Authorised access only</p>
+    <input id="admin-pw" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box;margin-bottom:12px"/>
+    <button onclick="adminLogin()" style="width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,#1a2b3c,#2d4a5e);color:#fff;border:none;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer">Enter</button>
+    <div id="admin-login-err" style="font-size:12px;color:#e53935;margin-top:10px;display:none">Incorrect password</div>
+  </div>
+</div>
+
+<div class="app" id="admin-app" style="display:none">
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">
@@ -107,6 +119,7 @@
     <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08)">
       <div style="font-size:12px;font-weight:600;color:#fff">Admin</div>
       <a href="agent-dashboard" style="font-size:10px;color:rgba(255,255,255,0.4);text-decoration:none">← Agent Dashboard</a>
+      <a href="#" onclick="adminLogout();return false" style="display:block;font-size:10px;color:rgba(255,255,255,0.35);text-decoration:none;margin-top:6px">🔒 Sign out</a>
     </div>
   </div>
 
@@ -123,6 +136,39 @@
 </div>
 
 <script>
+// Admin authentication — simple password hash check
+// To change password: update the hash below. Generate with: btoa('your-password')
+const ADMIN_HASH = 'aG9tZWFpbWF0Y2gyMDI2'; // base64 of 'homeaimatch2026'
+const ADMIN_SESSION_KEY = 'ham_admin_auth';
+
+function adminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  if (btoa(pw) === ADMIN_HASH) {
+    sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+    document.getElementById('admin-login-gate').style.display = 'none';
+    document.getElementById('admin-app').style.display = 'flex';
+    loadData();
+  } else {
+    document.getElementById('admin-login-err').style.display = 'block';
+    document.getElementById('admin-pw').value = '';
+    document.getElementById('admin-pw').focus();
+  }
+}
+
+function adminLogout() {
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  document.getElementById('admin-app').style.display = 'none';
+  document.getElementById('admin-login-gate').style.display = 'flex';
+  document.getElementById('admin-pw').value = '';
+  document.getElementById('admin-login-err').style.display = 'none';
+}
+
+// Auto-login if session exists
+if (sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true') {
+  document.getElementById('admin-login-gate').style.display = 'none';
+  document.getElementById('admin-app').style.display = 'flex';
+}
+
 const API = 'https://homeaimatch-backend-production.up.railway.app';
 let DATA = null;
 let currentTab = 'overview';
@@ -587,9 +633,9 @@ function toggleMsg(id) {
     short.style.display = 'inline'; full.style.display = 'none'; btn.textContent = 'Show more ▾';
   }
 }
-loadData();
+if (sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true') loadData();
 // Auto-refresh every 60 seconds
-setInterval(loadData, 60000);
+setInterval(function(){ if(sessionStorage.getItem(ADMIN_SESSION_KEY)==='true') loadData(); }, 60000);
 </script>
 </body>
 </html>
