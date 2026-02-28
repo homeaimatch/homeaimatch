@@ -741,6 +741,7 @@ function HomeAIMatch() {
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [messages, setMessages] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
+  const [qHistory, setQHistory] = useState([]);
   const [answers, setAnswers] = useState({});
   const [isTyping, setIsTyping] = useState(false);
   const [showOpts, setShowOpts] = useState(false);
@@ -807,7 +808,7 @@ function HomeAIMatch() {
       // Extract just the city name for the location field
       nA.location = isIreland ? "Cork" : isPortugal ? "Lourinhã" : ans;
       nA.currency = (isIreland || isPortugal) ? "EUR" : "GBP";
-      setAnswers(nA);setAnswered(p=>p+1);
+      setAnswers(nA);setAnswered(p=>p+1);setQHistory(h=>[...h,currentQ]);
       var mkt=nA.market;var cities=MARKETS[mkt]?MARKETS[mkt].cities:[];
       setQuestions(function(prev){return prev.map(function(qq){return qq.id==="location"?Object.assign({},qq,{options:cities}):qq;});});
       setIsTyping(true);
@@ -815,7 +816,7 @@ function HomeAIMatch() {
       return;
     }
 
-    setAnswers(nA);setAnswered(p=>p+1);
+    setAnswers(nA);setAnswered(p=>p+1);setQHistory(h=>[...h,currentQ]);
     let nx=-1;for(let i=currentQ+1;i<questions.length;i++){if(!questions[i].showIf||questions[i].showIf(nA)){nx=i;break;}}
 
     if(nx!==-1){
@@ -823,11 +824,11 @@ function HomeAIMatch() {
       setTimeout(()=>{setMessages(p=>[...p,{text:questions[nx].text,isUser:false}]);setIsTyping(false);setCurrentQ(nx);setTimeout(()=>setShowOpts(true),200);},500+Math.random()*300);
     } else {
       setIsTyping(true);
-      setMessages(pr=>[...pr,{text:lang==="pt"?"A procurar a sua correspondência perfeita...":"Searching for your perfect match...",isUser:false}]);
+      setMessages(pr=>[...pr,{text:lang==="pt"?"A procurar o seu lar perfeito...":"Searching for your perfect match...",isUser:false}]);
       // Call real backend API
       const apiResult = await apiCall('/api/match', { answers: nA });
       if (apiResult && apiResult.matches && apiResult.matches.length > 0) {
-        const p = apiResult.persona || getPersona(nA, lang);
+        const p = lang==="pt" ? getPersona(nA, lang) : (apiResult.persona || getPersona(nA, lang));
         setPersona(p);
         setMessages(pr=>[...pr,{text:lang==="pt"?`${p.emoji} O seu perfil: "${p.title}" — ${p.desc || p.description}\n\nEncontrei ${apiResult.matches.length} correspondências para si!`:`${p.emoji} You're "${p.title}" — ${p.desc || p.description}\n\nI found ${apiResult.matches.length} matches for you!`,isUser:false}]);
         setIsTyping(false);
@@ -842,7 +843,21 @@ function HomeAIMatch() {
     }
   }
 
-  function reset(){setMessages([]);setCurrentQ(0);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
+  function goBack(){
+    if(qHistory.length===0)return;
+    var prevQ=qHistory[qHistory.length-1];
+    setQHistory(h=>h.slice(0,-1));
+    // Remove the last bot message and user answer from messages
+    setMessages(p=>{var m=[...p];while(m.length>0&&m[m.length-1].isUser)m.pop();if(m.length>0)m.pop();return m;});
+    // Undo the answer
+    var q=questions[prevQ];
+    if(q.field){setAnswers(a=>{var na={...a};delete na[q.field];return na;});}
+    setAnswered(p=>Math.max(0,p-1));
+    setCurrentQ(prevQ);
+    setShowOpts(true);setMultiSel([]);setSearchText("");
+  }
+
+  function reset(){setMessages([]);setCurrentQ(0);setQHistory([]);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
 
   const cQ=questions[currentQ];
   const filtC=cQ?.type==="search"?(cQ.options||[]).filter(c=>c.toLowerCase().includes(searchText.toLowerCase())):[];
@@ -892,6 +907,7 @@ function HomeAIMatch() {
               })}
             </div>
             {cQ.type==="multi"&&multiSel.length>0&&<button onClick={()=>proceed(multiSel)} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"9px 22px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:"pointer",marginTop:7}}>{T.contBtn}</button>}
+            {qHistory.length>0&&<button onClick={goBack} style={{background:"transparent",border:"none",padding:"8px 0",fontSize:12,fontFamily:"'Outfit',sans-serif",fontWeight:500,color:B.gray,cursor:"pointer",marginTop:6,display:"flex",alignItems:"center",gap:4}}>← {lang==="pt"?"Voltar":"Back"}</button>}
           </div>
         )}
 
