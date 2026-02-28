@@ -101,6 +101,7 @@
       <div class="nav-item" onclick="switchTab('agents')"><span class="icon">👤</span><span class="nav-label">Agents</span></div>
       <div class="nav-item" onclick="switchTab('leads')"><span class="icon">📬</span><span class="nav-label">Leads</span></div>
       <div class="nav-item" onclick="switchTab('contacts')"><span class="icon">✉️</span><span class="nav-label">Messages</span></div>
+      <div class="nav-item" onclick="switchTab('claims')"><span class="icon">🔗</span><span class="nav-label">Claims</span></div>
       <div class="nav-item" onclick="switchTab('map')"><span class="icon">🗺️</span><span class="nav-label">Property Map</span></div>
     </div>
     <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08)">
@@ -141,10 +142,10 @@ async function loadData() {
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.nav-item').forEach((n, i) => {
-    const tabs = ['overview','properties','agents','leads','contacts','map'];
+    const tabs = ['overview','properties','agents','leads','contacts','claims','map'];
     n.classList.toggle('active', tabs[i] === tab);
   });
-  const titles = {overview:'Overview',properties:'Properties',agents:'Agents',leads:'Leads',contacts:'Contact Messages',map:'Property Map'};
+  const titles = {overview:'Overview',properties:'Properties',agents:'Agents',leads:'Leads',contacts:'Contact Messages',claims:'Listing Claims',map:'Property Map'};
   document.getElementById('page-title').textContent = titles[tab] || tab;
   render();
 }
@@ -158,6 +159,7 @@ function render() {
     case 'agents': el.innerHTML = renderAgents(); break;
     case 'leads': el.innerHTML = renderLeads(); break;
     case 'contacts': el.innerHTML = renderContacts(); break;
+    case 'claims': el.innerHTML = renderClaims(); loadClaims(); break;
     case 'map': el.innerHTML = renderMap(); setTimeout(initMap, 100); break;
   }
 }
@@ -404,6 +406,119 @@ function renderContacts() {
 }
 
 // ── MAP ──
+// ============================================================
+// CLAIMS MANAGEMENT
+// ============================================================
+let adminClaims = [];
+
+async function loadClaims() {
+  try {
+    const res = await fetch(API + '/api/admin/claims', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    if (!res.ok) {
+      // Fallback: load from listing_claims table via regular API
+      const claimsFromData = DATA?.claims || [];
+      adminClaims = claimsFromData;
+      document.getElementById('claims-container').innerHTML = renderClaimsList();
+      return;
+    }
+    adminClaims = await res.json();
+    document.getElementById('claims-container').innerHTML = renderClaimsList();
+  } catch(e) {
+    // Fallback: try to get claims from the DATA object
+    const lc = (DATA?.leads || []).length; // just to show something
+    document.getElementById('claims-container').innerHTML = '<p style="color:var(--gray);font-size:13px">Claims endpoint not available yet. Claims are stored in the <code>listing_claims</code> table in Supabase. You can manage them directly there, or deploy the <code>/api/admin/claims</code> endpoint.</p><br>' + renderClaimsFallback();
+  }
+}
+
+function renderClaimsFallback() {
+  // Show instructions for managing via Supabase
+  return `
+    <div class="card">
+      <h3>📋 Managing Claims via Supabase</h3>
+      <p style="font-size:13px;color:var(--gray);line-height:1.7;margin-bottom:12px">
+        Until the admin API endpoint is deployed, you can manage claims directly in Supabase:<br><br>
+        <strong>1.</strong> Go to your Supabase dashboard → Table Editor → <code>listing_claims</code><br>
+        <strong>2.</strong> Find the claim row (filter by <code>status = 'pending'</code>)<br>
+        <strong>3.</strong> To <strong style="color:#43a047">approve</strong>: Change <code>status</code> to <code>approved</code>, then update the property's <code>agent_id</code> in the <code>properties</code> table<br>
+        <strong>4.</strong> To <strong style="color:#e53935">reject</strong>: Change <code>status</code> to <code>rejected</code>
+      </p>
+    </div>
+  `;
+}
+
+function renderClaimsList() {
+  if (!adminClaims || adminClaims.length === 0) {
+    return '<p style="color:var(--gray);font-size:13px">No claims found.</p>';
+  }
+  const pending = adminClaims.filter(c => c.status === 'pending');
+  const others = adminClaims.filter(c => c.status !== 'pending');
+  
+  let html = '';
+  if (pending.length > 0) {
+    html += `<div class="card" style="border-left:4px solid #f59e0b;margin-bottom:16px">
+      <h3>⏳ Pending Claims (${pending.length})</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Agent</th><th>Property</th><th>Requested</th><th>Actions</th></tr></thead>
+        <tbody>
+        ${pending.map(c => `<tr>
+          <td><strong>${c.agent_name || c.agent_id || '—'}</strong><br><span style="font-size:11px;color:var(--gray)">${c.agent_email || ''}</span></td>
+          <td style="max-width:300px"><strong>${c.property_title || c.property_id || '—'}</strong></td>
+          <td style="font-size:12px;color:var(--gray)">${timeAgo(c.claimed_at || c.created_at)}</td>
+          <td>
+            <button class="btn btn-sm" style="background:#43a047;color:#fff;margin-right:4px" onclick="handleClaim('${c.id}','approved')">✓ Approve</button>
+            <button class="btn btn-sm" style="background:#e53935;color:#fff" onclick="handleClaim('${c.id}','rejected')">✕ Reject</button>
+          </td>
+        </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+  
+  if (others.length > 0) {
+    html += `<div class="card">
+      <h3>📋 All Claims (${others.length})</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Agent</th><th>Property</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+        ${others.map(c => `<tr>
+          <td>${c.agent_name || c.agent_id || '—'}</td>
+          <td>${c.property_title || c.property_id || '—'}</td>
+          <td><span class="badge" style="background:${c.status==='approved'?'#e8f5e9':'#ffebee'};color:${c.status==='approved'?'#43a047':'#e53935'}">${c.status}</span></td>
+          <td style="font-size:12px;color:var(--gray)">${timeAgo(c.claimed_at || c.created_at)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+  return html;
+}
+
+async function handleClaim(claimId, newStatus) {
+  if (!confirm(`${newStatus === 'approved' ? 'Approve' : 'Reject'} this claim?`)) return;
+  try {
+    const res = await fetch(API + '/api/admin/claims/' + claimId, {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (res.ok) {
+      showToast(`Claim ${newStatus}!`, newStatus === 'approved' ? 'success' : 'info');
+      loadClaims();
+    } else {
+      showToast('API not available. Update directly in Supabase: listing_claims table → set status to "' + newStatus + '"', 'error');
+    }
+  } catch(e) {
+    showToast('API not available. Update directly in Supabase: listing_claims table → set status to "' + newStatus + '"', 'error');
+  }
+}
+
+function renderClaims() {
+  return `<div id="claims-container"><div class="loading">Loading claims...</div></div>`;
+}
+
+// ============================================================
+// MAP
+// ============================================================
 function renderMap() {
   const props = DATA.properties.data || [];
   const withCoords = props.filter(p => p.latitude && p.longitude).length;

@@ -586,28 +586,30 @@ const MapView = ({ results }) => {
 };
 
 
-const ContactModal=({agent,house,onClose})=>{
+const ContactModal=({agent,house,answers,lang:cLang,onClose})=>{
+  const pt=cLang==="pt";
   const[cn,setCn]=useState("");
   const[ce,setCe]=useState("");
-  const[cm,setCm]=useState("Hi " + agent.name + ", I found " + house.name + " on homeAImatch and would love to arrange a viewing.");
+  const[cm,setCm]=useState(pt ? "Olá " + agent.name + ", encontrei " + house.name + " no homeAImatch e gostaria de agendar uma visita." : "Hi " + agent.name + ", I found " + house.name + " on homeAImatch and would love to arrange a viewing.");
   const[sent,setSent]=useState(false);
   const[consent,setConsent]=useState(false);
+  const[profileConsent,setProfileConsent]=useState(true);
   const F2 = "'Outfit',sans-serif";
   const canSend = cn && ce.includes("@") && consent;
   if(sent)return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:16,animation:"fadeSlide 0.3s ease-out"}} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} style={{background:B.white,borderRadius:18,padding:32,maxWidth:400,width:"100%",textAlign:"center"}}>
         <div style={{width:56,height:56,borderRadius:"50%",background:"#e8f5e9",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 14px"}}>✓</div>
-        <div style={{fontSize:18,fontWeight:700,color:B.dark,fontFamily:F2,marginBottom:6}}>Message Sent!</div>
-        <div style={{fontSize:13,color:B.gray,fontFamily:F2,lineHeight:1.5,marginBottom:20}}>{agent.name} from {agent.agency} will reply shortly.</div>
-        <button onClick={onClose} style={{padding:"10px 28px",borderRadius:10,background:B.blue,color:"#fff",border:"none",fontSize:13,fontWeight:600,fontFamily:F2,cursor:"pointer"}}>Done</button>
+        <div style={{fontSize:18,fontWeight:700,color:B.dark,fontFamily:F2,marginBottom:6}}>{pt?"Mensagem Enviada!":"Message Sent!"}</div>
+        <div style={{fontSize:13,color:B.gray,fontFamily:F2,lineHeight:1.5,marginBottom:20}}>{pt?`${agent.name} da ${agent.agency} responderá em breve.`:`${agent.name} from ${agent.agency} will reply shortly.`}</div>
+        <button onClick={onClose} style={{padding:"10px 28px",borderRadius:10,background:B.blue,color:"#fff",border:"none",fontSize:13,fontWeight:600,fontFamily:F2,cursor:"pointer"}}>{pt?"Feito":"Done"}</button>
       </div>
     </div>);
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:100,display:"flex",alignItems:"center",justifyContent:"center",padding:16,animation:"fadeSlide 0.3s ease-out"}} onClick={onClose}>
       <div onClick={e=>e.stopPropagation()} style={{background:B.white,borderRadius:18,padding:28,maxWidth:440,width:"100%",maxHeight:"90vh",overflowY:"auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}>
-          <div><div style={{fontSize:16,fontWeight:700,color:B.dark,fontFamily:F2}}>Contact Agent</div><div style={{fontSize:12,color:B.gray,fontFamily:F2}}>Re: {house.name}</div></div>
+          <div><div style={{fontSize:16,fontWeight:700,color:B.dark,fontFamily:F2}}>{pt?"Contactar Agente":"Contact Agent"}</div><div style={{fontSize:12,color:B.gray,fontFamily:F2}}>Re: {house.name}</div></div>
           <button onClick={onClose} style={{background:"none",border:"none",fontSize:22,color:B.gray,cursor:"pointer",lineHeight:1}}>x</button>
         </div>
         <div style={{display:"flex",gap:12,alignItems:"center",background:B.grayL,borderRadius:12,padding:14,marginBottom:16}}>
@@ -615,20 +617,24 @@ const ContactModal=({agent,house,onClose})=>{
           <div><div style={{fontSize:14,fontWeight:700,color:B.dark,fontFamily:F2}}>{agent.name}</div><div style={{fontSize:12,color:B.gray,fontFamily:F2}}>{agent.agency}</div>{agent.phone&&<div style={{fontSize:12,color:B.blue,fontFamily:F2,marginTop:2}}>{agent.phone}</div>}</div>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:10}}>
-          <input value={cn} onChange={e=>setCn(e.target.value)} placeholder="Your name" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
-          <input value={ce} onChange={e=>setCe(e.target.value)} placeholder="Your email" type="email" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
+          <input value={cn} onChange={e=>setCn(e.target.value)} placeholder={pt?"O seu nome":"Your name"} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
+          <input value={ce} onChange={e=>setCe(e.target.value)} placeholder={pt?"O seu email":"Your email"} type="email" style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark}}/>
           <textarea value={cm} onChange={e=>setCm(e.target.value)} rows={4} style={{padding:"11px 14px",borderRadius:10,border:"1.5px solid "+B.border,fontSize:13.5,fontFamily:F2,outline:"none",color:B.dark,resize:"vertical",lineHeight:1.5}}/>
           <label style={{display:"flex",gap:8,alignItems:"flex-start",cursor:"pointer",fontSize:11.5,color:B.gray,lineHeight:1.5,fontFamily:F2}}>
             <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{marginTop:2,flexShrink:0,accentColor:B.blue}}/>
-            <span>I agree to share my name, email, and message with the agent. I have read the <a href="legal.html#privacy" target="_blank" style={{color:B.blue}}>Privacy Policy</a> and <a href="legal.html#tos" target="_blank" style={{color:B.blue}}>Terms of Service</a>.</span>
+            <span>{pt?<>Autorizo a partilha do meu nome, email e mensagem com o agente. Li a <a href="legal.html#privacy" target="_blank" style={{color:B.blue}}>Política de Privacidade</a> e os <a href="legal.html#tos" target="_blank" style={{color:B.blue}}>Termos de Serviço</a>.</>:<>I agree to share my name, email, and message with the agent. I have read the <a href="legal.html#privacy" target="_blank" style={{color:B.blue}}>Privacy Policy</a> and <a href="legal.html#tos" target="_blank" style={{color:B.blue}}>Terms of Service</a>.</>}</span>
+          </label>
+          <label style={{display:"flex",gap:8,alignItems:"flex-start",cursor:"pointer",fontSize:11.5,color:B.dark,lineHeight:1.5,fontFamily:F2,background:profileConsent?"#e8f5e9":"#fff8e1",padding:"10px 12px",borderRadius:10,border:"1.5px solid "+(profileConsent?"#66bb6a":"#f59e0b"),marginTop:2}}>
+            <input type="checkbox" checked={profileConsent} onChange={e=>setProfileConsent(e.target.checked)} style={{marginTop:2,flexShrink:0,accentColor:"#43a047"}}/>
+            <span style={{fontWeight:500}}>{pt?<>📋 Autorizo a partilha do meu <strong>perfil de comprador</strong> (respostas ao quiz: orçamento, preferências, estilo de vida) com o agente para um atendimento mais personalizado.</>:<>📋 I agree to share my <strong>buyer profile</strong> (quiz answers: budget, preferences, lifestyle) with the agent for a more personalised service.</>}</span>
           </label>
           <div style={{display:"flex",gap:8}}>
             <button onClick={()=>{if(canSend){
-              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null}).then(()=>setSent(true)).catch(()=>{
+              apiCall('/api/leads',{buyer_name:cn,buyer_email:ce,buyer_message:cm,property_id:house.id,match_score:null,buyer_profile:profileConsent?answers:null}).then(()=>setSent(true)).catch(()=>{
                 // Fallback to Formspree
                 fetch("https://formspree.io/f/YOUR_FORM_ID",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"lead",name:cn,email:ce,message:cm,agent:agent.name,agency:agent.agency,property:house.name,date:new Date().toISOString()})}).catch(err=>console.log(err));setSent(true);
               });
-            }}} disabled={!canSend} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:canSend?"pointer":"not-allowed",fontFamily:F2,background:canSend?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>Send Message</button>
+            }}} disabled={!canSend} style={{flex:1,padding:"12px",borderRadius:10,fontSize:13.5,fontWeight:700,border:"none",cursor:canSend?"pointer":"not-allowed",fontFamily:F2,background:canSend?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":"#ddd",color:"#fff"}}>{pt?"Enviar Mensagem":"Send Message"}</button>
             {agent.phone&&<a href={"tel:"+agent.phone.replace(/ /g,"")} style={{padding:"12px 18px",borderRadius:10,fontSize:13.5,fontWeight:600,border:"1.5px solid "+B.blue,color:B.blue,fontFamily:F2,textDecoration:"none",display:"flex",alignItems:"center",gap:5}}>Call</a>}
           </div>
         </div>
@@ -879,7 +885,7 @@ function HomeAIMatch() {
     <div style={{minHeight:"100vh",background:"#fafbfc",fontFamily:"'Outfit',sans-serif",display:"flex",flexDirection:"column"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');@keyframes fadeSlide{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}}*{box-sizing:border-box;margin:0;padding:0;}body{background:#fafbfc;}input::placeholder{color:#b0bec5;}::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#d0d8e0;border-radius:3px;}`}</style>
 
-      {contactHouse&&contactHouse.agent&&<ContactModal agent={contactHouse.agent} house={contactHouse} onClose={()=>setContactHouse(null)}/>}
+      {contactHouse&&contactHouse.agent&&<ContactModal agent={contactHouse.agent} house={contactHouse} answers={answers} lang={lang} onClose={()=>setContactHouse(null)}/>}
       {/* Header */}
       <div style={{background:B.white,borderBottom:`1px solid ${B.border}`,padding:"11px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:10}}>
         <LogoFull/>
