@@ -288,12 +288,32 @@ async function claimListing(propertyId) {
 async function cancelClaim(claimId) {
   if (!confirm('Cancel this claim? This action cannot be undone.')) return;
   try {
-    await apiFetch('/api/agents/claims/' + claimId, 'DELETE');
-    showToast('Claim cancelled', 'success');
-    loadDashboard();
-    renderContent();
+    // Try the API endpoint first
+    const res = await fetch(API_URL + '/api/agents/claims/' + claimId, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.token }
+    });
+    if (res.ok) {
+      showToast('Claim cancelled', 'success');
+      loadDashboard();
+      renderContent();
+      return;
+    }
+    // If endpoint doesn't exist, try PATCH to set status to cancelled
+    const res2 = await fetch(API_URL + '/api/agents/claims/' + claimId, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.token },
+      body: JSON.stringify({ status: 'cancelled' })
+    });
+    if (res2.ok) {
+      showToast('Claim cancelled', 'success');
+      loadDashboard();
+      renderContent();
+      return;
+    }
+    showToast('This endpoint is not deployed yet. Please contact admin to cancel the claim, or cancel it directly in Supabase (listing_claims table → delete the row).', 'error');
   } catch (err) {
-    showToast(err.message || 'Failed to cancel claim', 'error');
+    showToast('Endpoint not available. Contact admin or cancel via Supabase directly.', 'error');
   }
 }
 
@@ -569,6 +589,59 @@ function renderLeads() {
   </table></div></div>`;
 }
 
+// Buyer intent scoring — categorises leads as Hot, Active, or Browsing
+function getBuyerIntent(bp) {
+  let score = 0;
+  // Mortgage status
+  if (bp.mortgage === 'Pre-approved mortgage') score += 3;
+  else if (bp.mortgage === 'Cash buyer — no mortgage needed') score += 3;
+  else if (bp.mortgage === 'Will need a mortgage') score += 1;
+
+  // Intent / readiness
+  if (bp.intent === 'Ready to buy now') score += 3;
+  else if (bp.intent === 'Actively searching') score += 2;
+  else if (bp.intent === 'Just exploring') score += 0;
+
+  // Timeline
+  if (bp.timeline === 'Within 3 months') score += 3;
+  else if (bp.timeline === '3-6 months') score += 2;
+  else if (bp.timeline === '6-12 months') score += 1;
+  else if (bp.timeline === 'No rush') score += 0;
+
+  // Purpose
+  if (bp.purpose === 'Primary home') score += 1;
+  else if (bp.purpose === 'Relocation from abroad') score += 1;
+
+  let label, color, bg, icon, details = [];
+  if (score >= 7) {
+    label = '🔥 Hot Buyer'; color = '#c62828'; bg = '#ffebee';
+    details.push('High purchase intent');
+  } else if (score >= 4) {
+    label = '🔍 Actively Looking'; color = '#e65100'; bg = '#fff3e0';
+    details.push('Moderate intent');
+  } else {
+    label = '👀 Browsing'; color = '#546e7a'; bg = '#eceff1';
+    details.push('Early stage');
+  }
+
+  // Add specific detail tags
+  if (bp.mortgage === 'Pre-approved mortgage') details.push('Mortgage pre-approved');
+  else if (bp.mortgage === 'Cash buyer — no mortgage needed') details.push('Cash buyer');
+  if (bp.intent === 'Ready to buy now') details.push('Ready now');
+  else if (bp.intent === 'Actively searching') details.push('Actively searching');
+  if (bp.timeline) details.push(bp.timeline);
+  if (bp.purpose) details.push(bp.purpose);
+
+  const html = `<div style="margin-bottom:5px">
+    <span style="display:inline-block;background:${bg};color:${color};padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:0.02em">${label}</span>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px">
+      ${details.slice(1).map(d => `<span style="background:#f5f5f5;color:#616161;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:500">${d}</span>`).join('')}
+    </div>
+  </div>`;
+
+  return { score, label, html };
+}
+
 function renderBuyerProfile(bp) {
   const pills = [];
   if (bp.budget) pills.push({icon: '💰', text: bp.budget});
@@ -584,10 +657,12 @@ function renderBuyerProfile(bp) {
   const parking = bp.parking || [];
 
   const profileId = 'bp-' + Math.random().toString(36).substr(2, 9);
+  const intent = getBuyerIntent(bp);
 
   return `
     <div style="font-size:11px;line-height:1.6">
-      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px">
+      ${intent.html}
+      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;margin-top:4px">
         ${pills.slice(0, 4).map(p => `<span style="background:var(--blue-l);color:var(--blue-d, #1578A8);padding:2px 7px;border-radius:10px;font-size:10px;font-weight:500;white-space:nowrap">${p.icon} ${p.text}</span>`).join('')}
       </div>
       <button onclick="document.getElementById('${profileId}').style.display=document.getElementById('${profileId}').style.display==='none'?'block':'none'" class="btn btn-ghost" style="font-size:10px;padding:2px 6px;color:var(--blue)">View full profile ▾</button>
@@ -605,7 +680,11 @@ function renderBuyerProfile(bp) {
         ${priorities.length ? `<div style="margin-bottom:4px"><strong>Top priorities:</strong> ${priorities.join(', ')}</div>` : ''}
         ${parking.length ? `<div style="margin-bottom:4px"><strong>Parking:</strong> ${parking.join(', ')}</div>` : ''}
         ${bp.location ? `<div style="margin-bottom:4px"><strong>Location:</strong> ${bp.location}</div>` : ''}
-        ${bp.radius ? `<div><strong>Radius:</strong> ${bp.radius}</div>` : ''}
+        ${bp.radius ? `<div style="margin-bottom:4px"><strong>Radius:</strong> ${bp.radius}</div>` : ''}
+        ${bp.purpose ? `<div style="margin-bottom:4px;margin-top:8px;padding-top:8px;border-top:1px solid #e0e0e0"><strong>🎯 Purpose:</strong> ${bp.purpose}</div>` : ''}
+        ${bp.mortgage ? `<div style="margin-bottom:4px"><strong>🏦 Mortgage:</strong> ${bp.mortgage}</div>` : ''}
+        ${bp.intent ? `<div style="margin-bottom:4px"><strong>⚡ Readiness:</strong> ${bp.intent}</div>` : ''}
+        ${bp.timeline ? `<div><strong>📅 Timeline:</strong> ${bp.timeline}</div>` : ''}
       </div>
     </div>
   `;
