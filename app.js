@@ -639,17 +639,18 @@ const ContactModal=({agent,house,onClose})=>{
 
 const PricingPage=({onBack,onStart,lang})=>{
   var T=_T(lang);
+  var p=lang==="pt";
   const F2="'Outfit',sans-serif";
   const buyerPlans=[
-    {name:"Free Search",price:"Free",per:"",desc:"See if homeAImatch is right for you",color:B.gray,pop:false,cta:"Try Free",feat:["AI lifestyle quiz","Top 3 matches (basic info)","Match score percentage","Buyer persona","-Full property details","-AI reasoning & insights","-Neighbourhood data","-Agent contact"]},
-    {name:"Full Report",price:"€4.99",per:"/search",desc:"Everything you need to decide",color:B.blue,pop:true,cta:"Get Full Report",feat:["Everything in Free +","ALL matching properties scored","Full AI reasoning per match","Walkability & commute data","School ratings & EPC energy","Price history & area trends","Comparison table","Direct agent contact"]},
-    {name:"3-Pack",price:"€9.99",per:"3 searches",desc:"Refine as you go — save 33%",color:B.blueD||B.blue,pop:false,cta:"Buy 3-Pack",feat:["3 Full Reports","Same features as Full Report","Use anytime, no expiry","Perfect for refining","Share reports with partner","Priority support","-","-"]}
+    {name:p?"Pesquisa Grátis":"Free Search",price:p?"Grátis":"Free",per:"",desc:p?"Veja se o homeAImatch é para si":"See if homeAImatch is right for you",color:B.gray,pop:false,cta:p?"Experimentar":"Try Free",feat:[p?"Quiz de estilo de vida com IA":"AI lifestyle quiz",p?"Top 3 correspondências (info básica)":"Top 3 matches (basic info)",p?"Percentagem de match":"Match score percentage",p?"Persona de comprador":"Buyer persona",p?"-Detalhes completos do imóvel":"-Full property details",p?"-Análise e insights com IA":"-AI reasoning & insights",p?"-Dados do bairro":"-Neighbourhood data",p?"-Contacto do agente":"-Agent contact"]},
+    {name:p?"Relatório Completo":"Full Report",price:"€4.99",per:p?"/pesquisa":"/search",desc:p?"Tudo o que precisa para decidir":"Everything you need to decide",color:B.blue,pop:true,cta:p?"Obter Relatório":"Get Full Report",feat:[p?"Tudo do Grátis +":"Everything in Free +",p?"TODOS os imóveis avaliados":"ALL matching properties scored",p?"Análise IA por correspondência":"Full AI reasoning per match",p?"Dados de mobilidade e acessos":"Walkability & commute data",p?"Avaliação de escolas e energia":"School ratings & EPC energy",p?"Histórico de preços e tendências":"Price history & area trends",p?"Tabela comparativa":"Comparison table",p?"Contacto direto com agente":"Direct agent contact"]},
+    {name:p?"Pack de 3":"3-Pack",price:"€9.99",per:p?"3 pesquisas":"3 searches",desc:p?"Refine à medida — poupe 33%":"Refine as you go — save 33%",color:B.blueD||B.blue,pop:false,cta:p?"Comprar Pack":"Buy 3-Pack",feat:[p?"3 Relatórios Completos":"3 Full Reports",p?"Mesmas funcionalidades":"Same features as Full Report",p?"Sem prazo de validade":"Use anytime, no expiry",p?"Perfeito para refinar":"Perfect for refining",p?"Partilhar com parceiro/a":"Share reports with partner",p?"Suporte prioritário":"Priority support","-","-"]}
   ];
   const agentPlans=[
-    {name:"Free",price:"€0",per:"",desc:"Try it — 3 listings, 3 leads, no card",color:B.gray,pop:false,cta:"Get Started",link:"agent-dashboard.html",feat:["Up to 3 listings","3 free leads included","Full buyer profiles","Claim existing listings","Agent profile","-Priority placement","-Featured badge"]},
-    {name:"10 Lead Pack",price:"€99",per:"one-time",desc:"€9.90 per lead",color:B.blue,pop:false,cta:"Buy Pack",link:"agent-dashboard.html",feat:["10 leads — use anytime","Up to 10 listings","Full buyer profiles","Lead management tools","Analytics dashboard","-Priority placement","-Featured badge"]},
-    {name:"25 Lead Pack",price:"€199",per:"one-time",desc:"€7.96 per lead — save 20%",color:B.blue,pop:false,cta:"Buy Pack",link:"agent-dashboard.html",feat:["25 leads — use anytime","Unlimited listings","Full buyer profiles","Lead management tools","Priority listing placement","Featured agent badge","-White-label quiz"]},
-    {name:"Unlimited",price:"€99",per:"/month",desc:"6-month min · unlimited leads",color:B.orange,pop:true,cta:"Go Unlimited",link:"agent-dashboard.html",feat:["Unlimited leads","Unlimited listings","Full buyer profiles & personas","Priority listing placement","Featured agent badge","Advanced analytics","Priority support"]}
+    {name:p?"GRÁTIS":"FREE",price:"€0",per:"",desc:p?"Para sempre · sem cartão":"Forever · no card needed",color:B.gray,pop:false,cta:p?"Começar Grátis":"Get Started Free",link:"agent-dashboard.html",feat:[(p?"Leads ilimitados":"Unlimited leads")+" ("+(p?"básicos":"basic")+")",p?"Imóveis ilimitados":"Unlimited listings",p?"Lead básico: nome, email, mensagem":"Basic lead: name, email, message",p?"Reivindicar imóveis existentes":"Claim existing listings",p?"-Perfil de agente premium":"-Premium agent profile",p?"-Perfil completo do comprador":"-Full buyer profile",p?"-Tags de intenção do comprador":"-Buyer intent tags",p?"-Perfil de comprador ideal":"-Ideal buyer profile per listing"]},
+    {name:"STARTER",price:"€99",per:p?"/mês":"/month",desc:p?"Até 50 imóveis":"Up to 50 listings",color:B.blue,pop:true,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[(p?"Leads ilimitados":"Unlimited leads")+" ("+(p?"premium":"premium")+")",p?"Até 50 imóveis":"Up to 50 listings",p?"Perfil completo do comprador via quiz":"Full buyer profile from quiz",p?"Tags de intenção: crédito, prazo, urgência":"Intent tags: mortgage, timeline, urgency",p?"Perfil de comprador ideal por imóvel":"Ideal buyer profile per listing",p?"Compradores ativos ao adicionar imóvel":"Active buyers notified on new listing",p?"Perfil de agente premium com foto":"Premium agent profile with photo",p?"Painel de análise":"Analytics dashboard"]},
+    {name:"PRO",price:"€199",per:p?"/mês":"/month",desc:p?"Até 120 imóveis":"Up to 120 listings",color:B.blue,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Starter +":"Everything in Starter +",p?"Até 120 imóveis":"Up to 120 listings",p?"Selo de agente destaque":"Featured agent badge",p?"Posicionamento prioritário":"Priority placement in results",p?"Suporte prioritário":"Priority support"]},
+    {name:"ENTERPRISE",price:"€299",per:p?"/mês":"/month",desc:p?"Até 200 imóveis":"Up to 200 listings",color:B.dark,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Pro +":"Everything in Pro +",p?"Até 200 imóveis":"Up to 200 listings",p?"Gestor de conta dedicado":"Dedicated account manager",p?"Integrações personalizadas":"Custom integrations",p?"Relatórios avançados":"Advanced reporting"]}
   ];
   return(
     <div style={{minHeight:"100vh",background:B.white,fontFamily:F2}}>
@@ -658,18 +659,18 @@ const PricingPage=({onBack,onStart,lang})=>{
         <button onClick={onStart} style={{background:B.orange,color:"#fff",border:"none",padding:"10px 24px",borderRadius:28,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:F2}}>{T.findHome}</button>
       </nav>
       <section style={{maxWidth:1060,margin:"0 auto",padding:"40px 24px 10px",textAlign:"center"}}>
-        <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10}}>Pricing</div>
-        <h1 style={{fontSize:38,fontWeight:800,color:B.dark,lineHeight:1.15,letterSpacing:"-0.035em",marginBottom:12}}>Pay per search, not per month</h1>
-        <p style={{fontSize:15,color:B.gray,maxWidth:520,margin:"0 auto"}}>No subscriptions for buyers. Agents only pay for results.</p>
+        <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10}}>{p?"Preços":"Pricing"}</div>
+        <h1 style={{fontSize:38,fontWeight:800,color:B.dark,lineHeight:1.15,letterSpacing:"-0.035em",marginBottom:12}}>{p?"Pague por pesquisa, não por mês":"Pay per search, not per month"}</h1>
+        <p style={{fontSize:15,color:B.gray,maxWidth:520,margin:"0 auto"}}>{p?"Sem subscrições para compradores. Agentes recebem leads ilimitados.":"No subscriptions for buyers. Agents get unlimited leads."}</p>
       </section>
 
       <section style={{maxWidth:1060,margin:"0 auto",padding:"10px 24px 8px",textAlign:"center"}}>
-        <div style={{fontSize:12,fontWeight:700,color:B.blue,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:30,marginBottom:16}}>For Home Buyers</div>
+        <div style={{fontSize:12,fontWeight:700,color:B.blue,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:30,marginBottom:16}}>{p?"Para Compradores":"For Home Buyers"}</div>
       </section>
       <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 30px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:20,alignItems:"start"}}>
         {buyerPlans.map((pl,i)=>(
           <div key={i} style={{background:B.white,borderRadius:18,border:pl.pop?"2px solid "+B.blue:"1px solid "+B.border,overflow:"hidden",boxShadow:pl.pop?"0 12px 40px rgba(30,150,209,0.12)":"0 2px 8px rgba(0,0,0,0.04)",animation:"fadeSlide 0.5s ease-out "+i*0.1+"s both"}}>
-            {pl.pop&&<div style={{background:B.blue,color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>BEST VALUE</div>}
+            {pl.pop&&<div style={{background:B.blue,color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>{p?"MELHOR VALOR":"BEST VALUE"}</div>}
             <div style={{padding:"28px 24px"}}>
               <div style={{fontSize:13,fontWeight:700,color:pl.color,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>{pl.name}</div>
               <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}}><span style={{fontSize:40,fontWeight:800,color:B.dark}}>{pl.price}</span><span style={{fontSize:14,color:B.gray}}>{pl.per}</span></div>
@@ -677,38 +678,48 @@ const PricingPage=({onBack,onStart,lang})=>{
               <button onClick={onStart} style={{width:"100%",padding:13,borderRadius:12,fontSize:14,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.blue+","+B.blueD+")":B.grayL,color:pl.pop?"#fff":B.dark}}>{pl.cta}</button>
               <div style={{marginTop:22,display:"flex",flexDirection:"column",gap:10}}>
                 {pl.feat.map((f,j)=>{const inc=!f.startsWith("-");const txt=inc?f:f.slice(1);if(!txt)return null;return(
-                  <div key={j} style={{display:"flex",gap:9,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:13,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
+                  <div key={j} style={{display:"flex",gap:9,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:13,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Tudo")||f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
               </div>
             </div>
           </div>))}
       </section>
 
       <section style={{maxWidth:1060,margin:"0 auto",padding:"10px 24px 8px",textAlign:"center"}}>
-        <div style={{fontSize:12,fontWeight:700,color:B.orange,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:10,marginBottom:16}}>For Estate Agents</div>
-        <p style={{fontSize:13,color:B.gray,maxWidth:500,margin:"0 auto 8px"}}>Only pay when it works. Start free with 3 leads.</p>
+        <div style={{fontSize:12,fontWeight:700,color:B.orange,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:10,marginBottom:10}}>{p?"Para Agentes Imobiliários":"For Estate Agents"}</div>
+        <p style={{fontSize:13,color:B.gray,maxWidth:500,margin:"0 auto 8px"}}>{p?"Leads ilimitados. Sempre. Escolha pelo tamanho da sua carteira.":"Unlimited leads. Always. Choose by portfolio size."}</p>
       </section>
-      <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 30px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:16,alignItems:"start"}}>
+      <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 20px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:16,alignItems:"start"}}>
         {agentPlans.map((pl,i)=>(
-          <div key={i} style={{background:B.white,borderRadius:18,border:pl.pop?"2px solid "+B.orange:"1px solid "+B.border,overflow:"hidden",boxShadow:pl.pop?"0 12px 40px rgba(245,146,27,0.1)":"0 2px 8px rgba(0,0,0,0.04)",animation:"fadeSlide 0.5s ease-out "+(0.3+i*0.1)+"s both"}}>
-            {pl.pop&&<div style={{background:"linear-gradient(135deg,"+B.orange+","+B.orangeD+")",color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>BEST VALUE</div>}
+          <div key={i} style={{background:B.white,borderRadius:18,border:pl.pop?"2px solid "+B.blue:"1px solid "+B.border,overflow:"hidden",boxShadow:pl.pop?"0 12px 40px rgba(30,150,209,0.12)":"0 2px 8px rgba(0,0,0,0.04)",animation:"fadeSlide 0.5s ease-out "+(0.3+i*0.1)+"s both"}}>
+            {pl.pop&&<div style={{background:B.blue,color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>{p?"MAIS POPULAR":"MOST POPULAR"}</div>}
             <div style={{padding:"24px 20px"}}>
               <div style={{fontSize:12,fontWeight:700,color:pl.color,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>{pl.name}</div>
               <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}}><span style={{fontSize:36,fontWeight:800,color:B.dark}}>{pl.price}</span><span style={{fontSize:13,color:B.gray}}>{pl.per}</span></div>
               <div style={{fontSize:12.5,color:B.gray,marginBottom:20}}>{pl.desc}</div>
-              <a href={pl.link} style={{display:"block",width:"100%",padding:12,borderRadius:12,fontSize:13,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.orange+","+B.orangeD+")":B.grayL,color:pl.pop?"#fff":B.dark,textAlign:"center",textDecoration:"none",boxSizing:"border-box"}}>{pl.cta}</a>
+              <a href={pl.link} style={{display:"block",width:"100%",padding:12,borderRadius:12,fontSize:13,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.blue+","+B.blueD+")":B.grayL,color:pl.pop?"#fff":B.dark,textAlign:"center",textDecoration:"none",boxSizing:"border-box"}}>{pl.cta}</a>
               <div style={{marginTop:18,display:"flex",flexDirection:"column",gap:8}}>
                 {pl.feat.map((f,j)=>{const inc=!f.startsWith("-");const txt=inc?f:f.slice(1);if(!txt)return null;return(
-                  <div key={j} style={{display:"flex",gap:8,alignItems:"flex-start"}}><span style={{fontSize:12,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:12.5,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Unlimited leads")||f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
+                  <div key={j} style={{display:"flex",gap:8,alignItems:"flex-start"}}><span style={{fontSize:12,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:12.5,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("ilimitados")||f.includes("Unlimited")||f.includes("Tudo")||f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
               </div>
             </div>
           </div>))}
       </section>
 
+      {/* API / White-Label teaser */}
+      <section style={{maxWidth:680,margin:"0 auto",padding:"0 24px 24px"}}>
+        <div style={{background:B.grayL,border:"2px dashed "+B.border,borderRadius:16,padding:"24px 28px",textAlign:"center"}}>
+          <div style={{fontSize:12,fontWeight:700,color:B.orange,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6}}>🔌 API / White-Label</div>
+          <div style={{fontSize:20,fontWeight:800,color:B.dark,marginBottom:6}}>{p?"Integre o quiz no seu website":"Embed the quiz on your website"}</div>
+          <p style={{fontSize:13,color:B.gray,marginBottom:12,lineHeight:1.5}}>{p?"Adicione o quiz de correspondência por IA diretamente ao website da sua agência.":"Add the AI matching quiz directly to your agency's website."}</p>
+          <span style={{display:"inline-block",background:B.orangeL||"#FFF5E9",color:B.orange,fontWeight:700,fontSize:12,padding:"7px 18px",borderRadius:18}}>{p?"Brevemente · Contacte-nos":"Coming Soon · Contact us"}</span>
+        </div>
+      </section>
+
       <section style={{maxWidth:960,margin:"0 auto",padding:"10px 24px 30px",textAlign:"center"}}>
         <div style={{background:B.blueXL||"#F2F9FD",borderRadius:16,padding:"28px 32px",display:"flex",flexWrap:"wrap",gap:32,justifyContent:"center",alignItems:"center"}}>
-          <div style={{flex:"1 1 200px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:B.blue}}>2 min</div><div style={{fontSize:13,color:B.gray,marginTop:4}}>Quiz takes</div></div>
-          <div style={{flex:"1 1 200px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:B.blue}}>10</div><div style={{fontSize:13,color:B.gray,marginTop:4}}>Lifestyle criteria scored</div></div>
-          <div style={{flex:"1 1 200px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:B.orange}}>0</div><div style={{fontSize:13,color:B.gray,marginTop:4}}>Subscriptions needed</div></div>
+          <div style={{flex:"1 1 200px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:B.blue}}>2 min</div><div style={{fontSize:13,color:B.gray,marginTop:4}}>{p?"Duração do quiz":"Quiz takes"}</div></div>
+          <div style={{flex:"1 1 200px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:B.blue}}>10+</div><div style={{fontSize:13,color:B.gray,marginTop:4}}>{p?"Critérios avaliados":"Lifestyle criteria scored"}</div></div>
+          <div style={{flex:"1 1 200px",textAlign:"center"}}><div style={{fontSize:32,fontWeight:800,color:B.orange}}>∞</div><div style={{fontSize:13,color:B.gray,marginTop:4}}>{p?"Leads para agentes":"Leads for agents"}</div></div>
         </div>
       </section>
 
