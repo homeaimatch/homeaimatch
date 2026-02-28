@@ -136,8 +136,7 @@
 </div>
 
 <script>
-// Admin authentication — simple password hash check
-// To change password: update the hash below. Generate with: btoa('your-password')
+// Admin authentication
 const ADMIN_HASH = 'aG9tZWFpbWF0Y2gyMDI2'; // base64 of 'homeaimatch2026'
 const ADMIN_SESSION_KEY = 'ham_admin_auth';
 
@@ -151,10 +150,8 @@ function adminLogin() {
   } else {
     document.getElementById('admin-login-err').style.display = 'block';
     document.getElementById('admin-pw').value = '';
-    document.getElementById('admin-pw').focus();
   }
 }
-
 function adminLogout() {
   sessionStorage.removeItem(ADMIN_SESSION_KEY);
   document.getElementById('admin-app').style.display = 'none';
@@ -162,11 +159,38 @@ function adminLogout() {
   document.getElementById('admin-pw').value = '';
   document.getElementById('admin-login-err').style.display = 'none';
 }
-
-// Auto-login if session exists
 if (sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true') {
   document.getElementById('admin-login-gate').style.display = 'none';
   document.getElementById('admin-app').style.display = 'flex';
+}
+
+async function runEnrichAll() {
+  const btn = document.getElementById('enrich-btn');
+  const status = document.getElementById('enrich-status');
+  btn.disabled = true; btn.textContent = '⏳ Running...';
+  status.style.display = 'block';
+  status.style.background = '#e3f2fd'; status.style.color = '#1565c0';
+  status.innerHTML = '🔄 Sending enrichment request to server...';
+  try {
+    const res = await fetch(API + '/api/admin/enrich-all', { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      if (data.queued > 0) {
+        status.style.background = '#e8f5e9'; status.style.color = '#2e7d32';
+        status.innerHTML = '✅ <strong>' + data.queued + ' properties</strong> queued for enrichment (' + (data.already_enriched||0) + ' already done, ' + data.total + ' total). Running in background at ~10/min. Refresh in a few minutes.';
+      } else {
+        status.style.background = '#f3e5f5'; status.style.color = '#6a1b9a';
+        status.innerHTML = '✅ ' + data.message + ' (' + (data.already_enriched||0) + ' enriched / ' + (data.total||0) + ' total)';
+      }
+    } else {
+      status.style.background = '#ffebee'; status.style.color = '#c62828';
+      status.innerHTML = '❌ Error: ' + (data.error || 'Unknown error');
+    }
+  } catch (err) {
+    status.style.background = '#ffebee'; status.style.color = '#c62828';
+    status.innerHTML = '❌ Failed to connect: ' + err.message;
+  }
+  btn.disabled = false; btn.textContent = '🗺️ Enrich New Properties';
 }
 
 const API = 'https://homeaimatch-backend-production.up.railway.app';
@@ -266,6 +290,17 @@ function renderOverview() {
         <div class="sub">${unreadMsgs} unread</div>
       </div>
     </div>
+
+    <div class="card fade-in" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <h3 style="margin:0 0 2px">⚡ Quick Actions</h3>
+        <div style="font-size:12px;color:var(--gray)">Tools for managing your platform</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="runEnrichAll()" id="enrich-btn" class="btn btn-sm" style="background:#1E96D1;color:#fff;font-size:12px;padding:8px 16px">🗺️ Enrich New Properties</button>
+      </div>
+    </div>
+    <div id="enrich-status" style="display:none;margin-bottom:12px;padding:12px 16px;border-radius:10px;font-size:12px;line-height:1.6"></div>
 
     <div class="grid-2">
       <div class="card fade-in">
