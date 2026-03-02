@@ -50,7 +50,7 @@ function adaptMatch(m) {
       region: p.region || p.city,
       postcode: p.postcode,
       epc: p.epc_rating,
-      commuteMins: { cityCenter: p.commute_city_center || 20, techHub: (p.commute_city_center || 20) + 5, airport: 40 },
+      commuteMins: { cityCenter: p.commute_city_center || null, techHub: p.commute_city_center ? p.commute_city_center + 5 : null, airport: p.nearest_airport?.distance_km ? Math.round(p.nearest_airport.distance_km * 1.2) : null },
       schools: p.schools_quality || 'good',
       walkability: p.walkability || 5,
       condition: p.condition || 'move-in',
@@ -59,10 +59,10 @@ function adaptMatch(m) {
       nearbyDogPark: p.nearby_dog_park || false,
       neighborhoodVibe: p.neighborhood_vibe || [],
       amenities: {
-        groceries: p.amenity_groceries_km || 0.5,
-        gyms: p.amenity_gyms_km || 1,
-        parks: p.amenity_parks_km || 0.3,
-        hospitals: p.amenity_hospitals_km || 3,
+        groceries: p.amenity_groceries_km || (p.shops_count_1km > 0 ? Math.round((1 / Math.max(p.shops_count_1km, 1)) * 10) / 10 : null),
+        gyms: p.sports_count_2km > 0 ? 1 : null,
+        parks: p.amenity_parks_km || (p.parks_count_1km > 0 ? 0.3 : null),
+        hospitals: p.amenity_hospitals_km || (p.healthcare_count_1km > 0 ? 0.8 : null),
       },
       features: p.features || [],
       img: '🏡',
@@ -72,6 +72,14 @@ function adaptMatch(m) {
       latitude: p.latitude || null,
       longitude: p.longitude || null,
       image_urls: p.image_urls || [],
+      beach_nearby: p.beach_nearby || false,
+      nearest_beach: p.nearest_beach || null,
+      nearest_airport: p.nearest_airport || null,
+      neighborhood_type: p.neighborhood_type || null,
+      walkability_label: p.walkability_label || null,
+      restaurants_count_1km: p.restaurants_count_1km || 0,
+      shops_count_1km: p.shops_count_1km || 0,
+      transport_count_500m: p.transport_count_500m || 0,
       agent: p.agent ? {
         name: p.agent.name,
         agency: p.agent.agency,
@@ -320,12 +328,21 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
       <div style={{padding:"0 18px 12px",display:"flex",gap:14,flexWrap:"wrap"}}>
         <div style={{flex:1,minWidth:130}}>
           <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>Neighbourhood</div>
-          <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{h.neighborhoodVibe.map((v,i)=><span key={i} style={{fontSize:10.5,color:B.blue,background:B.blueL,padding:"2px 8px",borderRadius:14,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{v}</span>)}</div>
+          {h.walkability_label&&<span style={{fontSize:10.5,color:h.walkability>=7?B.green:h.walkability>=4?B.amepc:B.red,fontWeight:600,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:3}}>🚶 {h.walkability_label} ({h.walkability}/10)</span>}
+          {h.neighborhood_type&&<span style={{fontSize:10.5,color:B.gray,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:3}}>📍 {h.neighborhood_type.charAt(0).toUpperCase()+h.neighborhood_type.slice(1)}</span>}
+          <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{(Array.isArray(h.neighborhoodVibe)?h.neighborhoodVibe:[]).map((v,i)=><span key={i} style={{fontSize:10.5,color:B.blue,background:B.blueL,padding:"2px 8px",borderRadius:14,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{v}</span>)}</div>
         </div>
         <div style={{flex:1,minWidth:130}}>
           <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>Amenities</div>
           <div style={{display:"flex",flexDirection:"column",gap:2}}>
-            <AmStat icon="🛒" label="Groceries" dist={h.amenities.groceries}/><AmStat icon="💪" label="Gym" dist={h.amenities.gyms}/><AmStat icon="🌳" label="Parks" dist={h.amenities.parks}/><AmStat icon="🏥" label="Hospital" dist={h.amenities.hospitals}/>
+            {h.amenities.groceries!=null&&<AmStat icon="🛒" label="Groceries" dist={h.amenities.groceries}/>}
+            {h.amenities.parks!=null&&<AmStat icon="🌳" label="Parks" dist={h.amenities.parks}/>}
+            {h.amenities.hospitals!=null&&<AmStat icon="🏥" label="Healthcare" dist={h.amenities.hospitals}/>}
+            {h.beach_nearby&&<span style={{fontSize:11,color:B.blue,fontFamily:"'Outfit',sans-serif"}}>🏖️ Beach {h.nearest_beach?.distance_km||''}km</span>}
+            {h.restaurants_count_1km>0&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>🍽️ {h.restaurants_count_1km} restaurants nearby</span>}
+            {h.transport_count_500m>0&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>🚌 {h.transport_count_500m} transport stops</span>}
+            {h.nearest_airport&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>✈️ {h.nearest_airport.name} ({h.nearest_airport.distance_km}km)</span>}
+            {(!h.amenities.groceries&&!h.amenities.parks&&!h.amenities.hospitals&&!h.beach_nearby)&&<span style={{fontSize:11,color:"#b0bec5",fontFamily:"'Outfit',sans-serif"}}>Data not yet available</span>}
           </div>
         </div>
       </div>
