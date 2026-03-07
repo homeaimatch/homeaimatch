@@ -1006,14 +1006,29 @@ function renderClaims() {
       </div>
     </div>
 
-    ${state.unclaimed.length > 0 ? `<div class="card"><h3>Unclaimed Properties</h3>
-      ${state.unclaimed.map(p => `<div class="prop-mini">
-        ${p.image_urls?.length ? `<img src="${p.image_urls[0]}" onerror="this.style.display='none'"/>` : '<div style="width:60px;height:45px;background:var(--gray-l);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">🏠</div>'}
-        <div class="info">
-          <div class="title">${p.title}</div>
-          <div class="meta">${formatPrice(p.price, p.currency)} · ${p.beds} bed · ${p.city}${p.region ? ' / ' + p.region : ''}</div>
+    ${state.unclaimed.length > 0 ? `<div class="card"><h3>Unclaimed Properties (${state.unclaimed.length})</h3>
+      ${state.unclaimed.map((p, idx) => `<div class="prop-mini" style="flex-wrap:wrap">
+        <div style="display:flex;gap:10px;align-items:center;width:100%">
+          ${p.image_urls?.length ? `<img src="${p.image_urls[0]}" onerror="this.style.display='none'"/>` : '<div style="width:60px;height:45px;background:var(--gray-l);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">🏠</div>'}
+          <div class="info" style="flex:1">
+            <div class="title">${p.title}</div>
+            <div class="meta">${formatPrice(p.price, p.currency)} · ${p.beds} bed · ${p.city}${p.region ? ' / ' + p.region : ''}</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('claim-detail-${idx}').style.display=document.getElementById('claim-detail-${idx}').style.display==='none'?'block':'none'" style="font-size:10px">Details ▾</button>
+          <button class="btn btn-primary btn-sm" onclick="claimListing('${p.id}')">Claim</button>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="claimListing('${p.id}')">Claim</button>
+        <div id="claim-detail-${idx}" style="display:none;width:100%;margin-top:8px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid var(--border);font-size:11px;line-height:1.7">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+            <div><strong>City:</strong> ${p.city || '—'}</div>
+            <div><strong>Region:</strong> ${p.region || '—'}</div>
+            <div><strong>Type:</strong> ${p.property_type || '—'}</div>
+            <div><strong>Size:</strong> ${p.sqm ? p.sqm + ' m²' : '—'}</div>
+            <div><strong>Agency:</strong> ${p.agents?.agency?.name || p.agents?.name || '—'}</div>
+            <div><strong>Agent:</strong> ${p.agents?.name || '—'}</div>
+          </div>
+          ${p.source_url ? `<div style="margin-top:6px"><a href="${p.source_url}" target="_blank" style="color:var(--blue);font-size:11px">🔗 View original listing</a></div>` : ''}
+          ${p.image_urls?.length > 1 ? `<div style="display:flex;gap:4px;margin-top:6px;overflow-x:auto">${p.image_urls.slice(0,4).map(img => `<img src="${img}" style="width:80px;height:55px;border-radius:6px;object-fit:cover" onerror="this.style.display='none'"/>`).join('')}</div>` : ''}
+        </div>
       </div>`).join('')}
     </div>` : ''}
 
