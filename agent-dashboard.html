@@ -999,9 +999,9 @@ function renderClaims() {
   return `
     <div class="card" style="margin-bottom:20px">
       <h3>🔗 Claim Your Listings</h3>
-      <p style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:14px">If your properties are already listed on homeAImatch, you can claim them here. Claimed listings will show your contact details when buyers enquire.</p>
+      <p style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:14px">Search for your listings by property title, location, agent name, or agency name. Claimed listings will show your contact details when buyers enquire.</p>
       <div style="display:flex;gap:10px">
-        <input id="claim-search" placeholder="Search by title, area, address..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" onkeyup="if(event.key==='Enter')loadUnclaimed(this.value)"/>
+        <input id="claim-search" placeholder="Search by property, city, agent name, or agency..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" onkeyup="if(event.key==='Enter')loadUnclaimed(this.value)"/>
         <button class="btn btn-primary" onclick="loadUnclaimed(document.getElementById('claim-search').value)">Search</button>
       </div>
     </div>
