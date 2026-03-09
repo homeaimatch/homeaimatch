@@ -769,6 +769,9 @@ function HomeAIMatch() {
   const [isTyping, setIsTyping] = useState(false);
   const [showOpts, setShowOpts] = useState(false);
   const [results, setResults] = useState(null);
+  const [pendingResults, setPendingResults] = useState(null);
+  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [quizEmail, setQuizEmail] = useState("");
   const [expandedCard, setExpandedCard] = useState(null);
   const [multiSel, setMultiSel] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -856,13 +859,21 @@ function HomeAIMatch() {
         setPersona(p);
         setMessages(pr=>[...pr,{text:lang==="pt"?`${p.emoji} O seu perfil: "${p.title}" — ${p.desc || p.description}\n\nEncontrei ${apiResult.matches.length} correspondências para si!`:`${p.emoji} You're "${p.title}" — ${p.desc || p.description}\n\nI found ${apiResult.matches.length} matches for you!`,isUser:false}]);
         setIsTyping(false);
-        setTimeout(()=>setResults(apiResult.matches.map(adaptMatch)),500);
+        setTimeout(()=>{
+          const mapped = apiResult.matches.map(adaptMatch);
+          setPendingResults(mapped);
+          setShowEmailGate(true);
+        },500);
       } else {
         // Fallback to local scoring if API fails or returns no results
         const p=getPersona(nA,lang);setPersona(p);
         setMessages(pr=>[...pr,{text:lang==="pt"?`${p.emoji} O seu perfil: "${p.title}" — ${p.desc}\n\nA procurar imóveis...`:`${p.emoji} You're "${p.title}" — ${p.desc}\n\nSearching properties...`,isUser:false}]);
         setIsTyping(false);
-        setTimeout(()=>setResults(getMatches(nA)),500);
+        setTimeout(()=>{
+          const mapped = getMatches(nA);
+          setPendingResults(mapped);
+          setShowEmailGate(true);
+        },500);
       }
     }
   }
@@ -881,7 +892,16 @@ function HomeAIMatch() {
     setShowOpts(true);setMultiSel([]);setSearchText("");
   }
 
-  function reset(){setMessages([]);setCurrentQ(0);setQHistory([]);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
+  function unlockResults(){
+    if(quizEmail&&quizEmail.includes("@")){
+      // Save email to backend
+      fetch(API+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:quizEmail,source:"quiz_results",buyer_profile:answers,persona:persona,date:new Date().toISOString()})}).catch(err=>console.log("Email save error:",err));
+    }
+    setResults(pendingResults);
+    setShowEmailGate(false);
+  }
+
+  function reset(){setMessages([]);setCurrentQ(0);setQHistory([]);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setPendingResults(null);setShowEmailGate(false);setQuizEmail("");setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
 
   const cQ=questions[currentQ];
   const filtC=cQ?.type==="search"?(cQ.options||[]).filter(c=>c.toLowerCase().includes(searchText.toLowerCase())):[];
@@ -932,6 +952,18 @@ function HomeAIMatch() {
             </div>
             {cQ.type==="multi"&&multiSel.length>0&&<button onClick={()=>proceed(multiSel)} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"9px 22px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:"pointer",marginTop:7}}>{T.contBtn}</button>}
             {qHistory.length>0&&<button onClick={goBack} style={{background:"transparent",border:"none",padding:"8px 0",fontSize:12,fontFamily:"'Outfit',sans-serif",fontWeight:500,color:B.gray,cursor:"pointer",marginTop:6,display:"flex",alignItems:"center",gap:4}}>← {lang==="pt"?"Voltar":"Back"}</button>}
+          </div>
+        )}
+
+        {showEmailGate&&!results&&(
+          <div style={{background:B.white,borderRadius:14,padding:"24px 20px",border:`1.5px solid ${B.blue}`,animation:"fadeSlide 0.5s ease-out",marginTop:12}}>
+            <div style={{fontSize:15,fontWeight:700,color:B.dark,marginBottom:4}}>{lang==="pt"?"📬 Os seus resultados estão prontos!":"📬 Your matches are ready!"}</div>
+            <div style={{fontSize:12.5,color:B.gray,lineHeight:1.6,marginBottom:14}}>{lang==="pt"?"Introduza o seu email para ver os resultados e receber notificações de novos imóveis que combinem com o seu perfil.":"Enter your email to see your results and get notified when new properties match your profile."}</div>
+            <div style={{display:"flex",gap:8}}>
+              <input value={quizEmail} onChange={e=>setQuizEmail(e.target.value)} placeholder={lang==="pt"?"O seu email":"Your email"} type="email" onKeyDown={e=>{if(e.key==="Enter")unlockResults()}} style={{flex:1,padding:"10px 14px",borderRadius:10,border:`1.5px solid ${B.border}`,fontSize:13,fontFamily:"'Outfit',sans-serif",outline:"none"}}/>
+              <button onClick={unlockResults} style={{padding:"10px 20px",borderRadius:10,background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",fontSize:13,fontWeight:700,fontFamily:"'Outfit',sans-serif",cursor:"pointer",whiteSpace:"nowrap"}}>{lang==="pt"?"Ver Resultados →":"See Results →"}</button>
+            </div>
+            <button onClick={()=>{setResults(pendingResults);setShowEmailGate(false)}} style={{background:"none",border:"none",color:B.gray,fontSize:11,fontFamily:"'Outfit',sans-serif",cursor:"pointer",marginTop:10,opacity:0.6,textDecoration:"underline"}}>{lang==="pt"?"Continuar sem email":"Skip for now"}</button>
           </div>
         )}
 
