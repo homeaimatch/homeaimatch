@@ -3,17 +3,54 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>homeAImatch — AI-Powered Property Matching | UK</title>
-  <meta name="description" content="Find your perfect home in the UK with AI. Our lifestyle-first quiz matches you to properties based on commute, vibe, pets, and more — not just bedrooms and budget."/>
-  <meta name="keywords" content="property matching, UK homes, AI property search, house finder, buy home UK"/>
-  <meta property="og:title" content="homeAImatch — AI-Powered Property Matching"/>
-  <meta property="og:description" content="Find your perfect home with AI. Lifestyle-first matching across 12 UK cities."/>
+
+  <!-- Google Search Console Verification -->
+  <meta name="google-site-verification" content="8vGxY8kQyLMfxvdrrynErNiJ4-M9GhjZ0W_DVxyKRHg" />
+
+  <!-- SEO -->
+  <title>homeAImatch — AI Property Matching | Silver Coast Portugal & Cork Ireland</title>
+  <meta name="description" content="Find your perfect home with AI. Our lifestyle quiz matches you to properties in Portugal's Silver Coast and Cork, Ireland — based on your commute, neighbourhood vibe, pets, schools, and more. Not just bedrooms and budget."/>
+  <meta name="keywords" content="property matching, AI property search, buy house Portugal, Silver Coast Portugal, Lourinhã, Peniche, Óbidos, Cork Ireland, house finder, lifestyle property matching, expat Portugal, relocate Portugal"/>
+  <link rel="canonical" href="https://homeaimatch.com/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="homeAImatch" />
+  <meta name="language" content="en" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:title" content="homeAImatch — Find the Home That Fits Your Life"/>
+  <meta property="og:description" content="AI-powered property matching for Portugal's Silver Coast and Cork, Ireland. Take a 2-minute lifestyle quiz and get matched to properties that truly fit how you live."/>
   <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://www.homeaimatch.com"/>
+  <meta property="og:url" content="https://homeaimatch.com"/>
+  <meta property="og:image" content="https://homeaimatch.com/og-image.png"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:site_name" content="homeAImatch"/>
+  <meta property="og:locale" content="en_GB"/>
+  <meta property="og:locale:alternate" content="pt_PT"/>
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="homeAImatch — AI Property Matching"/>
+  <meta name="twitter:description" content="Find your perfect home with AI. Lifestyle-first matching in Portugal & Ireland."/>
+  <meta name="twitter:image" content="https://homeaimatch.com/og-image.png"/>
+
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="logo-icon.png"/>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NCS0Q6D33"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0NCS0Q6D33');
+  </script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #fff; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -22,6 +59,45 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
   </style>
+
+  <!-- Structured Data (JSON-LD) — helps Google understand your site -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "homeAImatch",
+    "url": "https://homeaimatch.com",
+    "description": "AI-powered property matching platform for Portugal's Silver Coast and Cork, Ireland. Lifestyle-first home search.",
+    "applicationCategory": "RealEstateApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR",
+      "description": "Free AI property matching quiz"
+    },
+    "areaServed": [
+      {
+        "@type": "Place",
+        "name": "Silver Coast, Portugal",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "PT",
+          "addressRegion": "Leiria"
+        }
+      },
+      {
+        "@type": "Place",
+        "name": "Cork, Ireland",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "IE",
+          "addressRegion": "Cork"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <div id="root"></div>
