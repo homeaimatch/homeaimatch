@@ -893,10 +893,11 @@ function HomeAIMatch() {
   }
 
   function unlockResults(){
-    if(quizEmail&&quizEmail.includes("@")){
-      // Save email to backend
+    // Save email if provided and valid
+    if(quizEmail&&quizEmail.includes("@")&&quizEmail.includes(".")){
       fetch(API+"/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:quizEmail,source:"quiz_results",buyer_profile:answers,persona:persona,date:new Date().toISOString()})}).catch(err=>console.log("Email save error:",err));
     }
+    // Always show results
     setResults(pendingResults);
     setShowEmailGate(false);
   }
