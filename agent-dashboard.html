@@ -161,7 +161,7 @@ const API_URL = 'https://homeaimatch-backend-production.up.railway.app';
 // STATE
 // ============================================================
 let state = {
-  screen: 'login', // login, register, dashboard
+  screen: 'login', // login, register, forgot-password, reset-password, dashboard
   tab: 'overview', // overview, leads, listings, claims, add-property, notifications, profile
   agent: null,
   token: null,
@@ -361,6 +361,8 @@ function render() {
   const app = document.getElementById('app');
   if (state.screen === 'login') { app.innerHTML = renderLogin(); return; }
   if (state.screen === 'register') { app.innerHTML = renderRegister(); return; }
+  if (state.screen === 'forgot-password') { app.innerHTML = renderForgotPassword(); return; }
+  if (state.screen === 'reset-password') { app.innerHTML = renderResetPassword(); return; }
   app.innerHTML = renderDashboard();
 }
 
@@ -385,6 +387,7 @@ function renderLogin() {
       <form onsubmit="handleLogin(event)">
         <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="agent@agency.ie" required/></div>
         <div class="form-group"><label>Password</label><input id="login-password" type="password" placeholder="••••••••" required/></div>
+        <div style="text-align:right;margin-top:-4px;margin-bottom:8px"><a href="#" onclick="state.screen='forgot-password';render();return false;" style="font-size:12px;color:var(--blue);text-decoration:none">Forgot password?</a></div>
         <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Sign In</button>
       </form>
       <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
@@ -421,6 +424,95 @@ function renderRegister() {
       </div>
     </div>
   </div>`;
+}
+
+function renderForgotPassword() {
+  return `<div class="auth-wrap">
+    <div class="auth-card fade-in">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:32px;margin-bottom:8px">🔑</div>
+        <h1>Reset Password</h1>
+        <p class="subtitle">Enter your email and we'll send you a link to reset your password.</p>
+      </div>
+      <form onsubmit="handleForgotPassword(event)">
+        <div class="form-group"><label>Email</label><input id="forgot-email" type="email" placeholder="agent@agency.pt" required/></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Send Reset Link</button>
+      </form>
+      <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
+        <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">← Back to login</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderResetPassword() {
+  return `<div class="auth-wrap">
+    <div class="auth-card fade-in">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:32px;margin-bottom:8px">🔒</div>
+        <h1>Set New Password</h1>
+        <p class="subtitle">Choose a new password for your account.</p>
+      </div>
+      <form onsubmit="handleResetPassword(event)">
+        <div class="form-group"><label>New Password</label><input id="reset-password" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
+        <div class="form-group"><label>Confirm Password</label><input id="reset-password-confirm" type="password" placeholder="Repeat password" minlength="8" required/></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Set New Password</button>
+      </form>
+      <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
+        <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">← Back to login</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgot-email').value;
+  try {
+    await apiFetch('/api/agents/forgot-password', 'POST', { email });
+    showToast('If that email exists, a reset link has been sent. Check your inbox.', 'success');
+  } catch (err) {
+    // Always show success message to prevent email enumeration
+    showToast('If that email exists, a reset link has been sent. Check your inbox.', 'success');
+  }
+}
+
+async function handleResetPassword(e) {
+  e.preventDefault();
+  const pw = document.getElementById('reset-password').value;
+  const pw2 = document.getElementById('reset-password-confirm').value;
+  if (pw !== pw2) { showToast('Passwords do not match', 'error'); return; }
+  if (pw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  // Get token from URL hash
+  const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+  const token = params.get('reset_token') || params.get('token');
+  if (!token) { showToast('Invalid or expired reset link', 'error'); return; }
+  try {
+    await apiFetch('/api/agents/reset-password', 'POST', { token, new_password: pw });
+    showToast('Password updated! You can now sign in.', 'success');
+    window.location.hash = '';
+    state.screen = 'login';
+    render();
+  } catch (err) {
+    showToast(err.message || 'Invalid or expired reset link', 'error');
+  }
+}
+
+async function handleChangePassword() {
+  const curr = document.getElementById('pw-current').value;
+  const newPw = document.getElementById('pw-new').value;
+  const confirm = document.getElementById('pw-confirm').value;
+  if (newPw !== confirm) { showToast('New passwords do not match', 'error'); return; }
+  if (newPw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  try {
+    await apiFetch('/api/agents/change-password', 'POST', { current_password: curr, new_password: newPw });
+    showToast('Password changed successfully', 'success');
+    document.getElementById('pw-current').value = '';
+    document.getElementById('pw-new').value = '';
+    document.getElementById('pw-confirm').value = '';
+  } catch (err) {
+    showToast(err.message || 'Failed to change password', 'error');
+  }
 }
 
 // ============================================================
@@ -1389,6 +1481,13 @@ function renderProfile() {
       <div class="form-group"><label>License Number</label><input id="prof-license" value="${a.license_number || ''}" placeholder="PSR License No."/></div>
       <button class="btn btn-primary" onclick="saveProfile()" style="margin-top:8px">Save Changes</button>
     </div>
+    <div class="card" style="max-width:600px;margin-top:16px">
+      <h3>Change Password</h3>
+      <div class="form-group"><label>Current Password</label><input id="pw-current" type="password" placeholder="••••••••" required/></div>
+      <div class="form-group"><label>New Password</label><input id="pw-new" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
+      <div class="form-group"><label>Confirm New Password</label><input id="pw-confirm" type="password" placeholder="Repeat new password" minlength="8" required/></div>
+      <button class="btn btn-primary" onclick="handleChangePassword()" style="margin-top:8px">Change Password</button>
+    </div>
   `;
 }
 
@@ -1412,6 +1511,10 @@ async function saveProfile() {
 // ============================================================
 // INIT
 // ============================================================
+// Check for password reset token in URL
+if (window.location.hash.includes('reset_token') || window.location.hash.includes('token=')) {
+  state.screen = 'reset-password';
+}
 loadSession();
 
 // Auto-load notifications when switching to that tab
