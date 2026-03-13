@@ -181,9 +181,11 @@ function loadSession() {
     state.token = token;
     state.agent = JSON.parse(agent);
     state.screen = 'dashboard';
+    render();
     loadDashboard();
+  } else {
+    render();
   }
-  render();
 }
 
 function saveSession(agent, token) {
@@ -194,12 +196,22 @@ function saveSession(agent, token) {
   state.screen = 'dashboard';
 }
 
+let _loggingOut = false;
 function logout() {
-  apiFetch('/api/agents/logout', 'POST').catch(() => {});
+  if (_loggingOut) return;
+  _loggingOut = true;
+  // Only try server logout if we still have a token
+  if (state.token) {
+    fetch(API_URL + '/api/agents/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.token }
+    }).catch(() => {});
+  }
   localStorage.removeItem('agent_token');
   localStorage.removeItem('agent_data');
   state = { screen: 'login', tab: 'overview', agent: null, token: null, dashboard: null, unclaimed: [], loading: false };
   render();
+  _loggingOut = false;
 }
 
 async function apiFetch(path, method = 'GET', body = null) {
