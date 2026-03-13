@@ -660,21 +660,34 @@ const ContactModal=({agent,house,answers,lang:cLang,onClose})=>{
 };
 
 
+const CountdownTimer=({lang})=>{
+  const [now,setNow]=React.useState(new Date());
+  React.useEffect(()=>{const t=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(t);},[]);
+  const end=new Date('2027-01-01T00:00:00');
+  const diff=Math.max(0,end-now);
+  const days=Math.floor(diff/(1000*60*60*24));
+  const hrs=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const mins=Math.floor((diff%(1000*60*60))/(1000*60));
+  const secs=Math.floor((diff%(1000*60))/1000);
+  const p=lang==="pt";
+  const F2="'Outfit',sans-serif";
+  const unit=(v,en,pt)=>React.createElement("div",{style:{textAlign:"center"}},
+    React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff",fontFamily:F2}},String(v).padStart(2,'0')),
+    React.createElement("div",{style:{fontSize:10,color:"#8899aa",textTransform:"uppercase",letterSpacing:"0.08em"}},p?pt:en));
+  return React.createElement("div",{style:{display:"flex",gap:20,justifyContent:"center",marginTop:8}},
+    unit(days,"days","dias"),unit(hrs,"hours","horas"),unit(mins,"min","min"),unit(secs,"sec","seg"));
+};
+
 const PricingPage=({onBack,onStart,lang})=>{
   var T=_T(lang);
   var p=lang==="pt";
   const F2="'Outfit',sans-serif";
-  const buyerPlans=[
-    {name:p?"Pesquisa Grátis":"Free Search",price:p?"Grátis":"Free",per:"",desc:p?"Veja se o homeAImatch é para si":"See if homeAImatch is right for you",color:B.gray,pop:false,cta:p?"Experimentar":"Try Free",feat:[p?"Quiz de estilo de vida com IA":"AI lifestyle quiz",p?"Top 5 propriedades (Top 3 com informação limitada":"Top 5 matches (Top 3 preview only)",p?"Percentagem de match":"Match score percentage",p?"Persona de comprador":"Buyer persona",p?"-Detalhes completos do imóvel":"-Full property details",p?"-Análise e insights com IA":"-AI reasoning & insights",p?"-Dados do bairro":"-Neighbourhood data",p?"-Contacto do agente":"-Agent contact"]},
-    {name:p?"Relatório Completo":"Full Report",price:"€4.99",per:p?"/pesquisa":"/search",desc:p?"Tudo o que precisa para decidir":"Everything you need to decide",color:B.blue,pop:true,cta:p?"Obter Relatório":"Get Full Report",feat:[p?"Tudo do Grátis +":"Everything in Free +",p?"TODOS os imóveis avaliados":"ALL matching properties scored",p?"Análise IA por correspondência":"Full AI reasoning per match",p?"Dados de mobilidade e acessos":"Walkability & commute data",p?"Avaliação de escolas e energia":"School ratings & EPC energy",p?"Histórico de preços e tendências":"Price history & area trends",p?"Tabela comparativa":"Comparison table",p?"Contacto direto com agente":"Direct agent contact"]},
-    {name:p?"Pack de 3":"3-Pack",price:"€9.99",per:p?"3 pesquisas":"3 searches",desc:p?"Refine à medida — poupe 33%":"Refine as you go — save 33%",color:B.blueD||B.blue,pop:false,cta:p?"Comprar Pack":"Buy 3-Pack",feat:[p?"3 Relatórios Completos":"3 Full Reports",p?"Mesmas funcionalidades":"Same features as Full Report",p?"Sem prazo de validade":"Use anytime, no expiry",p?"Perfeito para refinar":"Perfect for refining",p?"Partilhar com parceiro/a":"Share reports with partner",p?"Suporte prioritário":"Priority support","-","-"]}
-  ];
   const agentPlans=[
     {name:p?"GRÁTIS":"FREE",price:"€0",per:"",desc:p?"Para sempre · sem cartão":"Forever · no card needed",color:B.gray,pop:false,cta:p?"Começar Grátis":"Get Started Free",link:"agent-dashboard.html",feat:[(p?"Leads ilimitados":"Unlimited leads")+" ("+(p?"básicos":"basic")+")",p?"Imóveis ilimitados":"Unlimited listings",p?"Lead básico: nome, email, mensagem":"Basic lead: name, email, message",p?"-Reivindicar imóveis existentes":"-Claim existing listings",p?"-Perfil de agente premium":"-Premium agent profile",p?"-Perfil completo do comprador":"-Full buyer profile",p?"-Tags de intenção do comprador":"-Buyer intent tags",p?"-Perfil de comprador ideal":"-Ideal buyer profile per listing"]},
-    {name:"STARTER",price:"€49.99",per:p?"/mês":"/month",desc:p?"Até 10 imóveis":"Up to 10 listings",color:B.blue,pop:true,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[(p?"Leads ilimitados":"Unlimited leads")+" ("+(p?"premium":"premium")+")",p?"Até 10 imóveis":"Up to 10 listings",p?"Reivindicar imóveis existentes":"Claim existing listings",p?"Perfil completo do comprador via quiz":"Full buyer profile from quiz",p?"Tags de intenção: crédito, prazo, urgência":"Intent tags: mortgage, timeline, urgency",p?"Perfil de comprador ideal por imóvel":"Ideal buyer profile per listing",p?"Compradores ativos ao adicionar imóvel":"Active buyers notified on new listing",p?"Perfil de agente premium com foto":"Premium agent profile with photo",p?"Painel de análise":"Analytics dashboard"]},
-    {name:"PRO",price:"€99",per:p?"/mês":"/month",desc:p?"Até 30 imóveis":"Up to 30 listings",color:B.blue,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Starter +":"Everything in Starter +",p?"Até 30 imóveis":"Up to 30 listings",p?"Selo de agente destaque":"Featured agent badge",p?"Suporte prioritário":"Priority support"]},
-    {name:"BUSINESS",price:"€199",per:p?"/mês":"/month",desc:p?"Até 60 imóveis":"Up to 60 listings",color:B.blue,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Pro +":"Everything in Pro +",p?"Até 60 imóveis":"Up to 60 listings",p?"Gestor de conta dedicado":"Dedicated account manager",p?"Relatórios avançados":"Advanced reporting"]},
-    {name:"ENTERPRISE",price:"€299",per:p?"/mês":"/month",desc:p?"Mais de 120 imóveis":"120+ listings",color:B.dark,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Business +":"Everything in Business +",p?"Mais de 120 imóveis":"120+ listings",p?"Integrações personalizadas":"Custom integrations",p?"Suporte dedicado e onboarding":"Dedicated support & onboarding"]}
+    {name:"STARTER",price:"€25",per:p?"/mês":"/month",desc:p?"Até 10 imóveis":"Up to 10 listings",color:B.blue,pop:true,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[(p?"Leads ilimitados":"Unlimited leads")+" ("+(p?"premium":"premium")+")",p?"Até 10 imóveis":"Up to 10 listings",p?"Reivindicar imóveis existentes":"Claim existing listings",p?"Perfil completo do comprador via quiz":"Full buyer profile from quiz",p?"Tags de intenção: crédito, prazo, urgência":"Intent tags: mortgage, timeline, urgency",p?"Perfil de comprador ideal por imóvel":"Ideal buyer profile per listing",p?"Compradores ativos ao adicionar imóvel":"Active buyers notified on new listing",p?"Perfil de agente premium com foto":"Premium agent profile with photo",p?"Painel de análise":"Analytics dashboard"]},
+    {name:"PRO",price:"€49",per:p?"/mês":"/month",desc:p?"Até 30 imóveis":"Up to 30 listings",color:B.blue,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Starter +":"Everything in Starter +",p?"Até 30 imóveis":"Up to 30 listings",p?"Selo de agente destaque":"Featured agent badge",p?"Suporte prioritário":"Priority support"]},
+    {name:"BUSINESS",price:"€99",per:p?"/mês":"/month",desc:p?"Até 100 imóveis":"Up to 100 listings",color:B.blue,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Pro +":"Everything in Pro +",p?"Até 100 imóveis":"Up to 100 listings",p?"Gestor de conta dedicado":"Dedicated account manager",p?"Relatórios avançados":"Advanced reporting"]},
+    {name:"ENTERPRISE",price:"€199",per:p?"/mês":"/month",desc:p?"Mais de 100 imóveis":"100+ listings",color:B.dark,pop:false,cta:p?"Subscrever":"Subscribe",link:"agent-dashboard.html",feat:[p?"Tudo do Business +":"Everything in Business +",p?"Mais de 100 imóveis":"100+ listings",p?"Integrações personalizadas":"Custom integrations",p?"Suporte dedicado e onboarding":"Dedicated support & onboarding"]}
   ];
   return(
     <div style={{minHeight:"100vh",background:B.white,fontFamily:F2}}>
@@ -684,33 +697,32 @@ const PricingPage=({onBack,onStart,lang})=>{
       </nav>
       <section style={{maxWidth:1060,margin:"0 auto",padding:"40px 24px 10px",textAlign:"center"}}>
         <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10}}>{p?"Preços":"Pricing"}</div>
-        <h1 style={{fontSize:38,fontWeight:800,color:B.dark,lineHeight:1.15,letterSpacing:"-0.035em",marginBottom:12}}>{p?"Pague por pesquisa, não por mês":"Pay per search, not per month"}</h1>
-        <p style={{fontSize:15,color:B.gray,maxWidth:520,margin:"0 auto"}}>{p?"Sem subscrições para compradores. Agentes recebem leads ilimitados.":"No subscriptions for buyers. Agents get unlimited leads."}</p>
+        <h1 style={{fontSize:38,fontWeight:800,color:B.dark,lineHeight:1.15,letterSpacing:"-0.035em",marginBottom:12}}>{p?"Grátis para compradores. Leads ilimitados para agentes.":"Free for buyers. Unlimited leads for agents."}</h1>
+        <p style={{fontSize:15,color:B.gray,maxWidth:520,margin:"0 auto"}}>{p?"Encontre a casa perfeita sem custos. Agentes recebem leads qualificados.":"Find your perfect home at no cost. Agents receive qualified leads."}</p>
       </section>
 
-      <section style={{maxWidth:1060,margin:"0 auto",padding:"10px 24px 8px",textAlign:"center"}}>
-        <div style={{fontSize:12,fontWeight:700,color:B.blue,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:30,marginBottom:16}}>{p?"Para Compradores":"For Home Buyers"}</div>
-      </section>
-      <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 30px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:20,alignItems:"start"}}>
-        {buyerPlans.map((pl,i)=>(
-          <div key={i} style={{background:B.white,borderRadius:18,border:pl.pop?"2px solid "+B.blue:"1px solid "+B.border,overflow:"hidden",boxShadow:pl.pop?"0 12px 40px rgba(30,150,209,0.12)":"0 2px 8px rgba(0,0,0,0.04)",animation:"fadeSlide 0.5s ease-out "+i*0.1+"s both"}}>
-            {pl.pop&&<div style={{background:B.blue,color:"#fff",textAlign:"center",padding:6,fontSize:11,fontWeight:700,letterSpacing:"0.06em"}}>{p?"MELHOR VALOR":"BEST VALUE"}</div>}
-            <div style={{padding:"28px 24px"}}>
-              <div style={{fontSize:13,fontWeight:700,color:pl.color,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>{pl.name}</div>
-              <div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}}><span style={{fontSize:40,fontWeight:800,color:B.dark}}>{pl.price}</span><span style={{fontSize:14,color:B.gray}}>{pl.per}</span></div>
-              <div style={{fontSize:13,color:B.gray,marginBottom:22}}>{pl.desc}</div>
-              <button onClick={onStart} style={{width:"100%",padding:13,borderRadius:12,fontSize:14,fontWeight:700,border:"none",cursor:"pointer",fontFamily:F2,background:pl.pop?"linear-gradient(135deg,"+B.blue+","+B.blueD+")":B.grayL,color:pl.pop?"#fff":B.dark}}>{pl.cta}</button>
-              <div style={{marginTop:22,display:"flex",flexDirection:"column",gap:10}}>
-                {pl.feat.map((f,j)=>{const inc=!f.startsWith("-");const txt=inc?f:f.slice(1);if(!txt)return null;return(
-                  <div key={j} style={{display:"flex",gap:9,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>{inc?"✅":"—"}</span><span style={{fontSize:13,color:inc?B.dark:"#b0bec5",fontWeight:f.includes("Tudo")||f.includes("Everything")?700:400,lineHeight:1.35}}>{txt}</span></div>);})}
-              </div>
-            </div>
-          </div>))}
+      {/* Free for Buyers banner */}
+      <section style={{maxWidth:1060,margin:"0 auto",padding:"20px 24px 10px",textAlign:"center"}}>
+        <div style={{background:B.blueXL||"#F2F9FD",borderRadius:16,padding:"28px 32px",maxWidth:600,margin:"0 auto"}}>
+          <div style={{fontSize:32,fontWeight:800,color:B.blue,marginBottom:4}}>{p?"Grátis para Compradores":"Free for Buyers"}</div>
+          <div style={{fontSize:14,color:B.gray,lineHeight:1.6}}>{p?"O quiz de correspondência com IA é totalmente grátis. Sempre. Sem subscrições, sem pagamentos. Encontre a casa que combina com o seu estilo de vida.":"The AI matching quiz is completely free. Always. No subscriptions, no payments. Find the home that fits your lifestyle."}</div>
+          <button onClick={onStart} style={{marginTop:16,background:B.orange,color:"#fff",border:"none",padding:"12px 32px",borderRadius:28,fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:F2}}>{p?"Fazer o Quiz Grátis":"Take the Free Quiz"}</button>
+        </div>
       </section>
 
-      <section style={{maxWidth:1060,margin:"0 auto",padding:"10px 24px 8px",textAlign:"center"}}>
-        <div style={{fontSize:12,fontWeight:700,color:B.orange,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:10,marginBottom:10}}>{p?"Para Agentes Imobiliários":"For Estate Agents"}</div>
-        <p style={{fontSize:13,color:B.gray,maxWidth:500,margin:"0 auto 8px"}}>{p?"Leads ilimitados. Sempre. Escolha pelo tamanho da sua carteira.":"Unlimited leads. Always. Choose by portfolio size."}</p>
+      {/* Early Access Banner for Agents */}
+      <section style={{maxWidth:1060,margin:"0 auto",padding:"30px 24px 10px",textAlign:"center"}}>
+        <div style={{background:"linear-gradient(135deg,"+B.dark+","+B.blueD+")",borderRadius:16,padding:"28px 32px",maxWidth:700,margin:"0 auto"}}>
+          <div style={{fontSize:11,fontWeight:700,color:B.orange,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:8}}>{p?"Acesso Antecipado":"Early Access"}</div>
+          <div style={{fontSize:24,fontWeight:800,color:"#fff",marginBottom:6}}>{p?"Grátis para agências até final de 2026":"Free for agencies until end of 2026"}</div>
+          <div style={{fontSize:13,color:"#b0c4d8",lineHeight:1.6,marginBottom:12}}>{p?"Registe-se agora e experimente todas as funcionalidades premium sem custos. Ajude-nos a construir a melhor plataforma para si.":"Register now and try all premium features at no cost. Help us build the best platform for you."}</div>
+          <CountdownTimer lang={lang}/>
+        </div>
+      </section>
+
+      <section style={{maxWidth:1060,margin:"0 auto",padding:"20px 24px 8px",textAlign:"center"}}>
+        <div style={{fontSize:12,fontWeight:700,color:B.orange,letterSpacing:"0.08em",textTransform:"uppercase",marginTop:10,marginBottom:4}}>{p?"Para Agentes Imobiliários":"For Estate Agents"}</div>
+        <p style={{fontSize:13,color:B.gray,maxWidth:500,margin:"0 auto 4px"}}>{p?"Leads ilimitados. Sempre. Preços a partir de Janeiro 2027.":"Unlimited leads. Always. Pricing from January 2027."}</p>
       </section>
       <section style={{maxWidth:1060,margin:"0 auto",padding:"0 24px 20px",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:16,alignItems:"start"}}>
         {agentPlans.map((pl,i)=>(

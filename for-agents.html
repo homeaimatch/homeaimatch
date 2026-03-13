@@ -325,7 +325,19 @@
   <div class="section-inner">
     <div class="section-tag">Pricing</div>
     <h2>Unlimited leads. Always.</h2>
-    <p class="subtitle">All plans include unlimited leads. Choose the plan that fits the size of your property portfolio.</p>
+    <p class="subtitle">Free for buyers. Always. Agents get premium features to convert leads into clients.</p>
+
+    <!-- Early Access Banner -->
+    <div style="background:linear-gradient(135deg,var(--dark),#1578a7);border-radius:18px;padding:32px;text-align:center;margin-bottom:32px;max-width:720px;margin-left:auto;margin-right:auto">
+      <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px">Early Access</div>
+      <div style="font-size:26px;font-weight:800;color:#fff;margin-bottom:8px">Free for agencies until end of 2026</div>
+      <p style="font-size:14px;color:#b0c4d8;line-height:1.6;margin-bottom:16px">Register now and try all premium features at no cost. Help us build the best platform for you.</p>
+      <div id="countdown-en" style="display:flex;gap:24px;justify-content:center"></div>
+      <a href="agent-dashboard.html" class="btn btn-primary" style="margin-top:18px;padding:12px 36px;font-size:15px">Get Early Access</a>
+    </div>
+
+    <p style="font-size:13px;color:var(--gray);text-align:center;margin-bottom:20px">Pricing from January 2027 · Lock in your account now for free.</p>
+
     <div class="pricing-grid">
       <div class="price-card">
         <div class="price-card-body">
@@ -336,7 +348,7 @@
           <div class="feat"><span class="check">✓</span> <strong>Unlimited leads</strong> (basic)</div>
           <div class="feat"><span class="check">✓</span> Unlimited listings</div>
           <div class="feat"><span class="check">✓</span> Basic lead: name, email, message</div>
-          <div class="feat off"><span class="check">—</span> Claim existing listings </div>
+          <div class="feat off"><span class="check">—</span> Claim existing listings</div>
           <div class="feat off"><span class="check">—</span> Premium agent profile</div>
           <div class="feat off"><span class="check">—</span> Full buyer profile</div>
           <div class="feat off"><span class="check">—</span> Buyer intent tags</div>
@@ -347,7 +359,7 @@
         <div class="pop-badge">MOST POPULAR</div>
         <div class="price-card-body">
           <div class="tier" style="color:var(--blue)">STARTER</div>
-          <div><span class="amount">€49.99</span><span class="per">/month</span></div>
+          <div><span class="amount">€25</span><span class="per">/month</span></div>
           <div class="desc">Up to 10 claimed listings</div>
           <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
           <div class="feat"><span class="check">✓</span> <strong>Unlimited leads</strong> (premium)</div>
@@ -364,7 +376,7 @@
       <div class="price-card">
         <div class="price-card-body">
           <div class="tier" style="color:var(--blue)">PRO</div>
-          <div><span class="amount">€99</span><span class="per">/month</span></div>
+          <div><span class="amount">€49</span><span class="per">/month</span></div>
           <div class="desc">Up to 30 claimed listings</div>
           <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
           <div class="feat"><span class="check">✓</span> Everything in Starter +</div>
@@ -376,7 +388,7 @@
       <div class="price-card">
         <div class="price-card-body">
           <div class="tier" style="color:var(--blue)">BUSINESS</div>
-          <div><span class="amount">€199</span><span class="per">/month</span></div>
+          <div><span class="amount">€99</span><span class="per">/month</span></div>
           <div class="desc">Up to 100 claimed listings</div>
           <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
           <div class="feat"><span class="check">✓</span> Everything in Pro +</div>
@@ -388,7 +400,7 @@
       <div class="price-card">
         <div class="price-card-body">
           <div class="tier" style="color:var(--blue)">ENTERPRISE</div>
-          <div><span class="amount">€299</span><span class="per">/month</span></div>
+          <div><span class="amount">€199</span><span class="per">/month</span></div>
           <div class="desc">100+ claimed listings</div>
           <a href="agent-dashboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:20px">Subscribe</a>
           <div class="feat"><span class="check">✓</span> Everything in Business +</div>
@@ -410,6 +422,25 @@
     </div>
   </div>
 </section>
+
+<script>
+function updateCountdown(id,lang){
+  var end=new Date('2027-01-01T00:00:00');
+  var now=new Date();
+  var diff=Math.max(0,end-now);
+  var d=Math.floor(diff/(1000*60*60*24));
+  var h=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  var m=Math.floor((diff%(1000*60*60))/(1000*60));
+  var s=Math.floor((diff%(1000*60))/1000);
+  var labels=lang==='pt'?['dias','horas','min','seg']:['days','hours','min','sec'];
+  var el=document.getElementById(id);
+  if(el)el.innerHTML=[
+    [d,labels[0]],[h,labels[1]],[m,labels[2]],[s,labels[3]]
+  ].map(function(x){return '<div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#fff">'+String(x[0]).padStart(2,'0')+'</div><div style="font-size:10px;color:#8899aa;text-transform:uppercase;letter-spacing:0.08em">'+x[1]+'</div></div>';}).join('');
+}
+setInterval(function(){updateCountdown('countdown-en','en');},1000);
+updateCountdown('countdown-en','en');
+</script>
 
 <!-- TESTIMONIALS / EARLY ADOPTER -->
 <section class="section testimonial-section">
