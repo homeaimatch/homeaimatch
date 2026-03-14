@@ -280,7 +280,8 @@ const CompTable = ({results}) => {
 /* ════════════════════════════════════════════════════════════════════
    MATCH CARD
    ════════════════════════════════════════════════════════════════════ */
-const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
+const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact,lang}) => {
+  const pt=lang==="pt";
   const{house:h,pct,reasons,commuteInfo:ci}=match;const top=rank===0;
   return(<div style={{background:B.white,borderRadius:14,overflow:"hidden",border:top?`2px solid ${B.blue}`:`1px solid ${B.border}`,boxShadow:top?`0 6px 24px rgba(30,150,209,0.1)`:"0 2px 6px rgba(0,0,0,0.03)",animation:`fadeSlide 0.45s ease-out ${rank*0.1}s both`}}>
     <div onClick={onToggle} style={{padding:"16px 18px 12px",cursor:"pointer"}}>
@@ -295,7 +296,7 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
         <div style={{flex:1,minWidth:0}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div>
-              <div style={{fontSize:9.5,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:top?B.blue:"#a8b5c4",fontFamily:"'Outfit',sans-serif"}}>{top?"★ Best Match":`#${rank+1} Match`}</div>
+              <div style={{fontSize:9.5,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:top?B.blue:"#a8b5c4",fontFamily:"'Outfit',sans-serif"}}>{top?(pt?"★ Melhor Resultado":"★ Best Match"):`#${rank+1} ${pt?"Resultado":"Match"}`}</div>
               <div style={{fontSize:15.5,fontWeight:700,color:B.dark,fontFamily:"'Outfit',sans-serif",letterSpacing:"-0.02em",marginTop:1}}>{h.name}</div>
             </div>
             <div style={{background:pct>=70?"#e8f5e9":pct>=50?"#fff8e1":B.grayL,color:pct>=70?B.green:pct>=50?"#f57f17":"#78909c",padding:"5px 12px",borderRadius:24,fontSize:13,fontWeight:800,fontFamily:"'Outfit',sans-serif",flexShrink:0}}>{pct}%</div>
@@ -322,36 +323,36 @@ const Card = ({match,rank,expanded,onToggle,saved,onSave,onContact}) => {
       )}
       <div style={{padding:"0 18px 12px",...(!(h.image_urls && h.image_urls.length > 1)?{borderTop:`1px solid ${B.border}`,paddingTop:12}:{})}}><p style={{fontSize:12.5,color:"#4a5a6a",lineHeight:1.65,fontFamily:"'Outfit',sans-serif",margin:0}}>{h.desc}</p></div>
       <div style={{padding:"0 18px 10px",display:"flex",gap:6,flexWrap:"wrap"}}>
-        <span style={{fontSize:11,fontWeight:600,fontFamily:"'Outfit',sans-serif",padding:"3px 10px",borderRadius:16,background:h.condition==="move-in"?"#e8f5e9":h.condition==="renovation-light"?"#fff8e1":"#fbe9e7",color:h.condition==="move-in"?B.green:h.condition==="renovation-light"?B.amepc:B.red}}>{h.condition==="move-in"?"✅ Move-in Ready":h.condition==="renovation-light"?"🔧 Light Reno":"🔨 Major Reno"}</span>
+        <span style={{fontSize:11,fontWeight:600,fontFamily:"'Outfit',sans-serif",padding:"3px 10px",borderRadius:16,background:h.condition==="move-in"?"#e8f5e9":h.condition==="renovation-light"?"#fff8e1":"#fbe9e7",color:h.condition==="move-in"?B.green:h.condition==="renovation-light"?B.amepc:B.red}}>{h.condition==="move-in"?(pt?"✅ Pronto a Habitar":"✅ Move-in Ready"):h.condition==="renovation-light"?(pt?"🔧 Obras Ligeiras":"🔧 Light Reno"):(pt?"🔨 Obras Maiores":"🔨 Major Reno")}</span>
         {(h.epc||h.epc)&&<span style={{fontSize:11,fontWeight:600,fontFamily:"'Outfit',sans-serif",padding:"3px 10px",borderRadius:16,background:B.blueL,color:B.blue}}>⚡ {h.epc?`EPC ${h.epc}`:`EPC ${h.epc}`}</span>}
       </div>
       <div style={{padding:"0 18px 12px",display:"flex",gap:14,flexWrap:"wrap"}}>
         <div style={{flex:1,minWidth:130}}>
-          <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>Neighbourhood</div>
-          {h.walkability_label&&<span style={{fontSize:10.5,color:h.walkability>=7?B.green:h.walkability>=4?B.amepc:B.red,fontWeight:600,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:3}}>🚶 {h.walkability_label} ({h.walkability}/10)</span>}
-          {h.neighborhood_type&&<span style={{fontSize:10.5,color:B.gray,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:3}}>📍 {h.neighborhood_type.charAt(0).toUpperCase()+h.neighborhood_type.slice(1)}</span>}
+          <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>{pt?"Bairro":"Neighbourhood"}</div>
+          {h.walkability_label&&<span style={{fontSize:10.5,color:h.walkability>=7?B.green:h.walkability>=4?B.amepc:B.red,fontWeight:600,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:3}}>🚶 {pt?(h.walkability>=8?"Muito Caminhável":h.walkability>=6?"Caminhável":h.walkability>=4?"Algo Caminhável":h.walkability>=2?"Dependente de Carro":"Muito Dependente de Carro"):h.walkability_label} ({h.walkability}/10)</span>}
+          {h.neighborhood_type&&<span style={{fontSize:10.5,color:B.gray,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:3}}>📍 {pt?(h.neighborhood_type==="urban"?"Urbano":h.neighborhood_type==="suburban"?"Suburbano":"Rural"):(h.neighborhood_type.charAt(0).toUpperCase()+h.neighborhood_type.slice(1))}</span>}
           <div style={{display:"flex",flexWrap:"wrap",gap:3}}>{(Array.isArray(h.neighborhoodVibe)?h.neighborhoodVibe:[]).map((v,i)=><span key={i} style={{fontSize:10.5,color:B.blue,background:B.blueL,padding:"2px 8px",borderRadius:14,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{v}</span>)}</div>
         </div>
         <div style={{flex:1,minWidth:130}}>
-          <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>Amenities</div>
+          <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>{pt?"Comodidades":"Amenities"}</div>
           <div style={{display:"flex",flexDirection:"column",gap:2}}>
-            {h.amenities.groceries!=null&&<AmStat icon="🛒" label="Groceries" dist={h.amenities.groceries}/>}
-            {h.amenities.parks!=null&&<AmStat icon="🌳" label="Parks" dist={h.amenities.parks}/>}
-            {h.amenities.hospitals!=null&&<AmStat icon="🏥" label="Healthcare" dist={h.amenities.hospitals}/>}
-            {h.beach_nearby&&<span style={{fontSize:11,color:B.blue,fontFamily:"'Outfit',sans-serif"}}>🏖️ Beach {h.nearest_beach?.distance_km||''}km</span>}
-            {h.restaurants_count_1km>0&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>🍽️ {h.restaurants_count_1km} restaurants nearby</span>}
-            {h.transport_count_500m>0&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>🚌 {h.transport_count_500m} transport stops</span>}
+            {h.amenities.groceries!=null&&<AmStat icon="🛒" label={pt?"Mercearias":"Groceries"} dist={h.amenities.groceries}/>}
+            {h.amenities.parks!=null&&<AmStat icon="🌳" label={pt?"Parques":"Parks"} dist={h.amenities.parks}/>}
+            {h.amenities.hospitals!=null&&<AmStat icon="🏥" label={pt?"Saúde":"Healthcare"} dist={h.amenities.hospitals}/>}
+            {h.beach_nearby&&<span style={{fontSize:11,color:B.blue,fontFamily:"'Outfit',sans-serif"}}>🏖️ {pt?"Praia":"Beach"} {h.nearest_beach?.distance_km||''}km</span>}
+            {h.restaurants_count_1km>0&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>🍽️ {h.restaurants_count_1km} {pt?"restaurantes perto":"restaurants nearby"}</span>}
+            {h.transport_count_500m>0&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>🚌 {h.transport_count_500m} {pt?"paragens de transporte":"transport stops"}</span>}
             {h.nearest_airport&&<span style={{fontSize:11,color:B.gray,fontFamily:"'Outfit',sans-serif"}}>✈️ {h.nearest_airport.name} ({h.nearest_airport.distance_km}km)</span>}
-            {(!h.amenities.groceries&&!h.amenities.parks&&!h.amenities.hospitals&&!h.beach_nearby)&&<span style={{fontSize:11,color:"#b0bec5",fontFamily:"'Outfit',sans-serif"}}>Data not yet available</span>}
+            {(!h.amenities.groceries&&!h.amenities.parks&&!h.amenities.hospitals&&!h.beach_nearby)&&<span style={{fontSize:11,color:"#b0bec5",fontFamily:"'Outfit',sans-serif"}}>{pt?"Dados ainda não disponíveis":"Data not yet available"}</span>}
           </div>
         </div>
       </div>
       <div style={{padding:"0 18px 12px",display:"flex",gap:14,flexWrap:"wrap"}}>
-        <div><div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4,fontFamily:"'Outfit',sans-serif"}}>Parking</div><div style={{display:"flex",flexWrap:"wrap",gap:3}}>{h.parking.map((p,i)=><span key={i} style={{fontSize:10.5,color:B.gray,background:B.grayL,padding:"2px 8px",borderRadius:14,fontFamily:"'Outfit',sans-serif"}}>🅿️ {p.replace(/-/g," ")}</span>)}</div></div>
-        <div><div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4,fontFamily:"'Outfit',sans-serif"}}>Pets</div><span style={{fontSize:10.5,fontFamily:"'Outfit',sans-serif",color:h.petFriendly?B.green:B.red}}>{h.petFriendly?"🐾 Pet-friendly":"🚫 No pets"}{h.nearbyDogPark?" · 🐕 Dog park nearby":""}</span></div>
+        <div><div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4,fontFamily:"'Outfit',sans-serif"}}>{pt?"Estacionamento":"Parking"}</div><div style={{display:"flex",flexWrap:"wrap",gap:3}}>{h.parking.map((p,i)=><span key={i} style={{fontSize:10.5,color:B.gray,background:B.grayL,padding:"2px 8px",borderRadius:14,fontFamily:"'Outfit',sans-serif"}}>🅿️ {p.replace(/-/g," ")}</span>)}</div></div>
+        <div><div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4,fontFamily:"'Outfit',sans-serif"}}>{pt?"Animais":"Pets"}</div><span style={{fontSize:10.5,fontFamily:"'Outfit',sans-serif",color:h.petFriendly?B.green:B.red}}>{h.petFriendly?(pt?"🐾 Aceita animais":"🐾 Pet-friendly"):(pt?"🚫 Não aceita animais":"🚫 No pets")}{h.nearbyDogPark?(pt?" · 🐕 Parque canino perto":" · 🐕 Dog park nearby"):""}</span></div>
       </div>
       <div style={{padding:"0 18px 12px",borderTop:`1px solid ${B.border}`,paddingTop:10}}>
-        <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>Why we matched you</div>
+        <div style={{fontSize:9.5,fontWeight:700,color:"#a8b5c4",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5,fontFamily:"'Outfit',sans-serif"}}>{pt?"Porque correspondemos consigo":"Why we matched you"}</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{reasons.map((r,i)=><span key={i} style={{fontSize:11,color:B.dark,background:B.grayL,padding:"3px 9px",borderRadius:14,fontFamily:"'Outfit',sans-serif",fontWeight:500}}>{r}</span>)}</div>
       </div>
       {h.agent&&<div style={{padding:"0 18px 12px",borderTop:`1px solid ${B.border}`,paddingTop:10}}>
@@ -988,7 +989,7 @@ function HomeAIMatch() {
               {["cards","compare","map"].map(m=><button key={m} onClick={()=>setViewMode(m)} style={{padding:"6px 14px",borderRadius:6,fontSize:11.5,fontWeight:600,fontFamily:"'Outfit',sans-serif",cursor:"pointer",border:"none",background:viewMode===m?B.white:"transparent",color:viewMode===m?B.dark:B.gray,boxShadow:viewMode===m?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{m==="cards"?T.cards:m==="compare"?T.compare:T.mapV}</button>)}
             </div>
             {viewMode==="map"?<MapView results={results}/>:viewMode==="compare"?<CompTable results={results}/>:(
-              <>{results.map((m,i)=><Card key={m.house.id} match={m} rank={i} expanded={expandedCard===m.house.id} onToggle={()=>setExpandedCard(expandedCard===m.house.id?null:m.house.id)} saved={!!saved[m.house.id]} onSave={id=>setSaved(p=>({...p,[id]:!p[id]}))} onContact={h=>setContactHouse(h)}/>)}</>
+              <>{results.map((m,i)=><Card key={m.house.id} match={m} rank={i} expanded={expandedCard===m.house.id} onToggle={()=>setExpandedCard(expandedCard===m.house.id?null:m.house.id)} saved={!!saved[m.house.id]} onSave={id=>setSaved(p=>({...p,[id]:!p[id]}))} onContact={h=>setContactHouse(h)} lang={lang}/>)}</>
             )}
             <div style={{textAlign:"center",padding:"18px 0 10px",fontSize:11.5,color:"#b0bec5",lineHeight:1.6}}>
               {T.matched}<br/>
