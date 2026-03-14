@@ -220,7 +220,9 @@ async function apiFetch(path, method = 'GET', body = null) {
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(API_URL + path, opts);
   const data = await res.json();
-  if (res.status === 401) { logout(); throw new Error('Session expired'); }
+  // Only treat 401 as session expiry if we have a token and it's not a login/register/password call
+  const isAuthCall = path.includes('/login') || path.includes('/register') || path.includes('/forgot-password') || path.includes('/reset-password');
+  if (res.status === 401 && state.token && !isAuthCall) { logout(); throw new Error('Session expired'); }
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
