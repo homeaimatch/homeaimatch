@@ -4,8 +4,8 @@ const { useState, useEffect, useRef } = React;
 var _initLang = new URLSearchParams(window.location.search).get('lang') || 'en';
 var OPT_PT = {"Cork, Ireland":"Cork, Irlanda","Silver Coast, Portugal":"Costa de Prata, Portugal","Primary home":"Residência principal","Holiday home":"Casa de férias","Investment property":"Investimento","Relocation from abroad":"Mudança do estrangeiro","Pre-approved mortgage":"Crédito pré-aprovado","Will need a mortgage":"Vou precisar de crédito","Cash buyer — no mortgage needed":"Compro a pronto","Not sure yet":"Ainda não sei","Ready to buy now":"Pronto para comprar","Actively searching":"À procura ativa","Just exploring":"Só a explorar","Within 3 months":"Dentro de 3 meses","3-6 months":"3-6 meses","6-12 months":"6-12 meses","No rush":"Sem pressa","Within 10 km":"Até 10 km","Within 25 km":"Até 25 km","Within 50 km":"Até 50 km","Anywhere in the region":"Qualquer lugar na região","Fully remote":"Totalmente remoto","Hybrid (2-3 days office)":"Híbrido (2-3 dias escritório)","Full-time in office":"Tempo inteiro no escritório","Retired / not working":"Reformado / sem trabalho","City centre":"Centro da cidade","Tech hub / business park":"Parque tecnológico","Airport area":"Zona do aeroporto","Multiple locations":"Vários locais","Under 15 min":"Menos de 15 min","Under 30 min":"Menos de 30 min","Under 45 min":"Menos de 45 min","Don't mind":"Tanto faz","City buzz — walkable & alive":"Cidade vibrante","Suburban — space with access":"Suburbano","Countryside — nature & peace":"Campo","Flexible — wherever suits":"Flexível","Just me":"Só eu","Me and a partner":"Eu e parceiro/a","Small family (1-2 kids)":"Família pequena (1-2 filhos)","Larger family (3+ kids)":"Família maior (3+ filhos)","Housemates":"Colegas de casa","Under €200K":"Até €200K","€200K – €400K":"€200K – €400K","€400K – €600K":"€400K – €600K","€600K – €800K":"€600K – €800K","€800K+":"€800K+","Move-in ready only":"Pronto a habitar","Light cosmetic work ok":"Pequenas obras ok","Big project — bring it on!":"Grande projeto — aceito!","Don't care":"Não me importo","Family-friendly":"Familiar","Nightlife & dining":"Vida noturna","Artsy & creative":"Artístico","Quiet & peaceful":"Calmo e tranquilo","Close to nature":"Perto da natureza","Upscale":"Sofisticado","Dog(s) — need garden!":"Cão — preciso jardim!","Dog(s) — parks work":"Cão — parques servem","Cat(s) only":"Só gato(s)","No pets":"Sem animais","Getting one soon":"A pensar adotar","Garage must-have":"Garagem obrigatória","Driveway fine":"Entrada serve","Street ok":"Rua serve","EV charging":"Carregamento EV","No car":"Sem carro","Short commute":"Deslocação curta","Great schools":"Boas escolas","Outdoor space":"Espaço exterior","Modern finishes":"Acabamentos modernos","Walkable area":"Zona caminhável","Home office":"Escritório em casa","Energy efficient":"Eficiência energética","Great views":"Boas vistas","Cosy & warm":"Acolhedor","Sleek & modern":"Elegante e moderno","Rustic & charming":"Rústico e encantador","Luxurious & refined":"Luxuoso e refinado","Simple & practical":"Simples e prático"};
 function optText(v,lang){return lang==='pt'?(OPT_PT[v]||v):v;}
-var UI_EN={pricing:"Pricing",forAgents:"For Agents",findHome:"Find My Home \u2192",seePricing:"See pricing",heroTag:"AI-Powered Property Matching",heroH1a:"Find the home that",heroH1b:"fits ",heroH1c:"your life",heroP:"Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit \u2014 now live in Cork, Ireland and West Portugal.",heroSub:"Free \u00b7 No signup required \u00b7 2 min quiz",notAvg:"Not your average property search",notAvgSub:"We match your lifestyle, not just your filter criteria.",feat1t:"AI-Powered Matching",feat1d:"Our algorithm scores properties across 10+ criteria tailored to your unique lifestyle.",feat2t:"Lifestyle-First Approach",feat2d:"We don\u2019t just match bedrooms and budget \u2014 we match your commute, pets, neighbourhood vibe, and more.",feat3t:"Cork & West Portugal",feat3d:"Live now in Cork, Ireland and the Silver Coast of Portugal. More regions coming soon.",feat4t:"2-Minute Quiz",feat4d:"Answer a few conversational questions and get your personalised top matches instantly.",howTitle:"How it works",s1t:"Tell us about you",s1d:"Quick chat about your lifestyle, family, budget, and preferences.",s2t:"Our AI does the work",s2d:"We score every listing across 10 weighted criteria unique to you.",s3t:"Get your matches",s3d:"Receive your top matches with detailed comparisons, save & share.",ctaTitle:"Ready to find your perfect home?",ctaSub:"Live now in Cork, Ireland & Silver Coast, Portugal.",ctaBtn:"Take the 2-Minute Quiz \u2192",ctaPricing:"pricing",faq:"FAQs",cards:"\ud83d\udccb Cards",compare:"\ud83d\udcca Compare",mapV:"\ud83d\uddfa\ufe0f Map",matched:"Matched from real listings \u00b7 AI-powered scoring",step:"STEP",contBtn:"Continue \u2192",faqQ1:"Is homeAImatch free for buyers?",faqA1:"Yes, completely free. Always. Take the quiz, see your matches, contact agents \u2014 no payments, no card required.",faqQ2:"How does the matching work?",faqA2:"Our AI scores every property across 10+ lifestyle criteria \u2014 budget, commute, family, pets, walkability, neighbourhood vibe and more. You see only properties that truly fit.",faqQ3:"Is it available in my area?",faqA3:"Currently live on the Silver Coast of Portugal. Expanding to all of Portugal and Cork, Ireland in 2026\u20132027.",faqQ4:"How does agent pricing work?",faqA4:"Free until end of 2026 for all agencies. From January 2027, plans start at \u20ac25/month. There\u2019s always a free plan with basic leads.",faqQ5:"What makes this different from Idealista?",faqA5:"Traditional portals use basic filters. We use AI to match buyers\u2019 full lifestyle to properties. Agents get buyer profiles and urgency levels before the first call.",faqQ6:"What areas do you cover?",faqA6:"Silver Coast, Portugal (Lourinh\u00e3, Peniche, \u00d3bidos, Caldas, Nazar\u00e9). Expanding to all of Portugal and Cork, Ireland throughout 2026\u20132027."};
-var UI_PT={pricing:"Pre\u00e7os",forAgents:"Para Agentes",findHome:"Encontrar Casa \u2192",seePricing:"Ver pre\u00e7os",heroTag:"Matching inteligente de Im\u00f3veis",heroH1a:"Encontre a casa que",heroH1b:"combina com ",heroH1c:"a sua vida",heroP:"Pare de percorrer centenas de an\u00fancios. Responda a algumas perguntas sobre o seu estilo de vida e a nossa IA encontrar\u00e1 os im\u00f3veis perfeitos \u2014 dispon\u00edvel em Cork, Irlanda e Oeste de Portugal.",heroSub:"Gr\u00e1tis \u00b7 Sem registo \u00b7 Quiz de 2 minutos",notAvg:"N\u00e3o \u00e9 uma pesquisa de im\u00f3veis comum",notAvgSub:"Fazemos correspond\u00eancia pelo estilo de vida, n\u00e3o apenas por filtros.",feat1t:"Correspond\u00eancia com IA",feat1d:"O nosso algoritmo avalia im\u00f3veis em mais de 10 crit\u00e9rios adaptados ao seu estilo de vida.",feat2t:"Estilo de Vida em Primeiro",feat2d:"N\u00e3o fazemos s\u00f3 correspond\u00eancia por quartos e or\u00e7amento \u2014 consideramos desloca\u00e7\u00f5es, animais, bairro e mais.",feat3t:"Cork e Oeste de Portugal",feat3d:"Dispon\u00edvel em Cork, Irlanda e na Costa de Prata. Mais regi\u00f5es em breve.",feat4t:"Quiz de 2 Minutos",feat4d:"Responda a perguntas simples e receba as melhores correspond\u00eancias instantaneamente.",howTitle:"Como funciona",s1t:"Fale-nos sobre si",s1d:"Conversa r\u00e1pida sobre estilo de vida, fam\u00edlia, or\u00e7amento e prefer\u00eancias.",s2t:"A nossa IA faz o trabalho",s2d:"Avaliamos cada im\u00f3vel em 10 crit\u00e9rios ponderados, \u00fanicos para si.",s3t:"Receba os resultados",s3d:"Receba o seu top com compara\u00e7\u00f5es detalhadas, guarde e partilhe.",ctaTitle:"Pronto para encontrar a sua casa?",ctaSub:"Dispon\u00edvel em Cork, Irlanda e Costa de Prata, Portugal.",ctaBtn:"Fa\u00e7a o Quiz de 2 Minutos \u2192",ctaPricing:"pre\u00e7os",faq:"Perguntas Frequentes",cards:"\ud83d\udccb Fichas",compare:"\ud83d\udcca Comparar",mapV:"\ud83d\uddfa\ufe0f Mapa",matched:"Correspond\u00eancia com im\u00f3veis reais \u00b7 Avalia\u00e7\u00e3o por IA",step:"PASSO",contBtn:"Continuar \u2192",faqQ1:"O homeAImatch \u00e9 gr\u00e1tis para compradores?",faqA1:"Sim, completamente gr\u00e1tis. Sempre. Fa\u00e7a o quiz, veja resultados, contacte agentes \u2014 sem pagamentos, sem cart\u00e3o.",faqQ2:"Como funciona a correspond\u00eancia?",faqA2:"A nossa IA avalia cada im\u00f3vel em mais de 10 crit\u00e9rios \u2014 or\u00e7amento, desloca\u00e7\u00e3o, fam\u00edlia, animais, caminhabilidade, ambiente e mais. V\u00ea apenas im\u00f3veis que realmente combinam consigo.",faqQ3:"Est\u00e1 dispon\u00edvel na minha zona?",faqA3:"Atualmente na Costa de Prata de Portugal. A expandir para todo o Portugal e Cork, Irlanda em 2026\u20132027.",faqQ4:"Pre\u00e7o para agentes?",faqA4:"Gr\u00e1tis at\u00e9 final de 2026 para todas as ag\u00eancias. A partir de Janeiro 2027, planos desde \u20ac25/m\u00eas. H\u00e1 sempre um plano gr\u00e1tis com leads b\u00e1sicos.",faqQ5:"Qual \u00e9 a diferen\u00e7a em rela\u00e7\u00e3o ao Idealista?",faqA5:"Os portais tradicionais usam filtros b\u00e1sicos. N\u00f3s usamos IA para corresponder o estilo de vida completo dos compradores com os im\u00f3veis. Os agentes recebem perfil e urg\u00eancia antes do primeiro contacto.",faqQ6:"Que \u00e1reas cobrem?",faqA6:"Costa de Prata, Portugal (Lourinh\u00e3, Peniche, \u00d3bidos, Caldas, Nazar\u00e9). A expandir para todo o Portugal e Cork, Irlanda ao longo de 2026\u20132027."};
+var UI_EN={pricing:"Pricing",forAgents:"For Agents",findHome:"Find My Home \u2192",seePricing:"See pricing",heroTag:"AI-Powered Property Matching",heroH1a:"Find the home that",heroH1b:"fits ",heroH1c:"your life",heroP:"Stop scrolling through hundreds of listings. Answer a few questions about how you actually live, and our AI will match you with properties that truly fit \u2014 now live on the Silver Coast, Portugal.",heroSub:"Free \u00b7 No signup required \u00b7 2 min quiz",notAvg:"Not your average property search",notAvgSub:"We match your lifestyle, not just your filter criteria.",feat1t:"AI-Powered Matching",feat1d:"Our algorithm scores properties across 10+ criteria tailored to your unique lifestyle.",feat2t:"Lifestyle-First Approach",feat2d:"We don\u2019t just match bedrooms and budget \u2014 we match your commute, pets, neighbourhood vibe, and more.",feat3t:"Silver Coast, Portugal",feat3d:"Live now on the Silver Coast of Portugal. 1400+ properties across Lourinh\u00e3, Torres Vedras, Caldas da Rainha and more.",feat4t:"2-Minute Quiz",feat4d:"Answer a few conversational questions and get your personalised top matches instantly.",howTitle:"How it works",s1t:"Tell us about you",s1d:"Quick chat about your lifestyle, family, budget, and preferences.",s2t:"Our AI does the work",s2d:"We score every listing across 10 weighted criteria unique to you.",s3t:"Get your matches",s3d:"Receive your top matches with detailed comparisons, save & share.",ctaTitle:"Ready to find your perfect home?",ctaSub:"Live now in Cork, Ireland & Silver Coast, Portugal.",ctaBtn:"Take the 2-Minute Quiz \u2192",ctaPricing:"pricing",faq:"FAQs",cards:"\ud83d\udccb Cards",compare:"\ud83d\udcca Compare",mapV:"\ud83d\uddfa\ufe0f Map",matched:"Matched from real listings \u00b7 AI-powered scoring",step:"STEP",contBtn:"Continue \u2192",faqQ1:"Is homeAImatch free for buyers?",faqA1:"Yes, completely free. Always. Take the quiz, see your matches, contact agents \u2014 no payments, no card required.",faqQ2:"How does the matching work?",faqA2:"Our AI scores every property across 10+ lifestyle criteria \u2014 budget, commute, family, pets, walkability, neighbourhood vibe and more. You see only properties that truly fit.",faqQ3:"Is it available in my area?",faqA3:"Currently live on the Silver Coast of Portugal. Expanding to all of Portugal and Cork, Ireland in 2026\u20132027.",faqQ4:"How does agent pricing work?",faqA4:"Free until end of 2026 for all agencies. From January 2027, plans start at \u20ac25/month. There\u2019s always a free plan with basic leads.",faqQ5:"What makes this different from Idealista?",faqA5:"Traditional portals use basic filters. We use AI to match buyers\u2019 full lifestyle to properties. Agents get buyer profiles and urgency levels before the first call.",faqQ6:"What areas do you cover?",faqA6:"Silver Coast, Portugal (Lourinh\u00e3, Peniche, \u00d3bidos, Caldas, Nazar\u00e9). Expanding to all of Portugal and Cork, Ireland throughout 2026\u20132027."};
+var UI_PT={pricing:"Pre\u00e7os",forAgents:"Para Agentes",findHome:"Encontrar Casa \u2192",seePricing:"Ver pre\u00e7os",heroTag:"Matching inteligente de Im\u00f3veis",heroH1a:"Encontre a casa que",heroH1b:"combina com ",heroH1c:"a sua vida",heroP:"Pare de percorrer centenas de an\u00fancios. Responda a algumas perguntas sobre o seu estilo de vida e a nossa IA encontrar\u00e1 os im\u00f3veis perfeitos \u2014 dispon\u00edvel em Costa de Prata, Portugal.",heroSub:"Gr\u00e1tis \u00b7 Sem registo \u00b7 Quiz de 2 minutos",notAvg:"N\u00e3o \u00e9 uma pesquisa de im\u00f3veis comum",notAvgSub:"Fazemos correspond\u00eancia pelo estilo de vida, n\u00e3o apenas por filtros.",feat1t:"Correspond\u00eancia com IA",feat1d:"O nosso algoritmo avalia im\u00f3veis em mais de 10 crit\u00e9rios adaptados ao seu estilo de vida.",feat2t:"Estilo de Vida em Primeiro",feat2d:"N\u00e3o fazemos s\u00f3 correspond\u00eancia por quartos e or\u00e7amento \u2014 consideramos desloca\u00e7\u00f5es, animais, bairro e mais.",feat3t:"Costa de Prata, Portugal",feat3d:"Disponível na Costa de Prata, Portugal. Mais regiões em breve.",ctaBtn:"Fa\u00e7a o Quiz de 2 Minutos \u2192",ctaPricing:"pre\u00e7os",faq:"Perguntas Frequentes",cards:"\ud83d\udccb Fichas",compare:"\ud83d\udcca Comparar",mapV:"\ud83d\uddfa\ufe0f Mapa",matched:"Correspond\u00eancia com im\u00f3veis reais \u00b7 Avalia\u00e7\u00e3o por IA",step:"PASSO",contBtn:"Continuar \u2192",faqQ1:"O homeAImatch \u00e9 gr\u00e1tis para compradores?",faqA1:"Sim, completamente gr\u00e1tis. Sempre. Fa\u00e7a o quiz, veja resultados, contacte agentes \u2014 sem pagamentos, sem cart\u00e3o.",faqQ2:"Como funciona a correspond\u00eancia?",faqA2:"A nossa IA avalia cada im\u00f3vel em mais de 10 crit\u00e9rios \u2014 or\u00e7amento, desloca\u00e7\u00e3o, fam\u00edlia, animais, caminhabilidade, ambiente e mais. V\u00ea apenas im\u00f3veis que realmente combinam consigo.",faqQ3:"Est\u00e1 dispon\u00edvel na minha zona?",faqA3:"Atualmente na Costa de Prata de Portugal. A expandir para todo o Portugal e Cork, Irlanda em 2026\u20132027.",faqQ4:"Pre\u00e7o para agentes?",faqA4:"Gr\u00e1tis at\u00e9 final de 2026 para todas as ag\u00eancias. A partir de Janeiro 2027, planos desde \u20ac25/m\u00eas. H\u00e1 sempre um plano gr\u00e1tis com leads b\u00e1sicos.",faqQ5:"Qual \u00e9 a diferen\u00e7a em rela\u00e7\u00e3o ao Idealista?",faqA5:"Os portais tradicionais usam filtros b\u00e1sicos. N\u00f3s usamos IA para corresponder o estilo de vida completo dos compradores com os im\u00f3veis. Os agentes recebem perfil e urg\u00eancia antes do primeiro contacto.",faqQ6:"Que \u00e1reas cobrem?",faqA6:"Costa de Prata, Portugal (Lourinh\u00e3, Peniche, \u00d3bidos, Caldas, Nazar\u00e9). A expandir para todo o Portugal e Cork, Irlanda ao longo de 2026\u20132027."};
 function _T(lang){return lang==='pt'?UI_PT:UI_EN;}
 
 
@@ -203,58 +203,61 @@ const HOUSES_UK = [
    QUESTIONS
    ════════════════════════════════════════════════════════════════════ */
 function getQuestions(market, lang) {
-  var cities = market ? MARKETS[market].cities : [];
   var p = lang==="pt";
   return [
-    { id:"greeting",field:null,type:"single",text:lang==="pt"?"Bem-vindo ao homeAImatch! Vou descobrir o que \xe9 importante para si e encontrar os im\xf3veis perfeitos. Qual regi\xe3o?":"Welcome to homeAImatch! I'll learn what matters to you and find properties that truly fit your life. Which region?",options:["Cork, Ireland","Silver Coast, Portugal"]},
-    { id:"location",field:"location",type:"search",text:p?"Qual cidade ou zona lhe interessa?":"Which city or area interests you?",options:cities,placeholder:p?"Escreva uma cidade...":"Type a city..."},
-    { id:"radius",field:"radius",type:"single",text:p?"Que distância do centro consideraria?":"How far from the city centre would you consider?",options:["Within 10 km","Within 25 km","Within 50 km","Anywhere in the region"]},
-    { id:"budget",field:"budget",type:"single",text:p?"Orçamento máximo?":"Budget ceiling?",options:["Under €200K","€200K – €400K","€400K – €600K","€600K – €800K","€800K+"]},
-    { id:"lifestyle",field:"lifestyle",type:"single",text:p?"Que ambiente prefere?":"What setting feels right?",options:["City buzz — walkable & alive","Suburban — space with access","Countryside — nature & peace","Flexible — wherever suits"]},
-    { id:"family",field:"family",type:"single",text:p?"Quem vai viver na casa?":"Who's moving in?",options:["Just me","Me and a partner","Small family (1-2 kids)","Larger family (3+ kids)","Housemates"]},
-    { id:"workFromHome",field:"workFromHome",type:"single",text:p?"Qual é a sua situação de trabalho?":"What's your work setup?",options:["Fully remote","Hybrid (2-3 days office)","Full-time in office","Retired / not working"]},
-    { id:"condition",field:"condition",type:"single",text:p?"E quanto a renovações?":"How about renovation?",options:["Move-in ready only","Light cosmetic work ok","Big project — bring it on!","Don't care"]},
-    { id:"neighborhoodVibe",field:"neighborhoodVibe",type:"multi",text:p?"Personalidade do bairro? Escolha todas.":"What neighbourhood personality? Pick all that fit.",options:["Family-friendly","Nightlife & dining","Artsy & creative","Quiet & peaceful","Close to nature","Upscale"]},
-    { id:"pets",field:"pets",type:"single",text:p?"Tem companheiros de quatro patas?":"Any furry companions?",options:["Dog(s) — need garden!","Dog(s) — parks work","Cat(s) only","No pets","Getting one soon"]},
-    { id:"parking",field:"parking",type:"multi",text:p?"Estacionamento?":"Parking needs?",options:["Garage must-have","Driveway fine","Street ok","EV charging","No car"]},
-    { id:"mustHave",field:"mustHave",type:"freetext",text:p?"Algo essencial na sua nova casa? (ex: jardim, garagem, vista mar)":"Anything essential in your new home? (e.g. garden, garage, sea view)",placeholder:p?"Escreva aqui...":"Type here...",maxLen:100},
-    { id:"priorities",field:"priorities",type:"multi",text:p?"Quase a terminar! 3 prioridades?":"Nearly done! Top 3 priorities?",options:["Short commute","Great schools","Outdoor space","Modern finishes","Walkable area","Home office","Energy efficient","Great views"]},
-    { id:"vibe",field:"vibe",type:"single",text:p?"Qual é o seu estilo de sonho?":"What’s your dream style?",options:["Cosy & warm","Sleek & modern","Rustic & charming","Luxurious & refined","Simple & practical"]},
-    { id:"purpose",field:"purpose",type:"single",text:p?"Primeiro \u2014 para que \xe9 este im\xf3vel?":"First things first \u2014 what\u2019s this property for?",options:["Primary home","Holiday home","Investment property","Relocation from abroad"]},
-    { id:"mortgage",field:"mortgage",type:"single",text:p?"Qual \xe9 a sua situa\xe7\xe3o de cr\xe9dito?":"What\u2019s your mortgage situation?",options:["Pre-approved mortgage","Will need a mortgage","Cash buyer \u2014 no mortgage needed","Not sure yet"]},
-    { id:"intent",field:"intent",type:"single",text:p?"Qu\xe3o pronto est\xe1 para comprar?":"How ready are you to buy?",options:["Ready to buy now","Actively searching","Just exploring"]},
-    { id:"timeline",field:"timeline",type:"single",text:p?"Qual \xe9 o seu prazo?":"What\u2019s your timeline?",options:["Within 3 months","3-6 months","6-12 months","No rush"]},
+    { id:"welcome",field:null,type:"info",text:p
+      ?"🏡 Bem-vindo ao homeAImatch!\n\nVou encontrar os imóveis perfeitos para o seu estilo de vida na Costa de Prata. O quiz demora ~2 minutos.\n\n📊 Como avaliamos:\n🏠 Imóvel (quartos, área, estado) — 25%\n💰 Orçamento — 20%\n📍 Localização e envolvente — 20%\n🌿 Estilo de vida e prioridades — 20%\n🐾 Extras (animais, transporte, etc.) — 15%"
+      :"🏡 Welcome to homeAImatch!\n\nI'll find properties that truly fit your lifestyle on the Silver Coast, Portugal. The quiz takes ~2 minutes.\n\n📊 How we score:\n🏠 Property (beds, size, condition) — 25%\n💰 Budget fit — 20%\n📍 Location & surroundings — 20%\n🌿 Lifestyle & priorities — 20%\n🐾 Extras (pets, transport, etc.) — 15%",
+      cta:p?"Começar o Quiz 🚀":"Start the Quiz 🚀"},
+    { id:"buyerType",field:"buyerType",type:"single",text:p?"👤 O que melhor descreve a sua situação?":"👤 What best describes you?",options:[
+      p?"Reformado/a":"Retired / semi-retired",p?"Trabalhador/a remoto/a":"Remote worker",p?"Casal jovem":"Young couple",p?"Família com filhos":"Family with kids",p?"Estudante":"Student",p?"Profissional individual":"Individual professional",p?"Investidor/a":"Investor"]},
+    { id:"transport",field:"transport",type:"single",text:p?"🚗 Como se desloca no dia-a-dia?":"🚗 How do you get around day-to-day?",options:[
+      p?"🚗 Carro próprio":"🚗 Own car",p?"🛵 Moto ou scooter":"🛵 Motorbike / scooter",p?"🚌 Transportes públicos":"🚌 Public transport",p?"🚲 Bicicleta":"🚲 Bicycle",p?"🚶 A pé — quero tudo perto":"🚶 Walking — everything nearby",p?"🚗 Vou comprar carro":"🚗 Planning to buy a car"]},
+    { id:"essentials",field:"essentials",type:"form",text:p?"🏠 Detalhes do imóvel":"🏠 Property essentials",
+      fields:[
+        {id:"minBeds",label:p?"🛏️ Quartos mín.":"🛏️ Min bedrooms",type:"select",options:["1","2","3","4","5+"],dflt:"2"},
+        {id:"minBaths",label:p?"🚿 WC mín.":"🚿 Min bathrooms",type:"select",options:["1","2","3+"],dflt:"1"},
+        {id:"minSqm",label:p?"📐 Área mín. (m²)":"📐 Min size (m²)",type:"select",options:[p?"Sem mínimo":"No minimum","50","80","100","120","150","200+"],dflt:p?"Sem mínimo":"No minimum"},
+        {id:"budgetMin",label:p?"💰 Orçamento mín.":"💰 Min budget",type:"select",options:[p?"Sem mínimo":"No minimum","€50K","€100K","€150K","€200K","€300K"],dflt:p?"Sem mínimo":"No minimum"},
+        {id:"budgetMax",label:p?"💰 Orçamento máx.":"💰 Max budget",type:"select",options:["€150K","€200K","€300K","€400K","€500K","€600K","€800K","€1M+"],dflt:"€400K"},
+      ]},
+    { id:"condition",field:"condition",type:"single",text:p?"🔧 Estado do imóvel?":"🔧 Property condition?",options:[
+      p?"🆕 Construção nova":"🆕 New build",p?"✅ Pronto a habitar":"✅ Move-in ready",p?"🔧 Obras ligeiras ok":"🔧 Light renovation ok",p?"🔨 Renovação total":"🔨 Full renovation project",p?"🤷 Tanto faz":"🤷 Don't mind"]},
+    { id:"outdoor",field:"outdoor",type:"single",text:p?"🌿 Espaço exterior?":"🌿 Outdoor space needed?",options:[
+      p?"Não é importante":"Not important",p?"🏠 Varanda ou terraço":"🏠 Balcony / terrace",p?"🌿 Jardim":"🌿 Garden",p?"🌳 Terreno grande":"🌳 Large plot / land"]},
+    { id:"features",field:"features",type:"multi",text:p?"✨ Características importantes? Selecione todas.":"✨ Important features? Select all that apply.",options:[
+      "🌿 "+(p?"Jardim":"Garden"),"🏊 "+(p?"Piscina":"Pool"),"💻 "+(p?"Escritório":"Home office"),"🏠 "+(p?"Varanda":"Balcony"),"☀️ "+(p?"Terraço":"Terrace"),
+      "🌊 "+(p?"Vista mar":"Sea view"),"🏛️ "+(p?"Época":"Period features"),"🍳 "+(p?"Cozinha moderna":"Modern kitchen"),"🔥 "+(p?"Lareira":"Fireplace"),
+      "📱 "+(p?"Casa inteligente":"Smart home"),"🚗 "+(p?"Garagem":"Garage"),"⚡ "+(p?"Carregamento EV":"EV charging"),"☀️ "+(p?"Solar":"Solar"),"📦 "+(p?"Arrecadação":"Storage")]},
+    { id:"setting",field:"setting",type:"single",text:p?"🏖️ Que tipo de zona prefere?":"🏖️ What area type do you prefer?",options:[
+      p?"🏖️ Cidade de praia":"🏖️ Beach town",p?"🏰 Vila histórica":"🏰 Historic town",p?"🏙️ Centro urbano":"🏙️ Urban centre",p?"🌾 Campo e tranquilidade":"🌾 Countryside & quiet",p?"🎲 Flexível":"🎲 Flexible — surprise me"]},
+    { id:"priorities",field:"priorities",type:"multi",text:p?"⭐ Top 3 prioridades no dia-a-dia?":"⭐ Top 3 daily life priorities?",options:[
+      "🚶 "+(p?"Zona caminhável":"Walkable area"),"🏫 "+(p?"Boas escolas":"Great schools"),"🏖️ "+(p?"Perto da praia":"Near the beach"),
+      "🍽️ "+(p?"Restaurantes e cafés":"Restaurants & cafes"),"🏥 "+(p?"Saúde perto":"Healthcare nearby"),"🚌 "+(p?"Transportes públicos":"Public transport"),
+      "🤫 "+(p?"Paz e sossego":"Peace & quiet"),"🌳 "+(p?"Natureza":"Nature & green space")]},
+    { id:"pets",field:"pets",type:"single",text:p?"🐾 Animais de estimação?":"🐾 Any pets?",options:[
+      p?"🐕 Cão(s)":"🐕 Dog(s)",p?"🐈 Gato(s)":"🐈 Cat(s)",p?"❌ Sem animais":"❌ No pets",p?"🐾 A pensar adotar":"🐾 Planning to get one"]},
+    { id:"parking",field:"parking",type:"single",text:p?"🅿️ Estacionamento?":"🅿️ Parking needs?",options:[
+      p?"🏠 Garagem obrigatória":"🏠 Garage must-have",p?"🅿️ Rua serve":"🅿️ Street parking fine",p?"⚡ Preciso carregamento EV":"⚡ Need EV charging",p?"🚶 Sem carro":"🚶 No car"]},
+    { id:"purpose",field:"purpose",type:"single",text:p?"🎯 Para que é este imóvel?":"🎯 What's this property for?",options:[
+      p?"🏠 Residência principal":"🏠 Primary home",p?"🏖️ Casa de férias":"🏖️ Holiday home",p?"📈 Investimento":"📈 Investment",p?"✈️ Mudança do estrangeiro":"✈️ Relocation from abroad"]},
+    { id:"mortgage",field:"mortgage",type:"single",text:p?"💳 Situação de crédito?":"💳 Mortgage situation?",options:[
+      p?"✅ Crédito pré-aprovado":"✅ Pre-approved mortgage",p?"🏦 Vou precisar de crédito":"🏦 Will need a mortgage",p?"💰 Compro a pronto":"💰 Cash buyer",p?"🤔 Ainda não sei":"🤔 Not sure yet"]},
+    { id:"intent",field:"intent",type:"single",text:p?"⏰ Quão pronto está?":"⏰ How ready are you?",options:[
+      p?"🔥 Pronto para comprar":"🔥 Ready to buy now",p?"🔍 À procura ativa":"🔍 Actively searching",p?"👀 Só a explorar":"👀 Just exploring"]},
+    { id:"timeline",field:"timeline",type:"single",text:p?"📅 Qual é o seu prazo?":"📅 What's your timeline?",options:[
+      p?"⚡ Dentro de 3 meses":"⚡ Within 3 months",p?"📅 3-6 meses":"📅 3-6 months",p?"📆 6-12 meses":"📆 6-12 months",p?"🧘 Sem pressa":"🧘 No rush"]},
   ];
 }
-
-/* ════════════════════════════════════════════════════════════════════
-   SCORING ALGORITHM
-   ════════════════════════════════════════════════════════════════════ */
-function scoreHouse(h, a) {
-  let s=0,mx=0,r=[],ci=null;
-  mx+=25;if(a.location){const l=a.location.toLowerCase();if(h.city.toLowerCase()===l||h.region?.toLowerCase().includes(l)){s+=25;r.push(`In ${h.region||h.city}`);}}
-  mx+=25;const bM={"Under €200K":[0,2e5],"€200K – €400K":[2e5,4e5],"€400K – €600K":[4e5,6e5],"€600K – €800K":[6e5,8e5],"€800K+":[8e5,Infinity],"Under £200K":[0,2e5],"£200K – £400K":[2e5,4e5],"£400K – £600K":[4e5,6e5],"£600K – £800K":[6e5,8e5],"£800K+":[8e5,Infinity]};const[bN,bX]=bM[a.budget]||[0,Infinity];if(h.price>=bN&&h.price<=bX){s+=25;r.push("Within budget");}else if(h.price>=bN*.85&&h.price<=bX*1.15){s+=12;r.push("Near budget range");}
-  mx+=20;if(a.workFromHome==="Fully remote"){if(h.features.some(f=>f.includes("office")||f.includes("coworking"))){s+=20;r.push("Workspace included");}else if(h.sqm>=140){s+=12;r.push("Room for office");}else s+=6;}else if(a.workFromHome==="Hybrid (2-3 days office)"||a.workFromHome==="Full-time in office"){var cm=h.commuteMins?h.commuteMins.cityCenter||30:30;ci={mins:cm,to:"City centre"};if(cm<=30){s+=20;r.push(cm+" min to centre");}else if(cm<=45){s+=10;r.push(cm+" min to centre");}else s+=5;}else s+=10;
-  mx+=15;const fb={"Just me":1,"Me and a partner":1,"Small family (1-2 kids)":3,"Larger family (3+ kids)":4,"Housemates":3};const mb=fb[a.family]||1;if(h.beds>=mb){s+=15;r.push(`${h.beds} bedrooms`);}else if(h.beds>=mb-1)s+=7;
-  mx+=15;const cp={"Move-in ready only":["move-in"],"Light cosmetic work ok":["move-in","renovation-light"],"Big project — bring it on!":["renovation-major","renovation-light"],"Don't care":["move-in","renovation-light","renovation-major"]};if((cp[a.condition]||[]).includes(h.condition)){s+=15;r.push({"move-in":"Move-in ready","renovation-light":"Light reno","renovation-major":"Reno project"}[h.condition]);}
-  mx+=12;const lM={"City buzz — walkable & alive":"urban","Suburban — space with access":"suburban","Countryside — nature & peace":"rural","Flexible — wherever suits":null};const lp=lM[a.lifestyle];if(lp===null)s+=8;else if(h.neighborhood===lp){s+=12;r.push(`${lp.charAt(0).toUpperCase()+lp.slice(1)} area`);}
-  mx+=10;const vM={"Family-friendly":"family-friendly","Nightlife & dining":"nightlife","Artsy & creative":"artsy","Quiet & peaceful":"quiet","Close to nature":"nature-lovers","Upscale":"luxury"};let vh=0;(a.neighborhoodVibe||[]).forEach(v=>{if(vM[v]&&h.neighborhoodVibe.includes(vM[v]))vh++;});if(vh>0){s+=Math.min(vh*5,10);r.push("Vibe match");}
-  mx+=10;if(a.pets==="Dog(s) — need garden!"){if(h.petFriendly&&h.yard!=="none"&&h.yard!=="small"){s+=10;r.push("Garden for dogs");}else if(h.petFriendly)s+=4;}else if(a.pets==="Dog(s) — parks work"||a.pets==="Getting one soon"){if(h.petFriendly&&h.nearbyDogPark){s+=10;r.push("Dog parks nearby");}else if(h.petFriendly)s+=5;}else if(a.pets==="Cat(s) only")s+=7;else s+=6;
-  mx+=8;let ph=0;(a.parking||[]).forEach(p=>{if(p==="Garage must-have"&&h.parking.some(pk=>pk.includes("garage")))ph++;if(p==="EV charging"&&h.parking.includes("ev-charging"))ph++;if(p==="Driveway fine"&&h.parking.some(pk=>pk.includes("driveway")||pk.includes("garage")))ph++;if(p==="Street ok"||p==="No car")ph++;});if(ph>0){s+=Math.min(ph*4,8);r.push("Parking ✓");}
-  mx+=15;const pC={"Short commute":()=>Object.values(h.commuteMins).some(m=>m<=15),"Great schools":()=>h.schools==="excellent","Outdoor space":()=>h.yard!=="none","Modern finishes":()=>["modern","contemporary","luxury","industrial"].includes(h.style),"Walkable area":()=>h.walkability>=8,"Home office":()=>h.features.some(f=>f.includes("office")),"Energy efficient":()=>h.features.some(f=>f.includes("solar")||f.includes("heat-pump"))||(h.epc&&h.epc.startsWith("A"))||(h.epc==="A"),"Great views":()=>h.features.some(f=>f.includes("view")||f.includes("sea")||f.includes("river")||f.includes("ocean"))};(a.priorities||[]).forEach(p=>{if(pC[p]?.()){s+=5;r.push(`✓ ${p}`);}});
-  mx+=8;const sM={"Cosy & warm":["cottage","craftsman","traditional","georgian"],"Sleek & modern":["modern","contemporary","industrial"],"Rustic & charming":["cottage","historic","traditional","victorian","mediterranean"],"Luxurious & refined":["luxury","modern","contemporary"],"Simple & practical":["traditional","modern"]};if((sM[a.vibe]||[]).includes(h.style)){s+=8;r.push("Style match");}
-  return{house:h,score:s,maxScore:mx,pct:Math.min(Math.round((s/mx)*100),99),reasons:[...new Set(r)],commuteInfo:ci};
-}
-
-function getMatches(a){return HOUSES_UK.map(h=>scoreHouse(h,a)).sort((a,b)=>b.pct-a.pct).slice(0,5);}
-
 function getPersona(a, lang){
   var pt = lang==="pt";
-  if(a.condition?.includes("project"))return{title:pt?"O Renovador Visionário":"The Visionary Renovator",emoji:"🔨",desc:pt?"Vê diamantes em bruto e tem a visão para os transformar.":"You see diamonds in the rough and have the vision to transform them."};
-  if(a.workFromHome==="Fully remote"&&a.lifestyle?.includes("Countryside"))return{title:pt?"O Nómada Digital":"The Digital Nomad",emoji:"🌍",desc:pt?"Liberdade para viver onde a inspiração levar.":"Freedom to live wherever inspires you."};
-  if(a.family?.includes("family"))return{title:pt?"O Construtor de Lar":"The Nesting Pro",emoji:"🐣",desc:pt?"Escolas, espaço e segurança — a construir um lar para a família.":"Schools, space, and safety — building a home for your crew."};
-  if(a.lifestyle?.includes("City"))return{title:pt?"O Explorador Urbano":"The Urban Explorer",emoji:"🌃",desc:pt?"Mobilidade, cultura e estar no centro de tudo.":"Walkability, culture, and being in the thick of it."};
-  if(a.vibe==="Luxurious & refined")return{title:pt?"O Refinado":"The Refined Seeker",emoji:"✨",desc:pt?"Aprecia qualidade, design e os detalhes mais finos.":"You appreciate quality, design, and the finer details."};
+  var bt = a.buyerType || "";
+  if(bt.includes("Retired")||bt.includes("Reformado"))return{title:pt?"O Explorador da Reforma":"The Retirement Explorer",emoji:"🌅",desc:pt?"Tempo para viver onde sempre sonhou. Tranquilidade, saúde perto e qualidade de vida.":"Time to live where you've always dreamed. Peace, healthcare nearby, and quality of life."};
+  if(bt.includes("Remote")||bt.includes("remoto"))return{title:pt?"O Nómada Digital":"The Digital Nomad",emoji:"💻",desc:pt?"Internet rápida, espaço para escritório e um café com vista — o mundo é o seu escritório.":"Fast internet, office space and a café with a view — the world is your office."};
+  if(bt.includes("couple")||bt.includes("Casal"))return{title:pt?"O Casal Aventureiro":"The Adventure Couple",emoji:"💑",desc:pt?"Dois a construir um futuro juntos. Espaço, localização e um lar para chamar de vosso.":"Two building a future together. Space, location, and a place to call your own."};
+  if(bt.includes("Family")||bt.includes("Família"))return{title:pt?"O Construtor de Lar":"The Family Builder",emoji:"👨‍👩‍👧‍👦",desc:pt?"Escolas, jardim, segurança — tudo para que a família cresça feliz.":"Schools, garden, safety — everything for a happy family life."};
+  if(bt.includes("Student")||bt.includes("Estudante"))return{title:pt?"O Estudante Esperto":"The Smart Student",emoji:"🎓",desc:pt?"Orçamento inteligente, boa localização e perto de tudo o que importa.":"Smart budget, great location, close to everything that matters."};
+  if(bt.includes("Investor")||bt.includes("Investidor"))return{title:pt?"O Investidor Estratégico":"The Strategic Investor",emoji:"📈",desc:pt?"Olho no retorno, análise de mercado e potencial de valorização.":"Eye on returns, market analysis, and appreciation potential."};
   return{title:pt?"O Comprador Inteligente":"The Smart Buyer",emoji:"🏡",desc:pt?"Metódico, informado e pronto para encontrar o encaixe perfeito.":"Methodical, informed, and ready to find the perfect fit."};
 }
 
@@ -789,6 +792,7 @@ function HomeAIMatch() {
   const [expandedCard, setExpandedCard] = useState(null);
   const [multiSel, setMultiSel] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [formData, setFormData] = useState({});
   const [persona, setPersona] = useState(null);
   const [answered, setAnswered] = useState(0);
   const [saved, setSaved] = useState({});
@@ -836,33 +840,55 @@ function HomeAIMatch() {
 
   async function proceed(ans) {
     const q=questions[currentQ];
-    const disp=Array.isArray(ans)?ans.join(", "):ans;
-    setMessages(p=>[...p,{text:disp,isUser:true}]);
-    setShowOpts(false);setMultiSel([]);setSearchText("");
-    const nA={...answers};if(q.field)nA[q.field]=ans;
 
-    if(q.id==="greeting"){
-      const isIreland = ans.toLowerCase().includes("cork") || ans.toLowerCase().includes("ireland");
-      const isPortugal = ans.toLowerCase().includes("silver") || ans.toLowerCase().includes("costa") || ans.toLowerCase().includes("portugal") || ans.toLowerCase().includes("lourinh");
-      nA.market = isIreland ? "ie" : isPortugal ? "pt" : "uk";
-      // Extract just the city name for the location field
-      nA.location = isIreland ? "Cork" : isPortugal ? "Silver Coast" : ans;
-      nA.currency = (isIreland || isPortugal) ? "EUR" : "GBP";
-      nA.language = lang;
-      setAnswers(nA);setAnswered(p=>p+1);setQHistory(h=>[...h,currentQ]);
-      var mkt=nA.market;var cities=MARKETS[mkt]?MARKETS[mkt].cities:[];
-      setQuestions(function(prev){return prev.map(function(qq){return qq.id==="location"?Object.assign({},qq,{options:cities}):qq;});});
+    // For "info" type (welcome screen), don't add user message — just advance
+    if(q.type==="info"){
+      // Set defaults for Silver Coast Portugal
+      const nA={...answers, market:"pt", location:"Silver Coast", currency:"EUR", language:lang};
+      setAnswers(nA);setQHistory(h=>[...h,currentQ]);
+      const nx=currentQ+1;
       setIsTyping(true);
-      setTimeout(function(){setMessages(function(p){return p.concat([{text:questions[1].text,isUser:false}]);});setIsTyping(false);setCurrentQ(1);setTimeout(function(){setShowOpts(true);},200);},600);
+      setTimeout(()=>{setMessages(p=>[...p,{text:questions[nx].text,isUser:false}]);setIsTyping(false);setCurrentQ(nx);setAnswered(p=>p+1);setTimeout(()=>setShowOpts(true),200);},400);
       return;
     }
+
+    // For "form" type, ans is an object of field values
+    if(q.type==="form"){
+      const summary = Object.entries(ans).map(([k,v])=>v).join(", ");
+      setMessages(p=>[...p,{text:summary,isUser:true}]);
+    } else {
+      const disp=Array.isArray(ans)?ans.join(", "):ans;
+      setMessages(p=>[...p,{text:disp,isUser:true}]);
+    }
+
+    setShowOpts(false);setMultiSel([]);setSearchText("");setFormData({});
+    const nA={...answers};
+    if(q.field){
+      if(q.type==="form"){
+        // Spread form fields into answers
+        Object.entries(ans).forEach(([k,v])=>{nA[k]=v;});
+      } else {
+        nA[q.field]=ans;
+      }
+    }
+    nA.language = lang;
 
     setAnswers(nA);setAnswered(p=>p+1);setQHistory(h=>[...h,currentQ]);
     let nx=-1;for(let i=currentQ+1;i<questions.length;i++){if(!questions[i].showIf||questions[i].showIf(nA)){nx=i;break;}}
 
     if(nx!==-1){
       setIsTyping(true);
-      setTimeout(()=>{setMessages(p=>[...p,{text:questions[nx].text,isUser:false}]);setIsTyping(false);setCurrentQ(nx);setTimeout(()=>setShowOpts(true),200);},500+Math.random()*300);
+      setTimeout(()=>{
+        setMessages(p=>[...p,{text:questions[nx].text,isUser:false}]);
+        setIsTyping(false);setCurrentQ(nx);
+        // Pre-fill form defaults
+        if(questions[nx].type==="form"){
+          const defaults={};
+          questions[nx].fields.forEach(f=>{defaults[f.id]=f.dflt||"";});
+          setFormData(defaults);
+        }
+        setTimeout(()=>setShowOpts(true),200);
+      },400+Math.random()*200);
     } else {
       setIsTyping(true);
       setMessages(pr=>[...pr,{text:lang==="pt"?"A procurar o seu lar perfeito...":"Searching for your perfect match...",isUser:false}]);
@@ -879,7 +905,6 @@ function HomeAIMatch() {
           setShowEmailGate(true);
         },500);
       } else {
-        // Fallback to local scoring if API fails or returns no results
         const p=getPersona(nA,lang);setPersona(p);
         setMessages(pr=>[...pr,{text:lang==="pt"?`${p.emoji} O seu perfil: "${p.title}" — ${p.desc}\n\nA procurar imóveis...`:`${p.emoji} You're "${p.title}" — ${p.desc}\n\nSearching properties...`,isUser:false}]);
         setIsTyping(false);
@@ -916,7 +941,7 @@ function HomeAIMatch() {
     setShowEmailGate(false);
   }
 
-  function reset(){setMessages([]);setCurrentQ(0);setQHistory([]);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setPendingResults(null);setShowEmailGate(false);setQuizEmail("");setExpandedCard(null);setMultiSel([]);setSearchText("");setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
+  function reset(){setMessages([]);setCurrentQ(0);setQHistory([]);setAnswers({});setIsTyping(false);setShowOpts(false);setResults(null);setPendingResults(null);setShowEmailGate(false);setQuizEmail("");setExpandedCard(null);setMultiSel([]);setSearchText("");setFormData({});setPersona(null);setAnswered(0);setSaved({});setViewMode("cards");setQuestions(getQuestions(null,lang));setPage("landing");}
 
   const cQ=questions[currentQ];
   const filtC=cQ?.type==="search"?(cQ.options||[]).filter(c=>c.toLowerCase().includes(searchText.toLowerCase())):[];
@@ -957,16 +982,45 @@ function HomeAIMatch() {
 
         {showOpts&&!results&&cQ&&(
           <div style={{animation:"fadeSlide 0.35s ease-out",marginTop:5,marginBottom:8,marginLeft:34}}>
+
+            {/* INFO type — welcome screen with CTA button */}
+            {cQ.type==="info"&&(
+              <button onClick={()=>proceed("start")} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"12px 28px",borderRadius:24,fontSize:14,fontFamily:"'Outfit',sans-serif",fontWeight:700,cursor:"pointer",marginTop:4,transition:"transform 0.2s",boxShadow:"0 4px 14px rgba(30,150,209,0.3)"}}>{cQ.cta}</button>
+            )}
+
+            {/* FORM type — compact multi-field form */}
+            {cQ.type==="form"&&(
+              <div style={{background:B.white,borderRadius:14,padding:"18px 16px",border:`1.5px solid ${B.border}`,marginBottom:8}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                  {cQ.fields.map((f,i)=>(
+                    <div key={f.id} style={i===cQ.fields.length-1&&cQ.fields.length%2!==0?{gridColumn:"1 / -1"}:{}}>
+                      <label style={{fontSize:12,fontWeight:600,color:B.gray,fontFamily:"'Outfit',sans-serif",display:"block",marginBottom:4}}>{f.label}</label>
+                      <select value={formData[f.id]||f.dflt||""} onChange={e=>{setFormData(p=>({...p,[f.id]:e.target.value}));}} style={{width:"100%",padding:"9px 12px",borderRadius:10,border:`1.5px solid ${B.border}`,fontSize:13,fontFamily:"'Outfit',sans-serif",background:"#fff",color:B.dark,outline:"none",cursor:"pointer"}}>
+                        {f.options.map(o=><option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={()=>{const vals={};cQ.fields.forEach(f=>{vals[f.id]=formData[f.id]||f.dflt||f.options[0];});proceed(vals);}} style={{width:"100%",background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"11px 22px",borderRadius:12,fontSize:13,fontFamily:"'Outfit',sans-serif",fontWeight:700,cursor:"pointer",marginTop:14}}>{T.contBtn}</button>
+              </div>
+            )}
+
+            {/* SEARCH / FREETEXT types */}
             {(cQ.type==="search"||cQ.type==="freetext")&&<input type="text" value={searchText} onChange={e=>setSearchText(e.target.value.slice(0,cQ.maxLen||200))} placeholder={cQ.placeholder} style={{width:"100%",padding:"10px 14px",borderRadius:10,border:`1.5px solid ${B.border}`,fontSize:13.5,fontFamily:"'Outfit',sans-serif",outline:"none",background:"#fff",color:B.dark,marginBottom:7}} onFocus={e=>e.target.style.borderColor=B.blue} onBlur={e=>e.target.style.borderColor=B.border} onKeyDown={e=>{if(e.key==="Enter"&&cQ.type==="freetext"&&searchText.trim())proceed(searchText.trim());}}/>}
             {cQ.type==="freetext"&&<div style={{display:"flex",gap:6,marginBottom:4}}><button onClick={function(){if(searchText.trim())proceed(searchText.trim());}} style={{background:searchText.trim()?B.blue:"#ccc",color:"#fff",border:"none",padding:"8px 18px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:searchText.trim()?"pointer":"default"}}>{(_T(lang)).contBtn}</button><button onClick={function(){proceed("No preference");}} style={{background:"#fff",color:B.gray,border:"1.5px solid "+B.border,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer"}}>{lang==="pt"?"Sem preferência":"No preference"}</button></div>}
-            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-              {(cQ.type==="freetext"?[]:(cQ.type==="search"?filtC:cQ.options)).map((opt,i)=>{
-                const sel=cQ.type==="multi"&&multiSel.includes(opt);
-                return <button key={i} onClick={()=>cQ.type==="search"?proceed(opt):handleAnswer(opt)} style={{background:sel?B.dark:"#fff",color:sel?"#f0f4f8":B.dark,border:sel?`1.5px solid ${B.dark}`:`1.5px solid ${B.border}`,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}>{optText(opt,lang)}</button>;
-              })}
-            </div>
+
+            {/* SINGLE / MULTI option buttons */}
+            {(cQ.type==="single"||cQ.type==="multi")&&(
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                {cQ.options.map((opt,i)=>{
+                  const sel=cQ.type==="multi"&&multiSel.includes(opt);
+                  return <button key={i} onClick={()=>handleAnswer(opt)} style={{background:sel?B.dark:"#fff",color:sel?"#f0f4f8":B.dark,border:sel?`1.5px solid ${B.dark}`:`1.5px solid ${B.border}`,padding:"8px 15px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer",transition:"all 0.2s"}}>{opt}</button>;
+                })}
+              </div>
+            )}
+
             {cQ.type==="multi"&&multiSel.length>0&&<button onClick={()=>proceed(multiSel)} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"9px 22px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:"pointer",marginTop:7}}>{T.contBtn}</button>}
-            {qHistory.length>0&&<button onClick={goBack} style={{background:"transparent",border:"none",padding:"8px 0",fontSize:12,fontFamily:"'Outfit',sans-serif",fontWeight:500,color:B.gray,cursor:"pointer",marginTop:6,display:"flex",alignItems:"center",gap:4}}>← {lang==="pt"?"Voltar":"Back"}</button>}
+            {qHistory.length>0&&cQ.type!=="info"&&<button onClick={goBack} style={{background:"transparent",border:"none",padding:"8px 0",fontSize:12,fontFamily:"'Outfit',sans-serif",fontWeight:500,color:B.gray,cursor:"pointer",marginTop:6,display:"flex",alignItems:"center",gap:4}}>{lang==="pt"?"← Voltar":"← Back"}</button>}
           </div>
         )}
 
