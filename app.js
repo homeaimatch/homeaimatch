@@ -236,6 +236,15 @@ function getQuestions(market, lang) {
       p?"🏖️ Cidade de praia":"🏖️ Beach town",p?"🏰 Vila histórica":"🏰 Historic town",p?"🏙️ Centro urbano":"🏙️ Urban centre",p?"🌾 Campo e tranquilidade":"🌾 Countryside & quiet",p?"🎲 Flexível":"🎲 Flexible — surprise me"]},
     { id:"concelhos",field:"concelhos",type:"multi",text:p?"📍 Quer focar em concelhos específicos? (opcional — selecione ou avance)":"📍 Want to focus on specific areas? (optional — select or skip)",options:[
       "Lourinhã","Torres Vedras","Caldas da Rainha","Peniche","Óbidos","Bombarral","Nazaré","Alcobaça","Cadaval","Mafra"],skipLabel:p?"Toda a Costa de Prata":"All Silver Coast"},
+    { id:"vibe",field:"vibe",type:"multi",text:p?"🎭 Que personalidade de bairro procura? Escolha todas.":"🎭 What neighbourhood vibe do you want? Pick all that fit.",options:[
+      "👨‍👩‍👧 "+(p?"Familiar e seguro":"Family-friendly & safe"),
+      "🍷 "+(p?"Vida noturna e restaurantes":"Nightlife & dining"),
+      "🎨 "+(p?"Artístico e criativo":"Artsy & creative"),
+      "🤫 "+(p?"Calmo e tranquilo":"Quiet & peaceful"),
+      "🌿 "+(p?"Perto da natureza":"Close to nature"),
+      "💎 "+(p?"Sofisticado e exclusivo":"Upscale & exclusive"),
+      "🏄 "+(p?"Surfista e descontraído":"Surf & laid-back"),
+      "🏘️ "+(p?"Comunidade local":"Local community feel")]},
     { id:"priorities",field:"priorities",type:"multi",text:p?"⭐ Top 3 prioridades no dia-a-dia?":"⭐ Top 3 daily life priorities?",options:[
       "🚶 "+(p?"Zona caminhável":"Walkable area"),"🏫 "+(p?"Boas escolas":"Great schools"),"🏖️ "+(p?"Perto da praia":"Near the beach"),
       "🍽️ "+(p?"Restaurantes e cafés":"Restaurants & cafes"),"🏥 "+(p?"Saúde perto":"Healthcare nearby"),"🚌 "+(p?"Transportes públicos":"Public transport"),
