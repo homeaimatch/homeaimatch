@@ -227,10 +227,12 @@ function getQuestions(market, lang) {
       p?"Não é importante":"Not important",p?"🏠 Varanda ou terraço":"🏠 Balcony / terrace",p?"🌿 Jardim":"🌿 Garden",p?"🌳 Terreno grande":"🌳 Large plot / land"]},
     { id:"features",field:"features",type:"multi",text:p?"✨ Características importantes? Selecione todas.":"✨ Important features? Select all that apply.",options:[
       "🌿 "+(p?"Jardim":"Garden"),"🏊 "+(p?"Piscina":"Pool"),"💻 "+(p?"Escritório":"Home office"),"🏠 "+(p?"Varanda":"Balcony"),"☀️ "+(p?"Terraço":"Terrace"),
-      "🌊 "+(p?"Vista mar":"Sea view"),"🏛️ "+(p?"Época":"Period features"),"🍳 "+(p?"Cozinha moderna":"Modern kitchen"),"🔥 "+(p?"Lareira":"Fireplace"),
+      "🌊 "+(p?"Vista mar":"Sea view"),"🏛️ "+(p?"Traça antiga":"Character / historic"),"🍳 "+(p?"Cozinha moderna":"Modern kitchen"),"🔥 "+(p?"Lareira":"Fireplace"),
       "📱 "+(p?"Casa inteligente":"Smart home"),"🚗 "+(p?"Garagem":"Garage"),"⚡ "+(p?"Carregamento EV":"EV charging"),"☀️ "+(p?"Solar":"Solar"),"📦 "+(p?"Arrecadação":"Storage")]},
     { id:"setting",field:"setting",type:"single",text:p?"🏖️ Que tipo de zona prefere?":"🏖️ What area type do you prefer?",options:[
       p?"🏖️ Cidade de praia":"🏖️ Beach town",p?"🏰 Vila histórica":"🏰 Historic town",p?"🏙️ Centro urbano":"🏙️ Urban centre",p?"🌾 Campo e tranquilidade":"🌾 Countryside & quiet",p?"🎲 Flexível":"🎲 Flexible — surprise me"]},
+    { id:"concelhos",field:"concelhos",type:"multi",text:p?"📍 Quer focar em concelhos específicos? (opcional — selecione ou avance)":"📍 Want to focus on specific areas? (optional — select or skip)",options:[
+      "Lourinhã","Torres Vedras","Caldas da Rainha","Peniche","Óbidos","Bombarral","Nazaré","Alcobaça","Cadaval","Mafra"],skipLabel:p?"Toda a Costa de Prata":"All Silver Coast"},
     { id:"priorities",field:"priorities",type:"multi",text:p?"⭐ Top 3 prioridades no dia-a-dia?":"⭐ Top 3 daily life priorities?",options:[
       "🚶 "+(p?"Zona caminhável":"Walkable area"),"🏫 "+(p?"Boas escolas":"Great schools"),"🏖️ "+(p?"Perto da praia":"Near the beach"),
       "🍽️ "+(p?"Restaurantes e cafés":"Restaurants & cafes"),"🏥 "+(p?"Saúde perto":"Healthcare nearby"),"🚌 "+(p?"Transportes públicos":"Public transport"),
@@ -1020,6 +1022,7 @@ function HomeAIMatch() {
             )}
 
             {cQ.type==="multi"&&multiSel.length>0&&<button onClick={()=>proceed(multiSel)} style={{background:`linear-gradient(135deg,${B.blue},${B.blueD})`,color:"#fff",border:"none",padding:"9px 22px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:600,cursor:"pointer",marginTop:7}}>{T.contBtn}</button>}
+            {cQ.type==="multi"&&cQ.skipLabel&&multiSel.length===0&&<button onClick={()=>proceed([])} style={{background:B.grayL,color:B.gray,border:`1.5px solid ${B.border}`,padding:"8px 18px",borderRadius:22,fontSize:12.5,fontFamily:"'Outfit',sans-serif",fontWeight:500,cursor:"pointer",marginTop:7}}>{cQ.skipLabel} →</button>}
             {qHistory.length>0&&cQ.type!=="info"&&<button onClick={goBack} style={{background:"transparent",border:"none",padding:"8px 0",fontSize:12,fontFamily:"'Outfit',sans-serif",fontWeight:500,color:B.gray,cursor:"pointer",marginTop:6,display:"flex",alignItems:"center",gap:4}}>{lang==="pt"?"← Voltar":"← Back"}</button>}
           </div>
         )}

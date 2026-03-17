@@ -257,6 +257,94 @@ function trendByDay(items, days = 30) {
   return { labels: Object.keys(counts).map(d => d.slice(5)), values: Object.values(counts) };
 }
 
+// ── INVENTORY BREAKDOWNS ──
+function renderInventoryBreakdown(properties, field) {
+  const counts = {};
+  (properties || []).forEach(p => {
+    const val = p[field] || 'unknown';
+    counts[val] = (counts[val] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const typeLabels = {flat:'🏢 Apartment',detached:'🏡 Detached',house:'🏠 House',villa:'🏛️ Villa',terraced:'🏘️ Terraced',cottage:'🏕️ Cottage',farm:'🌾 Farm',semi:'🏠 Semi-detached',land:'🌳 Land',unknown:'❓ Other'};
+  return '<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">' +
+    sorted.map(([k, v]) => {
+      const pct = Math.round(v / properties.length * 100);
+      const label = typeLabels[k] || k;
+      return `<div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <span style="min-width:130px;font-weight:500">${label}</span>
+        <div style="flex:1;height:18px;background:#f0f2f5;border-radius:9px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#1e96d1,#1578a7);border-radius:9px;min-width:2px"></div>
+        </div>
+        <span style="min-width:55px;text-align:right;color:#6b7b8d;font-size:12px">${v} (${pct}%)</span>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function renderBedroomBreakdown(properties) {
+  const counts = {1:0,2:0,3:0,4:0,'5+':0};
+  (properties || []).forEach(p => {
+    const b = p.beds || 0;
+    if (b >= 5) counts['5+']++;
+    else if (b >= 1) counts[b]++;
+  });
+  return '<div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">' +
+    Object.entries(counts).map(([k, v]) => 
+      `<div style="text-align:center;background:#f0f2f5;border-radius:12px;padding:12px 18px;min-width:60px">
+        <div style="font-size:22px;font-weight:700;color:#1a2b3c">${v}</div>
+        <div style="font-size:11px;color:#6b7b8d;margin-top:2px">${k} bed${k==='1'?'':'s'}</div>
+      </div>`
+    ).join('') + '</div>';
+}
+
+function renderFeatureBreakdown(properties) {
+  const featureCounts = {};
+  (properties || []).forEach(p => {
+    (p.features || []).forEach(f => {
+      const clean = f.replace(/-/g, ' ');
+      featureCounts[clean] = (featureCounts[clean] || 0) + 1;
+    });
+  });
+  // Also count from parking
+  let garageCount = 0, evCount = 0;
+  (properties || []).forEach(p => {
+    if ((p.parking || []).some(pk => pk.includes('garage'))) garageCount++;
+    if ((p.parking || []).some(pk => pk.includes('ev'))) evCount++;
+  });
+  if (garageCount) featureCounts['garage'] = garageCount;
+  if (evCount) featureCounts['ev charging'] = evCount;
+
+  const sorted = Object.entries(featureCounts).sort((a, b) => b[1] - a[1]).slice(0, 12);
+  if (sorted.length === 0) return '<div style="color:#6b7b8d;font-size:13px;margin-top:8px">No feature data available yet</div>';
+  return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">' +
+    sorted.map(([k, v]) => 
+      `<span style="background:#e8f4fb;color:#1578a7;padding:5px 12px;border-radius:16px;font-size:12px;font-weight:500">${k} <strong>${v}</strong></span>`
+    ).join('') + '</div>';
+}
+
+function renderPriceBreakdown(properties) {
+  const ranges = {'<€100K':0,'€100-200K':0,'€200-300K':0,'€300-400K':0,'€400-500K':0,'€500K+':0};
+  (properties || []).forEach(p => {
+    const pr = p.price || 0;
+    if (pr < 100000) ranges['<€100K']++;
+    else if (pr < 200000) ranges['€100-200K']++;
+    else if (pr < 300000) ranges['€200-300K']++;
+    else if (pr < 400000) ranges['€300-400K']++;
+    else if (pr < 500000) ranges['€400-500K']++;
+    else ranges['€500K+']++;
+  });
+  return '<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">' +
+    Object.entries(ranges).map(([k, v]) => {
+      const pct = properties.length ? Math.round(v / properties.length * 100) : 0;
+      return `<div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <span style="min-width:90px;font-weight:500">${k}</span>
+        <div style="flex:1;height:18px;background:#f0f2f5;border-radius:9px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#e8833a,#d06828);border-radius:9px;min-width:2px"></div>
+        </div>
+        <span style="min-width:55px;text-align:right;color:#6b7b8d;font-size:12px">${v} (${pct}%)</span>
+      </div>`;
+    }).join('') + '</div>';
+}
+
 // ── OVERVIEW ──
 function renderOverview() {
   const p = DATA.properties, a = DATA.agents, l = DATA.leads, s = DATA.subscribers, c = DATA.contacts;
@@ -268,7 +356,7 @@ function renderOverview() {
       <div class="stat-card highlight">
         <div class="label">Total Properties</div>
         <div class="value">${p.count}</div>
-        <div class="sub">${(p.data||[]).filter(x=>x.listing_status==='active').length} active</div>
+        <div class="sub">${p.activeCount || (p.data||[]).filter(x=>x.listing_status==='active').length} active</div>
       </div>
       <div class="stat-card">
         <div class="label">Agents</div>
@@ -321,6 +409,28 @@ function renderOverview() {
       <div class="card fade-in">
         <h3>🏘️ Properties by City</h3>
         <canvas id="chart-cities" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:0">
+      <div class="card fade-in">
+        <h3>🏠 Property Types</h3>
+        ${renderInventoryBreakdown(p.data, 'property_type')}
+      </div>
+      <div class="card fade-in">
+        <h3>🛏️ Bedrooms Distribution</h3>
+        ${renderBedroomBreakdown(p.data)}
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:0">
+      <div class="card fade-in">
+        <h3>✨ Properties with Features</h3>
+        ${renderFeatureBreakdown(p.data)}
+      </div>
+      <div class="card fade-in">
+        <h3>💰 Price Distribution</h3>
+        ${renderPriceBreakdown(p.data)}
       </div>
     </div>
 
