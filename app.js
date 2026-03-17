@@ -227,8 +227,11 @@ function getQuestions(market, lang) {
       p?"Não é importante":"Not important",p?"🏠 Varanda ou terraço":"🏠 Balcony / terrace",p?"🌿 Jardim":"🌿 Garden",p?"🌳 Terreno grande":"🌳 Large plot / land"]},
     { id:"features",field:"features",type:"multi",text:p?"✨ Características importantes? Selecione todas.":"✨ Important features? Select all that apply.",options:[
       "🌿 "+(p?"Jardim":"Garden"),"🏊 "+(p?"Piscina":"Pool"),"💻 "+(p?"Escritório":"Home office"),"🏠 "+(p?"Varanda":"Balcony"),"☀️ "+(p?"Terraço":"Terrace"),
-      "🌊 "+(p?"Vista mar":"Sea view"),"🏛️ "+(p?"Traça antiga":"Character / historic"),"🍳 "+(p?"Cozinha moderna":"Modern kitchen"),"🔥 "+(p?"Lareira":"Fireplace"),
-      "📱 "+(p?"Casa inteligente":"Smart home"),"🚗 "+(p?"Garagem":"Garage"),"⚡ "+(p?"Carregamento EV":"EV charging"),"☀️ "+(p?"Solar":"Solar"),"📦 "+(p?"Arrecadação":"Storage")]},
+      "🌊 "+(p?"Vista mar":"Sea view"),"🏔️ "+(p?"Vista campo":"Country view"),"🍳 "+(p?"Cozinha moderna":"Modern kitchen"),"🔥 "+(p?"Lareira":"Fireplace"),
+      "🚗 "+(p?"Garagem":"Garage"),"📦 "+(p?"Arrecadação":"Storage"),"🏛️ "+(p?"Traça antiga":"Character / historic"),
+      "🔋 "+(p?"Eficiência energética":"Energy efficient"),"☀️ "+(p?"Painéis solares":"Solar panels"),"⚡ "+(p?"Carregamento EV":"EV charging"),
+      "♿ "+(p?"Acessível (mobilidade reduzida)":"Wheelchair accessible"),"📱 "+(p?"Casa inteligente":"Smart home"),"🔒 "+(p?"Condomínio fechado":"Gated community"),
+      "🏋️ "+(p?"Perto de ginásio":"Near gym / sports"),"🌳 "+(p?"Terreno grande":"Large land / plot")]},
     { id:"setting",field:"setting",type:"single",text:p?"🏖️ Que tipo de zona prefere?":"🏖️ What area type do you prefer?",options:[
       p?"🏖️ Cidade de praia":"🏖️ Beach town",p?"🏰 Vila histórica":"🏰 Historic town",p?"🏙️ Centro urbano":"🏙️ Urban centre",p?"🌾 Campo e tranquilidade":"🌾 Countryside & quiet",p?"🎲 Flexível":"🎲 Flexible — surprise me"]},
     { id:"concelhos",field:"concelhos",type:"multi",text:p?"📍 Quer focar em concelhos específicos? (opcional — selecione ou avance)":"📍 Want to focus on specific areas? (optional — select or skip)",options:[
