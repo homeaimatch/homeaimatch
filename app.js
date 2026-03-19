@@ -247,8 +247,9 @@ function getQuestions(market, lang) {
       "🏘️ "+(p?"Comunidade local":"Local community feel")]},
     { id:"priorities",field:"priorities",type:"multi",text:p?"⭐ Top 3 prioridades no dia-a-dia?":"⭐ Top 3 daily life priorities?",options:[
       "🚶 "+(p?"Zona caminhável":"Walkable area"),"🏫 "+(p?"Boas escolas":"Great schools"),"🏖️ "+(p?"Perto da praia":"Near the beach"),
-      "🍽️ "+(p?"Restaurantes e cafés":"Restaurants & cafes"),"🏥 "+(p?"Saúde perto":"Healthcare nearby"),"🚌 "+(p?"Transportes públicos":"Public transport"),
-      "🤫 "+(p?"Paz e sossego":"Peace & quiet"),"🌳 "+(p?"Natureza":"Nature & green space")]},
+      "🍽️ "+(p?"Restaurantes e cafés":"Restaurants & cafes"),"🏥 "+(p?"Hospital perto":"Hospital nearby"),"🚌 "+(p?"Transportes públicos":"Public transport"),
+      "🤫 "+(p?"Paz e sossego":"Peace & quiet"),"🌳 "+(p?"Natureza":"Nature & green space"),
+      "🛝 "+(p?"Parques infantis":"Playgrounds nearby")]},
     { id:"pets",field:"pets",type:"single",text:p?"🐾 Animais de estimação?":"🐾 Any pets?",options:[
       p?"🐕 Cão(s)":"🐕 Dog(s)",p?"🐈 Gato(s)":"🐈 Cat(s)",p?"❌ Sem animais":"❌ No pets",p?"🐾 A pensar adotar":"🐾 Planning to get one"]},
     { id:"parking",field:"parking",type:"single",text:p?"🅿️ Estacionamento?":"🅿️ Parking needs?",options:[
