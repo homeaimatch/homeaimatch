@@ -202,6 +202,11 @@ async function loadData() {
   try {
     const resp = await fetch(API + '/api/admin/stats');
     DATA = await resp.json();
+    // Fetch enrichment vibe stats separately (lightweight)
+    try {
+      const enrichResp = await fetch(API + '/api/admin/enrichment-stats');
+      DATA.enrichment = await enrichResp.json();
+    } catch (e) { DATA.enrichment = null; }
     document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
     render();
   } catch (err) {
@@ -345,6 +350,56 @@ function renderPriceBreakdown(properties) {
     }).join('') + '</div>';
 }
 
+function renderVibeBreakdown(enrichment) {
+  if (!enrichment || !enrichment.vibes) return '<div style="color:#6b7b8d;font-size:13px;margin-top:8px">Enrichment data not available. Re-enrich properties to see vibe data.</div>';
+  const vibes = enrichment.vibes;
+  const total = enrichment.total || 1;
+  const vibeLabels = {
+    'family-friendly': '👨‍👩‍👧 Family-friendly',
+    'nightlife': '🍷 Nightlife',
+    'artsy': '🎨 Artsy / Cultural',
+    'quiet': '🤫 Quiet & Peaceful',
+    'nature-lovers': '🌿 Close to Nature',
+    'surf': '🏄 Surf & Laid-back',
+    'local-community': '🏘️ Local Community',
+  };
+  const sorted = Object.entries(vibes).sort((a, b) => b[1] - a[1]);
+  if (sorted.length === 0) return '<div style="color:#6b7b8d;font-size:13px;margin-top:8px">No vibe data computed yet. Re-enrich properties.</div>';
+  return '<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">' +
+    sorted.map(([k, v]) => {
+      const pct = Math.round(v / total * 100);
+      const label = vibeLabels[k] || k;
+      return `<div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <span style="min-width:160px;font-weight:500">${label}</span>
+        <div style="flex:1;height:18px;background:#f0f2f5;border-radius:9px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#8b5cf6,#6d28d9);border-radius:9px;min-width:2px"></div>
+        </div>
+        <span style="min-width:65px;text-align:right;color:#6b7b8d;font-size:12px">${v} (${pct}%)</span>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function renderEnrichmentOverview(enrichment) {
+  if (!enrichment) return '<div style="color:#6b7b8d;font-size:13px;margin-top:8px">Enrichment data not available.</div>';
+  const stats = [
+    { label: 'Total Enriched', value: enrichment.total || 0, icon: '📊' },
+    { label: 'Beach Nearby', value: enrichment.beach_count || 0, icon: '🏖️' },
+    { label: 'Historic Areas', value: enrichment.historic_count || 0, icon: '🏛️' },
+    { label: 'With Playgrounds', value: enrichment.playground_count || 0, icon: '🛝' },
+    { label: 'Hospital <5km', value: enrichment.hospital_count || 0, icon: '🏥' },
+    { label: 'EV Charging <2km', value: enrichment.ev_count || 0, icon: '⚡' },
+    { label: 'Avg Walkability', value: enrichment.avg_walkability ? enrichment.avg_walkability.toFixed(1) + '/10' : '—', icon: '🚶' },
+  ];
+  return '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">' +
+    stats.map(s => 
+      `<div style="text-align:center;background:#f0f2f5;border-radius:12px;padding:10px 14px;min-width:80px;flex:1">
+        <div style="font-size:14px">${s.icon}</div>
+        <div style="font-size:18px;font-weight:700;color:#1a2b3c">${s.value}</div>
+        <div style="font-size:10px;color:#6b7b8d;margin-top:2px">${s.label}</div>
+      </div>`
+    ).join('') + '</div>';
+}
+
 // ── OVERVIEW ──
 function renderOverview() {
   const p = DATA.properties, a = DATA.agents, l = DATA.leads, s = DATA.subscribers, c = DATA.contacts;
@@ -431,6 +486,17 @@ function renderOverview() {
       <div class="card fade-in">
         <h3>💰 Price Distribution</h3>
         ${renderPriceBreakdown(p.data)}
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:0">
+      <div class="card fade-in">
+        <h3>🎭 Neighbourhood Vibes</h3>
+        ${renderVibeBreakdown(DATA.enrichment)}
+      </div>
+      <div class="card fade-in">
+        <h3>📊 Enrichment Overview</h3>
+        ${renderEnrichmentOverview(DATA.enrichment)}
       </div>
     </div>
 
