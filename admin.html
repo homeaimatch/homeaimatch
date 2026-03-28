@@ -215,6 +215,8 @@ async function loadData() {
       DATA.serviceProviders = { count: (provData.providers || []).length, active: (provData.providers || []).filter(p => p.active).length };
     } catch (e) { DATA.serviceProviders = { count: 0, active: 0 }; }
     document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+    // Skip render if provider form is currently open (prevents losing form data)
+    if (currentTab === 'providers' && providerFormOpen) return;
     render();
   } catch (err) {
     document.getElementById('main-content').innerHTML = '<div class="loading">Failed to load data. Check server connection.</div>';
@@ -681,6 +683,7 @@ function renderContacts() {
 // ============================================================
 let adminProviders = [];
 let providerEditId = null; // null = creating new, uuid = editing
+let providerFormOpen = false; // true when add/edit form is visible
 
 const PROVIDER_CATEGORIES = {
   mortgage: { label: '🏦 Mortgage / finance', color: '#1E96D1', group: 'Financial' },
@@ -899,6 +902,7 @@ function renderProvidersList() {
 
 function showProviderForm(provider) {
   providerEditId = provider ? provider.id : null;
+  providerFormOpen = true;
   const p = provider || { name:'', category:'mortgage', description:'', description_pt:'', phone:'', email:'', website:'', logo_url:'', areas_served:['all'], languages:['pt','en'], featured:false, active:true, display_order:0, notes:'' };
   
   const areasHtml = PROVIDER_AREAS.map(a => {
@@ -995,6 +999,7 @@ function showProviderForm(provider) {
 
 function hideProviderForm() {
   providerEditId = null;
+  providerFormOpen = false;
   document.getElementById('provider-form-container').innerHTML = '';
 }
 
@@ -1268,7 +1273,7 @@ function toggleMsg(id) {
   }
 }
 if (sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true') loadData();
-// Auto-refresh every 60 seconds
+// Auto-refresh every 60 seconds — but skip re-render if provider form is open
 setInterval(function(){ if(sessionStorage.getItem(ADMIN_SESSION_KEY)==='true') loadData(); }, 60000);
 </script>
 </body>
