@@ -621,6 +621,252 @@ const MapView = ({ results }) => {
 };
 
 
+/* ════════════════════════════════════════════════════════════════════
+   SERVICE PROVIDERS — "Useful services for your move"
+   Shows contextual local service providers based on quiz answers.
+   ════════════════════════════════════════════════════════════════════ */
+
+const SERVICE_TRIGGERS = {
+  builder:             { field: 'condition', match: v => /renovation|obras|project|total/i.test(v) },
+  architect:           { field: 'condition', match: v => /full|total|renovation project/i.test(v) },
+  electrician:         { field: 'condition', match: v => /renovation|obras|project|total|light/i.test(v) },
+  plumber:             { field: 'condition', match: v => /renovation|obras|project|total|light/i.test(v) },
+  mortgage:            { field: 'mortgage', match: v => /need|precisar|not sure|não sei/i.test(v) },
+  insurance:           { field: 'purpose',  match: v => /primary|principal|holiday|férias|investment|investimento/i.test(v) },
+  legal:               { field: 'intent',   match: v => /ready|pronto|active|procura/i.test(v) },
+  immigration_lawyer:  { field: 'purpose',  match: v => /relocation|mudança|abroad|estrangeiro/i.test(v) },
+  fiscal_rep:          { field: 'purpose',  match: v => /relocation|mudança|abroad|estrangeiro|holiday|férias/i.test(v) },
+  relocation:          { field: 'purpose',  match: v => /relocation|mudança|abroad|estrangeiro/i.test(v) },
+  property_management: { field: 'purpose',  match: v => /investment|investimento|holiday|férias/i.test(v) },
+  cleaning:            { field: 'purpose',  match: v => /holiday|férias/i.test(v) },
+  landscaping:         { field: 'outdoor',  match: v => /garden|jardim|large|terreno/i.test(v) },
+  vet:                 { field: 'pets',     match: v => /dog|cão|cao|cat|gato|planning|adotar/i.test(v) },
+  pool_maintenance:    { field: 'features', match: v => Array.isArray(v) ? v.some(f => /pool|piscina/i.test(f)) : /pool|piscina/i.test(v||'') },
+  surveyor:            { field: 'intent',   match: v => /ready|pronto|active|procura/i.test(v) },
+  ev_charging:         { field: 'parking',  match: v => /ev|carregamento/i.test(v) },
+  solar_installer:     { field: 'features', match: v => Array.isArray(v) ? v.some(f => /solar|painéis|energy|eficiência|eficiencia/i.test(f)) : /solar|energy/i.test(v||'') },
+};
+
+const SERVICE_META = {
+  builder:             { icon: '🔨', en: 'Builders & contractors', pt: 'Construtores', group: 'renovation' },
+  architect:           { icon: '📐', en: 'Architects & designers', pt: 'Arquitetos', group: 'renovation' },
+  electrician:         { icon: '⚡', en: 'Electricians', pt: 'Eletricistas', group: 'renovation' },
+  plumber:             { icon: '🔧', en: 'Plumbers', pt: 'Canalizadores', group: 'renovation' },
+  mortgage:            { icon: '🏦', en: 'Mortgage brokers', pt: 'Crédito habitação', group: 'financial' },
+  insurance:           { icon: '🛡️', en: 'Insurance', pt: 'Seguros', group: 'financial' },
+  legal:               { icon: '⚖️', en: 'Property solicitors', pt: 'Advogados imobiliários', group: 'legal' },
+  immigration_lawyer:  { icon: '🌍', en: 'Immigration lawyers', pt: 'Advogados de imigração', group: 'legal' },
+  fiscal_rep:          { icon: '🧾', en: 'Fiscal representatives', pt: 'Representantes fiscais', group: 'legal' },
+  relocation:          { icon: '🚚', en: 'Relocation services', pt: 'Serviços de mudanças', group: 'legal' },
+  property_management: { icon: '🏡', en: 'Property management', pt: 'Gestão de imóveis', group: 'management' },
+  cleaning:            { icon: '🧹', en: 'Cleaning services', pt: 'Serviços de limpeza', group: 'management' },
+  landscaping:         { icon: '🌿', en: 'Garden & landscaping', pt: 'Jardinagem', group: 'management' },
+  vet:                 { icon: '🏥', en: 'Veterinary clinics', pt: 'Clínicas veterinárias', group: 'lifestyle' },
+  pool_maintenance:    { icon: '🏊', en: 'Pool maintenance', pt: 'Manutenção de piscinas', group: 'lifestyle' },
+  surveyor:            { icon: '🔍', en: 'Property surveyors', pt: 'Peritos avaliadores', group: 'specialist' },
+  ev_charging:         { icon: '🔌', en: 'EV charging installers', pt: 'Instalação de carregamento EV', group: 'specialist' },
+  solar_installer:     { icon: '☀️', en: 'Solar panel installers', pt: 'Instalação de painéis solares', group: 'specialist' },
+};
+
+const GROUP_META = {
+  renovation: { en: 'Renovation & construction', pt: 'Renovação e construção', icon: '🏗️', color: '#D85A30', bg: '#FFF4E5' },
+  financial:  { en: 'Finance & insurance', pt: 'Financiamento e seguros', icon: '💰', color: '#1E96D1', bg: '#E8F4FB' },
+  legal:      { en: 'Legal & relocation', pt: 'Legal e mudança', icon: '⚖️', color: '#7F77DD', bg: '#EEEDFE' },
+  management: { en: 'Property care', pt: 'Cuidado do imóvel', icon: '🏡', color: '#0F6E56', bg: '#E1F5EE' },
+  lifestyle:  { en: 'Lifestyle', pt: 'Estilo de vida', icon: '🐾', color: '#27500A', bg: '#EAF3DE' },
+  specialist: { en: 'Specialist services', pt: 'Serviços especializados', icon: '🔍', color: '#BA7517', bg: '#FAEEDA' },
+};
+
+function getTriggeredCategories(answers) {
+  const triggered = [];
+  Object.entries(SERVICE_TRIGGERS).forEach(([cat, trigger]) => {
+    const val = answers[trigger.field];
+    if (val && trigger.match(val)) {
+      triggered.push(cat);
+    }
+  });
+  return triggered;
+}
+
+const ServiceProviders = ({ answers, lang }) => {
+  const pt = lang === 'pt';
+  const F2 = "'Outfit',sans-serif";
+  const [providers, setProviders] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [expandedGroup, setExpandedGroup] = useState(null);
+
+  const triggered = getTriggeredCategories(answers);
+
+  useEffect(() => {
+    if (triggered.length === 0) { setLoading(false); return; }
+    // Fetch providers for all triggered categories
+    const fetches = triggered.map(cat =>
+      fetch(API_URL + '/api/service-providers?category=' + cat + '&lang=' + lang)
+        .then(r => r.json())
+        .then(d => ({ category: cat, providers: (d.providers || []).slice(0, 3) }))
+        .catch(() => ({ category: cat, providers: [] }))
+    );
+    Promise.all(fetches).then(results => {
+      // Group by service group
+      const grouped = {};
+      results.forEach(({ category, providers: provs }) => {
+        if (provs.length === 0) return;
+        const meta = SERVICE_META[category];
+        const grp = meta?.group || 'other';
+        if (!grouped[grp]) grouped[grp] = { categories: [], providers: [] };
+        grouped[grp].categories.push(category);
+        provs.forEach(p => {
+          if (!grouped[grp].providers.find(ep => ep.id === p.id)) {
+            grouped[grp].providers.push({ ...p, _cat: category });
+          }
+        });
+      });
+      setProviders(grouped);
+      setLoading(false);
+    });
+  }, []);
+
+  if (triggered.length === 0) return null;
+  if (loading) return null;
+  if (!providers || Object.keys(providers).length === 0) {
+    // No providers in DB yet — show the categories that WOULD show, as a teaser
+    const groupedTriggers = {};
+    triggered.forEach(cat => {
+      const grp = SERVICE_META[cat]?.group || 'other';
+      if (!groupedTriggers[grp]) groupedTriggers[grp] = [];
+      groupedTriggers[grp].push(cat);
+    });
+
+    return (
+      <div style={{marginTop:20,animation:"fadeSlide 0.6s ease-out 0.3s both"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+          <div style={{width:32,height:32,borderRadius:10,background:`linear-gradient(135deg,${B.blue},${B.blueD})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🤝</div>
+          <div>
+            <div style={{fontSize:14.5,fontWeight:700,color:B.dark,fontFamily:F2,letterSpacing:"-0.02em"}}>{pt?"Serviços úteis para a sua mudança":"Useful services for your move"}</div>
+            <div style={{fontSize:11.5,color:B.gray,fontFamily:F2}}>{pt?"Profissionais locais recomendados com base nas suas respostas":"Local professionals recommended based on your answers"}</div>
+          </div>
+        </div>
+        <div style={{background:B.white,borderRadius:14,border:`1px solid ${B.border}`,padding:"18px 20px"}}>
+          <div style={{fontSize:12.5,color:B.gray,fontFamily:F2,lineHeight:1.6,marginBottom:14}}>{pt?"Com base no seu perfil, estes serviços poderão ser úteis. Em breve teremos parceiros locais para recomendar:":"Based on your profile, these services may be useful. We'll have local partners to recommend soon:"}</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {Object.entries(groupedTriggers).map(([grp, cats]) => {
+              const gm = GROUP_META[grp] || {};
+              return cats.map(cat => {
+                const sm = SERVICE_META[cat];
+                return <span key={cat} style={{display:"inline-flex",alignItems:"center",gap:5,padding:"6px 12px",borderRadius:20,fontSize:11.5,fontWeight:500,fontFamily:F2,background:gm.bg||B.grayL,color:gm.color||B.gray,border:`1px solid ${gm.color||B.border}22`}}>{sm.icon} {pt?sm.pt:sm.en}</span>;
+              });
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{marginTop:20,animation:"fadeSlide 0.6s ease-out 0.3s both"}}>
+      {/* Section header */}
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+        <div style={{width:32,height:32,borderRadius:10,background:`linear-gradient(135deg,${B.blue},${B.blueD})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>🤝</div>
+        <div>
+          <div style={{fontSize:14.5,fontWeight:700,color:B.dark,fontFamily:F2,letterSpacing:"-0.02em"}}>{pt?"Serviços úteis para a sua mudança":"Useful services for your move"}</div>
+          <div style={{fontSize:11.5,color:B.gray,fontFamily:F2}}>{pt?"Profissionais locais recomendados com base nas suas respostas":"Local professionals recommended based on your answers"}</div>
+        </div>
+      </div>
+
+      {/* Service groups */}
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {Object.entries(providers).map(([grp, data]) => {
+          const gm = GROUP_META[grp] || { en: grp, pt: grp, icon: '📋', color: B.gray, bg: B.grayL };
+          const isOpen = expandedGroup === grp;
+          return (
+            <div key={grp} style={{background:B.white,borderRadius:14,border:`1px solid ${B.border}`,overflow:"hidden",transition:"box-shadow 0.2s",boxShadow:isOpen?`0 4px 16px ${gm.color}12`:"0 1px 3px rgba(0,0,0,0.04)"}}>
+              {/* Group header — clickable */}
+              <div onClick={()=>setExpandedGroup(isOpen?null:grp)} style={{padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",transition:"background 0.15s",background:isOpen?`${gm.bg}`:"transparent"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <div style={{width:34,height:34,borderRadius:10,background:gm.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0,border:`1px solid ${gm.color}20`}}>{gm.icon}</div>
+                  <div>
+                    <div style={{fontSize:13.5,fontWeight:700,color:B.dark,fontFamily:F2}}>{pt?gm.pt:gm.en}</div>
+                    <div style={{fontSize:11,color:B.gray,fontFamily:F2}}>{data.providers.length} {pt?(data.providers.length===1?"parceiro":"parceiros"):(data.providers.length===1?"partner":"partners")}</div>
+                  </div>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  {/* Category pills preview */}
+                  {!isOpen && <div style={{display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end",maxWidth:180}}>
+                    {[...new Set(data.providers.map(p=>p._cat))].slice(0,3).map(cat => {
+                      const sm = SERVICE_META[cat];
+                      return <span key={cat} style={{fontSize:10,padding:"2px 7px",borderRadius:10,background:gm.bg,color:gm.color,fontFamily:F2,fontWeight:500,whiteSpace:"nowrap"}}>{sm?.icon}</span>;
+                    })}
+                  </div>}
+                  <div style={{fontSize:12,color:B.gray,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":"rotate(0deg)"}}>▾</div>
+                </div>
+              </div>
+
+              {/* Expanded provider cards */}
+              {isOpen && (
+                <div style={{padding:"0 18px 16px",display:"flex",flexDirection:"column",gap:10,animation:"fadeSlide 0.3s ease-out"}}>
+                  {data.providers.map(prov => {
+                    const sm = SERVICE_META[prov._cat] || {};
+                    return (
+                      <div key={prov.id} style={{display:"flex",gap:12,padding:"14px 16px",borderRadius:12,background:B.grayL,border:`1px solid ${B.border}`,alignItems:"flex-start",transition:"border-color 0.15s"}}
+                        onMouseOver={e=>e.currentTarget.style.borderColor=gm.color+'44'}
+                        onMouseOut={e=>e.currentTarget.style.borderColor=B.border}>
+                        {/* Provider icon/logo */}
+                        {prov.logo_url ? (
+                          <img src={prov.logo_url} alt="" style={{width:40,height:40,borderRadius:10,objectFit:"cover",flexShrink:0,border:`1px solid ${B.border}`}}/>
+                        ) : (
+                          <div style={{width:40,height:40,borderRadius:10,background:B.white,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0,border:`1px solid ${B.border}`}}>{sm.icon}</div>
+                        )}
+
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+                            <div>
+                              <div style={{fontSize:13.5,fontWeight:700,color:B.dark,fontFamily:F2}}>{prov.name}</div>
+                              <div style={{fontSize:11,color:gm.color,fontFamily:F2,fontWeight:500,marginTop:1}}>{sm.icon} {pt?sm.pt:sm.en}</div>
+                            </div>
+                            {prov.featured && <span style={{fontSize:9,fontWeight:700,color:"#f59e0b",background:"#fff8e1",padding:"2px 7px",borderRadius:8,fontFamily:F2,flexShrink:0,letterSpacing:"0.03em"}}>{pt?"DESTAQUE":"FEATURED"}</span>}
+                          </div>
+
+                          {prov.description && <div style={{fontSize:12,color:B.gray,fontFamily:F2,lineHeight:1.5,marginTop:6}}>{prov.description}</div>}
+
+                          {/* Contact row */}
+                          <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:8}}>
+                            {prov.phone && (
+                              <a href={"tel:"+prov.phone.replace(/ /g,"")} style={{display:"inline-flex",alignItems:"center",gap:4,fontSize:11,color:B.blue,fontFamily:F2,fontWeight:600,textDecoration:"none",padding:"4px 10px",borderRadius:8,background:B.blueL,border:`1px solid ${B.blue}18`}}>📞 {prov.phone}</a>
+                            )}
+                            {prov.email && (
+                              <a href={"mailto:"+prov.email} style={{display:"inline-flex",alignItems:"center",gap:4,fontSize:11,color:B.blue,fontFamily:F2,fontWeight:500,textDecoration:"none",padding:"4px 10px",borderRadius:8,background:B.blueL,border:`1px solid ${B.blue}18`}}>✉ {pt?"Email":"Email"}</a>
+                            )}
+                            {prov.website && (
+                              <a href={prov.website} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:4,fontSize:11,color:B.gray,fontFamily:F2,fontWeight:500,textDecoration:"none",padding:"4px 10px",borderRadius:8,background:B.white,border:`1px solid ${B.border}`}}>🌐 Website ↗</a>
+                            )}
+                          </div>
+
+                          {/* Areas served */}
+                          {prov.areas_served && prov.areas_served.length > 0 && !prov.areas_served.includes('all') && (
+                            <div style={{display:"flex",flexWrap:"wrap",gap:4,marginTop:6}}>
+                              {prov.areas_served.map(a => <span key={a} style={{fontSize:10,color:B.gray,background:B.white,padding:"2px 7px",borderRadius:8,fontFamily:F2,border:`1px solid ${B.border}`}}>📍 {a}</span>)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Transparency footer */}
+      <div style={{textAlign:"center",padding:"10px 0 0",fontSize:10,color:"#c0cad6",fontFamily:F2}}>
+        {pt?"Parceiros verificados · homeaimatch.com":"Verified partners · homeaimatch.com"}
+      </div>
+    </div>
+  );
+};
+
+
 const ContactModal=({agent,house,answers,lang:cLang,onClose})=>{
   const pt=cLang==="pt";
   const[cn,setCn]=useState("");
@@ -1060,6 +1306,10 @@ function HomeAIMatch() {
             {viewMode==="map"?<MapView results={results}/>:viewMode==="compare"?<CompTable results={results}/>:(
               <>{results.map((m,i)=><Card key={m.house.id} match={m} rank={i} expanded={expandedCard===m.house.id} onToggle={()=>setExpandedCard(expandedCard===m.house.id?null:m.house.id)} saved={!!saved[m.house.id]} onSave={id=>setSaved(p=>({...p,[id]:!p[id]}))} onContact={h=>setContactHouse(h)} lang={lang}/>)}</>
             )}
+
+            {/* Service Providers — contextual recommendations based on quiz answers */}
+            <ServiceProviders answers={answers} lang={lang}/>
+
             <div style={{textAlign:"center",padding:"18px 0 10px",fontSize:11.5,color:"#b0bec5",lineHeight:1.6}}>
               {T.matched}<br/>
               <span style={{fontSize:10.5,opacity:0.7}}>homeaimatch.com</span>

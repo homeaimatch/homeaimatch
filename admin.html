@@ -114,6 +114,7 @@
       <div class="nav-item" onclick="switchTab('leads')"><span class="icon">📬</span><span class="nav-label">Leads</span></div>
       <div class="nav-item" onclick="switchTab('contacts')"><span class="icon">✉️</span><span class="nav-label">Messages</span></div>
       <div class="nav-item" onclick="switchTab('claims')"><span class="icon">🔗</span><span class="nav-label">Claims</span></div>
+      <div class="nav-item" onclick="switchTab('providers')"><span class="icon">🤝</span><span class="nav-label">Providers</span></div>
       <div class="nav-item" onclick="switchTab('map')"><span class="icon">🗺️</span><span class="nav-label">Property Map</span></div>
     </div>
     <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.08)">
@@ -207,6 +208,12 @@ async function loadData() {
       const enrichResp = await fetch(API + '/api/admin/enrichment-stats');
       DATA.enrichment = await enrichResp.json();
     } catch (e) { DATA.enrichment = null; }
+    // Fetch service providers count
+    try {
+      const provResp = await fetch(API + '/api/admin/service-providers');
+      const provData = await provResp.json();
+      DATA.serviceProviders = { count: (provData.providers || []).length, active: (provData.providers || []).filter(p => p.active).length };
+    } catch (e) { DATA.serviceProviders = { count: 0, active: 0 }; }
     document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
     render();
   } catch (err) {
@@ -217,10 +224,10 @@ async function loadData() {
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.nav-item').forEach((n, i) => {
-    const tabs = ['overview','properties','agents','leads','contacts','claims','map'];
+    const tabs = ['overview','properties','agents','leads','contacts','claims','providers','map'];
     n.classList.toggle('active', tabs[i] === tab);
   });
-  const titles = {overview:'Overview',properties:'Properties',agents:'Agents',leads:'Leads',contacts:'Contact Messages',claims:'Listing Claims',map:'Property Map'};
+  const titles = {overview:'Overview',properties:'Properties',agents:'Agents',leads:'Leads',contacts:'Contact Messages',claims:'Listing Claims',providers:'Service Providers',map:'Property Map'};
   document.getElementById('page-title').textContent = titles[tab] || tab;
   render();
 }
@@ -235,6 +242,7 @@ function render() {
     case 'leads': el.innerHTML = renderLeads(); break;
     case 'contacts': el.innerHTML = renderContacts(); break;
     case 'claims': el.innerHTML = renderClaims(); loadClaims(); break;
+    case 'providers': el.innerHTML = renderProviders(); loadProviders(); break;
     case 'map': el.innerHTML = renderMap(); setTimeout(initMap, 100); break;
   }
 }
@@ -431,6 +439,11 @@ function renderOverview() {
         <div class="label">Contact Messages</div>
         <div class="value">${c.count}</div>
         <div class="sub">${unreadMsgs} unread</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Service Providers</div>
+        <div class="value">${(DATA.serviceProviders||{}).count||0}</div>
+        <div class="sub">${(DATA.serviceProviders||{}).active||0} active</div>
       </div>
     </div>
 
@@ -664,7 +677,417 @@ function renderContacts() {
 
 // ── MAP ──
 // ============================================================
-// CLAIMS MANAGEMENT
+// SERVICE PROVIDERS MANAGEMENT
+// ============================================================
+let adminProviders = [];
+let providerEditId = null; // null = creating new, uuid = editing
+
+const PROVIDER_CATEGORIES = {
+  mortgage: { label: '🏦 Mortgage / finance', color: '#1E96D1', group: 'Financial' },
+  insurance: { label: '🛡️ Insurance', color: '#2E8B57', group: 'Financial' },
+  legal: { label: '⚖️ Property solicitor / lawyer', color: '#8b5cf6', group: 'Legal & relocation' },
+  immigration_lawyer: { label: '🌍 Immigration lawyer', color: '#7F77DD', group: 'Legal & relocation' },
+  fiscal_rep: { label: '🧾 Fiscal representative', color: '#534AB7', group: 'Legal & relocation' },
+  relocation: { label: '🚚 Relocation services', color: '#D85A30', group: 'Legal & relocation' },
+  surveyor: { label: '🔍 Property surveyor', color: '#f59e0b', group: 'Specialist' },
+  builder: { label: '🔨 Builder / contractor', color: '#993C1D', group: 'Renovation' },
+  architect: { label: '📐 Architect / designer', color: '#ec4899', group: 'Renovation' },
+  electrician: { label: '⚡ Electrician', color: '#BA7517', group: 'Renovation' },
+  plumber: { label: '🔧 Plumber', color: '#639922', group: 'Renovation' },
+  property_management: { label: '🏡 Property management', color: '#0F6E56', group: 'Management' },
+  cleaning: { label: '🧹 Cleaning services', color: '#1D9E75', group: 'Management' },
+  landscaping: { label: '🌿 Garden / landscaping', color: '#5DCAA5', group: 'Management' },
+  vet: { label: '🏥 Veterinary', color: '#27500A', group: 'Lifestyle' },
+  pool_maintenance: { label: '🏊 Pool maintenance', color: '#185FA5', group: 'Lifestyle' },
+  ev_charging: { label: '⚡ EV charging installer', color: '#854F0B', group: 'Specialist' },
+  solar_installer: { label: '☀️ Solar panel installer', color: '#D97E15', group: 'Specialist' },
+};
+
+const PROVIDER_AREAS = ['all', 'Lourinhã', 'Torres Vedras', 'Caldas da Rainha', 'Peniche', 'Óbidos', 'Bombarral', 'Nazaré', 'Alcobaça', 'Cadaval', 'Mafra'];
+
+async function loadProviders() {
+  try {
+    const res = await fetch(API + '/api/admin/service-providers');
+    if (!res.ok) throw new Error('Failed to load providers');
+    const data = await res.json();
+    adminProviders = data.providers || [];
+    document.getElementById('providers-container').innerHTML = renderProvidersList();
+  } catch(e) {
+    console.error('Load providers error:', e);
+    document.getElementById('providers-container').innerHTML = `
+      <div class="card">
+        <p style="color:var(--gray);font-size:13px">⚠️ Could not load service providers. Make sure the <code>service_providers</code> table exists in Supabase and the API endpoints are deployed.</p>
+        <div style="margin-top:12px;padding:16px;background:var(--gray-l);border-radius:10px;font-size:12px;line-height:1.8;color:var(--gray)">
+          <strong style="color:var(--dark)">Supabase SQL to create the table:</strong><br>
+          <code style="display:block;margin-top:8px;padding:12px;background:#1a2b3c;color:#e0e0e0;border-radius:8px;font-size:11px;white-space:pre-wrap;overflow-x:auto">CREATE TABLE service_providers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN (
+    'mortgage','insurance','legal','immigration_lawyer','fiscal_rep',
+    'surveyor','builder','architect','electrician','plumber',
+    'property_management','cleaning','landscaping','relocation',
+    'vet','pool_maintenance','ev_charging','solar_installer'
+  )),
+  description TEXT DEFAULT '',
+  description_pt TEXT DEFAULT '',
+  phone TEXT DEFAULT '',
+  email TEXT DEFAULT '',
+  website TEXT DEFAULT '',
+  logo_url TEXT DEFAULT '',
+  areas_served TEXT[] DEFAULT '{all}',
+  languages TEXT[] DEFAULT '{pt,en}',
+  featured BOOLEAN DEFAULT false,
+  active BOOLEAN DEFAULT true,
+  display_order INTEGER DEFAULT 0,
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Enable RLS but allow public read of active providers
+ALTER TABLE service_providers ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read active providers" ON service_providers FOR SELECT USING (active = true);
+CREATE POLICY "Service key full access" ON service_providers FOR ALL USING (true) WITH CHECK (true);</code>
+        </div>
+      </div>`;
+  }
+}
+
+function renderProviders() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>
+        <div style="font-size:13px;color:var(--gray)">Manage local service providers shown to buyers (mortgage brokers, solicitors, etc.)</div>
+      </div>
+      <button onclick="showProviderForm()" style="background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer">+ Add Provider</button>
+    </div>
+    <div id="provider-form-container"></div>
+    <div id="providers-container"><div class="loading">Loading service providers...</div></div>
+  `;
+}
+
+function renderProvidersList() {
+  if (!adminProviders || adminProviders.length === 0) {
+    return `<div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:36px;margin-bottom:8px">🤝</div>
+      <div style="font-size:16px;font-weight:700;color:var(--dark);margin-bottom:4px">No Service Providers Yet</div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:16px">Add mortgage brokers, solicitors, builders, and other local service providers to recommend to buyers.</div>
+      <button onclick="showProviderForm()" style="background:var(--blue);color:#fff;border:none;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer">+ Add First Provider</button>
+    </div>`;
+  }
+
+  // Group by category group (Financial, Legal, Renovation, etc.)
+  const byGroup = {};
+  adminProviders.forEach(p => {
+    const catInfo = PROVIDER_CATEGORIES[p.category] || { label: p.category, color: '#6b7d8e', group: 'Other' };
+    const grp = catInfo.group || 'Other';
+    if (!byGroup[grp]) byGroup[grp] = [];
+    byGroup[grp].push({ ...p, _catInfo: catInfo });
+  });
+
+  // Summary stats
+  const activeCount = adminProviders.filter(p => p.active).length;
+  const featuredCount = adminProviders.filter(p => p.featured).length;
+  const catCount = new Set(adminProviders.map(p => p.category)).size;
+
+  let html = `
+    <div class="stats-grid fade-in" style="margin-bottom:16px">
+      <div class="stat-card">
+        <div class="label">Total Providers</div>
+        <div class="value">${adminProviders.length}</div>
+        <div class="sub">${activeCount} active</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Featured</div>
+        <div class="value">${featuredCount}</div>
+        <div class="sub">Shown prominently</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Categories Used</div>
+        <div class="value">${catCount}</div>
+        <div class="sub">of ${Object.keys(PROVIDER_CATEGORIES).length} available</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Groups</div>
+        <div class="value">${Object.keys(byGroup).length}</div>
+        <div class="sub">${Object.keys(byGroup).join(', ')}</div>
+      </div>
+    </div>
+  `;
+
+  // Group colors for border accent
+  const groupColors = { 'Financial': '#1E96D1', 'Legal & relocation': '#8b5cf6', 'Renovation': '#993C1D', 'Management': '#0F6E56', 'Lifestyle': '#27500A', 'Specialist': '#f59e0b', 'Other': '#6b7d8e' };
+  const groupIcons = { 'Financial': '💰', 'Legal & relocation': '⚖️', 'Renovation': '🔨', 'Management': '🏡', 'Lifestyle': '🐾', 'Specialist': '🔍', 'Other': '📋' };
+
+  // Render each group
+  Object.entries(byGroup).forEach(([groupName, providers]) => {
+    const gColor = groupColors[groupName] || '#6b7d8e';
+    const gIcon = groupIcons[groupName] || '📋';
+    html += `
+      <div class="card fade-in" style="border-left:4px solid ${gColor}">
+        <h3>${gIcon} ${groupName} (${providers.length})</h3>
+        <div class="table-wrap"><table>
+          <thead><tr>
+            <th>Provider</th>
+            <th>Category</th>
+            <th>Contact</th>
+            <th>Areas</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody>
+          ${providers.map(p => {
+            const ci = p._catInfo;
+            return `<tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                ${p.logo_url ? `<img src="${p.logo_url}" alt="" style="width:28px;height:28px;border-radius:6px;object-fit:cover"/>` : `<div style="width:28px;height:28px;border-radius:6px;background:${ci.color}20;display:flex;align-items:center;justify-content:center;font-size:14px">${ci.label.split(' ')[0]}</div>`}
+                <div>
+                  <strong>${p.name}</strong>
+                  <div style="font-size:10px;color:var(--gray);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.description || '—'}</div>
+                </div>
+              </div>
+            </td>
+            <td><span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:${ci.color}18;color:${ci.color}">${ci.label}</span></td>
+            <td style="font-size:11px">
+              ${p.email ? `<a href="mailto:${p.email}" style="color:var(--blue)">${p.email}</a><br/>` : ''}
+              ${p.phone ? `<span style="color:var(--gray)">${p.phone}</span><br/>` : ''}
+              ${p.website ? `<a href="${p.website}" target="_blank" style="color:var(--blue);font-size:10px">website ↗</a>` : ''}
+            </td>
+            <td style="font-size:11px;color:var(--gray)">${(p.areas_served || []).join(', ')}</td>
+            <td>
+              <span class="badge" style="background:${p.active?'var(--green-l)':'var(--red-l)'};color:${p.active?'var(--green)':'var(--red)'};cursor:pointer" onclick="toggleProvider('${p.id}','active')">${p.active ? '● Active' : '○ Inactive'}</span>
+            </td>
+            <td>
+              <span class="badge" style="background:${p.featured?'#fff8e1':'var(--gray-l)'};color:${p.featured?'#f59e0b':'var(--gray)'};cursor:pointer" onclick="toggleProvider('${p.id}','featured')">${p.featured ? '★ Featured' : '☆ Standard'}</span>
+            </td>
+            <td>
+              <button onclick="editProvider('${p.id}')" style="background:var(--blue-l);color:var(--blue);border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;margin-right:4px">Edit</button>
+              <button onclick="deleteProvider('${p.id}','${p.name.replace(/'/g, "\\'")}')" style="background:var(--red-l);color:var(--red);border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif">Delete</button>
+            </td>
+          </tr>`}).join('')}
+          </tbody>
+        </table></div>
+      </div>
+    `;
+  });
+
+  // Trigger reference card
+  html += `
+    <div class="card fade-in" style="border:1.5px dashed var(--border)">
+      <h3>📋 Quiz trigger reference</h3>
+      <div style="font-size:12px;color:var(--gray);line-height:1.7;margin-bottom:10px">Which buyer quiz answers trigger each service category in the results page:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px">
+        <div><strong style="color:var(--dark)">condition</strong> = "Full renovation" →<br/>builder, architect, electrician, plumber</div>
+        <div><strong style="color:var(--dark)">condition</strong> = "Light renovation" →<br/>builder, electrician, plumber</div>
+        <div><strong style="color:var(--dark)">mortgage</strong> = "Will need" / "Not sure" →<br/>mortgage broker</div>
+        <div><strong style="color:var(--dark)">intent</strong> = "Ready to buy" / "Active" →<br/>solicitor, surveyor</div>
+        <div><strong style="color:var(--dark)">purpose</strong> = "Relocation" →<br/>immigration lawyer, fiscal rep, relocation</div>
+        <div><strong style="color:var(--dark)">purpose</strong> = "Holiday home" →<br/>property management, cleaning, fiscal rep</div>
+        <div><strong style="color:var(--dark)">purpose</strong> = "Investment" →<br/>property management, insurance</div>
+        <div><strong style="color:var(--dark)">pets</strong> = "Dog(s)" / "Cat(s)" →<br/>vet</div>
+        <div><strong style="color:var(--dark)">outdoor</strong> = "Garden" / "Large plot" →<br/>landscaping</div>
+        <div><strong style="color:var(--dark)">features</strong> = "Pool" → pool maintenance</div>
+        <div><strong style="color:var(--dark)">parking</strong> = "EV charging" → EV installer</div>
+        <div><strong style="color:var(--dark)">features</strong> = "Solar" / "Energy eff." → solar installer</div>
+      </div>
+    </div>
+  `;
+
+  return html;
+}
+
+function showProviderForm(provider) {
+  providerEditId = provider ? provider.id : null;
+  const p = provider || { name:'', category:'mortgage', description:'', description_pt:'', phone:'', email:'', website:'', logo_url:'', areas_served:['all'], languages:['pt','en'], featured:false, active:true, display_order:0, notes:'' };
+  
+  const areasHtml = PROVIDER_AREAS.map(a => {
+    const checked = (p.areas_served || []).includes(a) ? 'checked' : '';
+    return `<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;margin-right:10px;margin-bottom:4px"><input type="checkbox" class="prov-area-cb" value="${a}" ${checked} style="accent-color:var(--blue)"/> ${a === 'all' ? '🌍 All Areas' : a}</label>`;
+  }).join('');
+
+  const catOptionsHtml = Object.entries(PROVIDER_CATEGORIES).map(([k,v]) => 
+    `<option value="${k}" ${p.category===k?'selected':''}>${v.label}</option>`
+  ).join('');
+
+  document.getElementById('provider-form-container').innerHTML = `
+    <div class="card fade-in" style="border:2px solid var(--blue);margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="margin:0">${providerEditId ? '✏️ Edit Provider' : '➕ Add New Provider'}</h3>
+        <button onclick="hideProviderForm()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Name *</label>
+          <input id="prov-name" value="${p.name}" placeholder="e.g. Crédito Agrícola" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Category *</label>
+          <select id="prov-category" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box;background:#fff">
+            ${catOptionsHtml}
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Description (EN)</label>
+          <input id="prov-desc" value="${p.description || ''}" placeholder="Brief description in English" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Description (PT)</label>
+          <input id="prov-desc-pt" value="${p.description_pt || ''}" placeholder="Descrição breve em Português" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Email</label>
+          <input id="prov-email" value="${p.email || ''}" placeholder="contact@example.com" type="email" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Phone</label>
+          <input id="prov-phone" value="${p.phone || ''}" placeholder="+351 912 345 678" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Website</label>
+          <input id="prov-website" value="${p.website || ''}" placeholder="https://..." style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Logo URL</label>
+          <input id="prov-logo" value="${p.logo_url || ''}" placeholder="https://...logo.png" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Display Order (lower = first)</label>
+          <input id="prov-order" value="${p.display_order || 0}" type="number" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:4px">Admin Notes (internal only)</label>
+          <input id="prov-notes" value="${p.notes || ''}" placeholder="Internal notes" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Outfit',sans-serif;outline:none;box-sizing:border-box"/>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label style="font-size:11px;font-weight:600;color:var(--gray);display:block;margin-bottom:6px">Areas Served</label>
+        <div style="display:flex;flex-wrap:wrap;gap:2px">${areasHtml}</div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-top:14px">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;cursor:pointer">
+          <input type="checkbox" id="prov-active" ${p.active !== false ? 'checked' : ''} style="accent-color:var(--green)"/> Active
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;cursor:pointer">
+          <input type="checkbox" id="prov-featured" ${p.featured ? 'checked' : ''} style="accent-color:#f59e0b"/> Featured
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;cursor:pointer">
+          <input type="checkbox" class="prov-lang-cb" value="pt" ${(p.languages||[]).includes('pt')?'checked':''} style="accent-color:var(--blue)"/> 🇵🇹 PT
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;cursor:pointer">
+          <input type="checkbox" class="prov-lang-cb" value="en" ${(p.languages||[]).includes('en')?'checked':''} style="accent-color:var(--blue)"/> 🇬🇧 EN
+        </label>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button onclick="saveProvider()" style="background:linear-gradient(135deg,var(--blue),var(--blue-d));color:#fff;border:none;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer">${providerEditId ? '💾 Update Provider' : '➕ Create Provider'}</button>
+        <button onclick="hideProviderForm()" style="background:var(--gray-l);color:var(--gray);border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  // Scroll to form
+  document.getElementById('provider-form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideProviderForm() {
+  providerEditId = null;
+  document.getElementById('provider-form-container').innerHTML = '';
+}
+
+function getProviderFormData() {
+  return {
+    name: document.getElementById('prov-name').value.trim(),
+    category: document.getElementById('prov-category').value,
+    description: document.getElementById('prov-desc').value.trim(),
+    description_pt: document.getElementById('prov-desc-pt').value.trim(),
+    email: document.getElementById('prov-email').value.trim(),
+    phone: document.getElementById('prov-phone').value.trim(),
+    website: document.getElementById('prov-website').value.trim(),
+    logo_url: document.getElementById('prov-logo').value.trim(),
+    display_order: parseInt(document.getElementById('prov-order').value) || 0,
+    notes: document.getElementById('prov-notes').value.trim(),
+    active: document.getElementById('prov-active').checked,
+    featured: document.getElementById('prov-featured').checked,
+    areas_served: [...document.querySelectorAll('.prov-area-cb:checked')].map(cb => cb.value),
+    languages: [...document.querySelectorAll('.prov-lang-cb:checked')].map(cb => cb.value),
+  };
+}
+
+async function saveProvider() {
+  const data = getProviderFormData();
+  if (!data.name) { alert('Provider name is required'); return; }
+  if (data.areas_served.length === 0) data.areas_served = ['all'];
+  if (data.languages.length === 0) data.languages = ['pt', 'en'];
+
+  try {
+    const url = providerEditId 
+      ? API + '/api/admin/service-providers/' + providerEditId
+      : API + '/api/admin/service-providers';
+    const method = providerEditId ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert('Error: ' + (err.error || 'Unknown error'));
+      return;
+    }
+
+    hideProviderForm();
+    loadProviders();
+  } catch (e) {
+    alert('Failed to save: ' + e.message);
+  }
+}
+
+function editProvider(id) {
+  const p = adminProviders.find(x => x.id === id);
+  if (!p) return;
+  showProviderForm(p);
+}
+
+async function toggleProvider(id, field) {
+  try {
+    const res = await fetch(API + '/api/admin/service-providers/' + id + '/toggle', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ field }),
+    });
+    if (res.ok) {
+      loadProviders();
+    } else {
+      const err = await res.json();
+      alert('Error: ' + (err.error || 'Unknown'));
+    }
+  } catch (e) {
+    alert('Failed: ' + e.message);
+  }
+}
+
+async function deleteProvider(id, name) {
+  if (!confirm('Delete service provider "' + name + '"? This cannot be undone.')) return;
+  try {
+    const res = await fetch(API + '/api/admin/service-providers/' + id, { method: 'DELETE' });
+    if (res.ok) {
+      loadProviders();
+    } else {
+      alert('Failed to delete');
+    }
+  } catch(e) {
+    alert('Delete failed: ' + e.message);
+  }
+}
+
+// ============================================================
+// MAP
 // ============================================================
 let adminClaims = [];
 
