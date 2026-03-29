@@ -160,6 +160,297 @@ const API_URL = 'https://homeaimatch-backend-production.up.railway.app';
 // ============================================================
 // STATE
 // ============================================================
+let lang = localStorage.getItem('agent_lang') || 'en';
+
+// ============================================================
+// i18n — All UI strings in EN and PT
+// ============================================================
+const i18n = {
+  // Auth screens
+  agentLogin: { en: 'Agent Login', pt: 'Acesso de Agente' },
+  signInSubtitle: { en: 'Sign in to your homeAImatch agent dashboard', pt: 'Aceda ao seu painel de agente homeAImatch' },
+  email: { en: 'Email', pt: 'Email' },
+  password: { en: 'Password', pt: 'Palavra-passe' },
+  forgotPw: { en: 'Forgot password?', pt: 'Esqueceu a palavra-passe?' },
+  signIn: { en: 'Sign In', pt: 'Entrar' },
+  noAccount: { en: "Don't have an account?", pt: 'Ainda não tem conta?' },
+  registerHere: { en: 'Register here', pt: 'Registe-se aqui' },
+  createAccount: { en: 'Create Agent Account', pt: 'Criar Conta de Agente' },
+  createAccountSub: { en: 'Join homeAImatch and connect with AI-matched buyers looking for properties like yours.', pt: 'Junte-se ao homeAImatch e conecte-se com compradores encontrados por IA à procura de imóveis como os seus.' },
+  fullName: { en: 'Full Name *', pt: 'Nome Completo *' },
+  phone: { en: 'Phone', pt: 'Telefone' },
+  agencyName: { en: 'Agency Name', pt: 'Nome da Agência' },
+  passwordMin: { en: 'At least 8 characters', pt: 'Mínimo 8 caracteres' },
+  agreeTerms: { en: 'I agree to the', pt: 'Concordo com os' },
+  termsOfService: { en: 'Terms of Service', pt: 'Termos de Serviço' },
+  privacyPolicy: { en: 'Privacy Policy', pt: 'Política de Privacidade' },
+  confirmAuth: { en: 'I confirm that I am authorised to list properties on behalf of my agency.', pt: 'Confirmo que estou autorizado a listar imóveis em nome da minha agência.' },
+  createAccountBtn: { en: 'Create Account', pt: 'Criar Conta' },
+  alreadyAccount: { en: 'Already have an account?', pt: 'Já tem conta?' },
+  signInLink: { en: 'Sign in', pt: 'Entrar' },
+  resetPassword: { en: 'Reset Password', pt: 'Repor Palavra-passe' },
+  resetPwSub: { en: "Enter your email and we'll send you a link to reset your password.", pt: 'Introduza o seu email e enviaremos um link para repor a sua palavra-passe.' },
+  sendResetLink: { en: 'Send Reset Link', pt: 'Enviar Link' },
+  backToLogin: { en: '← Back to login', pt: '← Voltar ao login' },
+  setNewPw: { en: 'Set New Password', pt: 'Definir Nova Palavra-passe' },
+  setNewPwSub: { en: 'Choose a new password for your account.', pt: 'Escolha uma nova palavra-passe para a sua conta.' },
+  newPassword: { en: 'New Password', pt: 'Nova Palavra-passe' },
+  confirmPassword: { en: 'Confirm Password', pt: 'Confirmar Palavra-passe' },
+  setNewPwBtn: { en: 'Set New Password', pt: 'Definir Palavra-passe' },
+
+  // Sidebar & navigation
+  overview: { en: 'Overview', pt: 'Resumo' },
+  leads: { en: 'Leads', pt: 'Contactos' },
+  myListings: { en: 'My Listings', pt: 'Os Meus Imóveis' },
+  claimListings: { en: 'Claim Listings', pt: 'Reivindicar Imóveis' },
+  addProperty: { en: 'Add Property', pt: 'Adicionar Imóvel' },
+  notifications: { en: 'Notifications', pt: 'Notificações' },
+  profile: { en: 'Profile', pt: 'Perfil' },
+  signOut: { en: 'Sign out', pt: 'Sair' },
+
+  // Tab titles
+  dashboard: { en: 'Dashboard', pt: 'Painel' },
+
+  // Overview
+  newLeads: { en: 'New Leads', pt: 'Novos Contactos' },
+  awaitingResponse: { en: 'Awaiting your response', pt: 'Aguardam a sua resposta' },
+  totalLeads: { en: 'Total Leads', pt: 'Total de Contactos' },
+  allTime: { en: 'All time', pt: 'Desde sempre' },
+  propertyViews: { en: 'Property Views', pt: 'Visualizações' },
+  last30Days: { en: 'Last 30 days', pt: 'Últimos 30 dias' },
+  pendingClaims: { en: 'pending claims', pt: 'reivindicações pendentes' },
+  recentLeads: { en: 'Recent Leads', pt: 'Contactos Recentes' },
+  noLeadsYet: { en: 'No leads yet', pt: 'Sem contactos ainda' },
+  leadsWillAppear: { en: 'Leads will appear here when buyers enquire about your properties.', pt: 'Os contactos aparecerão aqui quando compradores perguntarem sobre os seus imóveis.' },
+  quickActions: { en: 'Quick Actions', pt: 'Ações Rápidas' },
+  addNewListing: { en: 'Add New Listing', pt: 'Adicionar Novo Imóvel' },
+  claimExisting: { en: 'Claim Existing Listings', pt: 'Reivindicar Imóveis Existentes' },
+  viewAllLeads: { en: 'View All Leads', pt: 'Ver Todos os Contactos' },
+  tip: { en: 'Tip', pt: 'Dica' },
+  tipText: { en: 'Properties with complete details (images, description, neighbourhood info) get matched to more buyers.', pt: 'Imóveis com detalhes completos (imagens, descrição, informação da zona) são correspondidos com mais compradores.' },
+  refresh: { en: '↻ Refresh', pt: '↻ Atualizar' },
+  loading: { en: 'Loading...', pt: 'A carregar...' },
+
+  // Leads tab
+  buyer: { en: 'Buyer', pt: 'Comprador' },
+  property: { en: 'Property', pt: 'Imóvel' },
+  message: { en: 'Message', pt: 'Mensagem' },
+  buyerProfile: { en: 'Buyer Profile', pt: 'Perfil do Comprador' },
+  status: { en: 'Status', pt: 'Estado' },
+  date: { en: 'Date', pt: 'Data' },
+  actions: { en: 'Actions', pt: 'Ações' },
+  noProfileData: { en: 'No profile data', pt: 'Sem perfil' },
+  viewFullProfile: { en: 'View full profile ▾', pt: 'Ver perfil completo ▾' },
+  statusNew: { en: 'New', pt: 'Novo' },
+  statusContacted: { en: 'Contacted', pt: 'Contactado' },
+  statusViewing: { en: 'Viewing Booked', pt: 'Visita Marcada' },
+  statusClosed: { en: 'Closed', pt: 'Fechado' },
+
+  // Buyer intent
+  hotBuyer: { en: '🔥 Hot Buyer', pt: '🔥 Comprador Quente' },
+  activeLooking: { en: '🔍 Actively Looking', pt: '🔍 À Procura Ativa' },
+  browsing: { en: '👀 Browsing', pt: '👀 A Explorar' },
+  highIntent: { en: 'High purchase intent', pt: 'Alta intenção de compra' },
+  moderateIntent: { en: 'Moderate intent', pt: 'Intenção moderada' },
+  earlyStage: { en: 'Early stage', pt: 'Fase inicial' },
+  mortgagePreApproved: { en: 'Mortgage pre-approved', pt: 'Crédito pré-aprovado' },
+  cashBuyer: { en: 'Cash buyer', pt: 'Compra a pronto' },
+  readyNow: { en: 'Ready now', pt: 'Pronto agora' },
+  activelySearching: { en: 'Actively searching', pt: 'Em busca ativa' },
+
+  // Buyer profile labels
+  budget: { en: 'Budget', pt: 'Orçamento' },
+  household: { en: 'Household', pt: 'Agregado' },
+  setting: { en: 'Setting', pt: 'Zona' },
+  work: { en: 'Work', pt: 'Trabalho' },
+  commuteTo: { en: 'Commute to', pt: 'Deslocação para' },
+  maxCommute: { en: 'Max commute', pt: 'Deslocação máx.' },
+  condition: { en: 'Condition', pt: 'Estado' },
+  pets: { en: 'Pets', pt: 'Animais' },
+  dreamStyle: { en: 'Dream style', pt: 'Estilo de sonho' },
+  neighbourhood: { en: 'Neighbourhood', pt: 'Bairro' },
+  topPriorities: { en: 'Top priorities', pt: 'Prioridades' },
+  parking: { en: 'Parking', pt: 'Estacionamento' },
+  location: { en: 'Location', pt: 'Localização' },
+  radius: { en: 'Radius', pt: 'Raio' },
+  purpose: { en: 'Purpose', pt: 'Objetivo' },
+  mortgage: { en: 'Mortgage', pt: 'Crédito' },
+  readiness: { en: 'Readiness', pt: 'Disponibilidade' },
+  timeline: { en: 'Timeline', pt: 'Prazo' },
+
+  // Listings
+  listings: { en: 'listing', pt: 'imóvel' },
+  listingsPlural: { en: 'listings', pt: 'imóveis' },
+  noListingsYet: { en: 'No listings yet', pt: 'Sem imóveis ainda' },
+  noListingsDesc: { en: 'Add your first property or claim existing listings on the platform.', pt: 'Adicione o seu primeiro imóvel ou reivindique imóveis existentes na plataforma.' },
+  edit: { en: '✏️ Edit', pt: '✏️ Editar' },
+  saveChanges: { en: '💾 Save Changes', pt: '💾 Guardar Alterações' },
+  cancel: { en: 'Cancel', pt: 'Cancelar' },
+
+  // Claims
+  claimYourListings: { en: 'Claim Your Listings', pt: 'Reivindique os Seus Imóveis' },
+  claimDesc: { en: 'Search for your listings by property title, location, agent name, or agency name. Claimed listings will show your contact details when buyers enquire.', pt: 'Pesquise os seus imóveis por título, localização, nome do agente ou agência. Os imóveis reivindicados mostrarão os seus contactos quando compradores perguntarem.' },
+  searchPlaceholder: { en: 'Search by property, city, agent name, or agency...', pt: 'Pesquisar por imóvel, cidade, agente ou agência...' },
+  search: { en: 'Search', pt: 'Pesquisar' },
+  unclaimedProps: { en: 'Unclaimed Properties', pt: 'Imóveis Não Reivindicados' },
+  claim: { en: 'Claim', pt: 'Reivindicar' },
+  details: { en: 'Details ▾', pt: 'Detalhes ▾' },
+  myClaims: { en: 'My Claims', pt: 'As Minhas Reivindicações' },
+  claimed: { en: 'Claimed', pt: 'Reivindicado' },
+  cancelClaim: { en: 'Cancel', pt: 'Cancelar' },
+  remove: { en: 'Remove', pt: 'Remover' },
+  city: { en: 'City', pt: 'Cidade' },
+  region: { en: 'Region', pt: 'Região' },
+  type: { en: 'Type', pt: 'Tipo' },
+  size: { en: 'Size', pt: 'Área' },
+  agency: { en: 'Agency', pt: 'Agência' },
+  agent: { en: 'Agent', pt: 'Agente' },
+  viewOriginal: { en: '🔗 View original listing', pt: '🔗 Ver anúncio original' },
+
+  // Add Property
+  basicDetails: { en: '1. Basic Details', pt: '1. Dados Básicos' },
+  titleField: { en: 'Title *', pt: 'Título *' },
+  titlePlaceholder: { en: 'e.g. 3-Bed Terrace in Ballintemple, Cork', pt: 'ex. Moradia T3 em Lourinhã' },
+  titleFormat: { en: 'Format: [Type] in [Area], [City]', pt: 'Formato: [Tipo] em [Zona], [Cidade]' },
+  tagline: { en: 'Tagline', pt: 'Subtítulo' },
+  price: { en: 'Price *', pt: 'Preço *' },
+  currency: { en: 'Currency', pt: 'Moeda' },
+  beds: { en: 'Beds', pt: 'Quartos' },
+  baths: { en: 'Baths', pt: 'WCs' },
+  sizeSqm: { en: 'Size (m²)', pt: 'Área (m²)' },
+  propType: { en: 'Type', pt: 'Tipo' },
+  style: { en: 'Style', pt: 'Estilo' },
+  listingStatus: { en: 'Listing Status', pt: 'Estado do Anúncio' },
+  locationSection: { en: '2. Location', pt: '2. Localização' },
+  address: { en: 'Address', pt: 'Morada' },
+  county: { en: 'County', pt: 'Distrito' },
+  postcode: { en: 'Postcode / Eircode', pt: 'Código Postal' },
+  country: { en: 'Country', pt: 'País' },
+  latitude: { en: 'Latitude', pt: 'Latitude' },
+  longitude: { en: 'Longitude', pt: 'Longitude' },
+  coordsTip: { en: "📍 Right-click Google Maps → \"What's here?\" → copy coordinates", pt: '📍 Clique direito no Google Maps → "O que há aqui?" → copie as coordenadas' },
+  descSection: { en: '3. Description', pt: '3. Descrição' },
+  descPlaceholder: { en: 'Write or paste the property description. If Portuguese, translate to English — the AI uses this for scoring.', pt: 'Escreva ou cole a descrição do imóvel. Se estiver em inglês, traduza para português — a IA usa isto para avaliação.' },
+  imageSection: { en: '4. Images', pt: '4. Imagens' },
+  addImage: { en: '+ Add Image', pt: '+ Adicionar Imagem' },
+  neighbourhoodSection: { en: '5. Neighbourhood', pt: '5. Vizinhança' },
+  walkability: { en: 'Walkability', pt: 'Caminhabilidade' },
+  schoolsQuality: { en: 'Schools Quality', pt: 'Qualidade das Escolas' },
+  epcRating: { en: 'EPC Rating', pt: 'Certificado Energético' },
+  commuteCenter: { en: 'Commute to centre (min)', pt: 'Deslocação ao centro (min)' },
+  petFriendly: { en: 'Pet-Friendly?', pt: 'Aceita Animais?' },
+  dogPark: { en: 'Dog park nearby?', pt: 'Parque canino perto?' },
+  neighVibe: { en: 'Neighbourhood Vibe', pt: 'Ambiente do Bairro' },
+  featuresSection: { en: 'Features & Amenities', pt: 'Características e Comodidades' },
+  features: { en: 'Features', pt: 'Características' },
+  groceries: { en: 'Groceries (km)', pt: 'Supermercado (km)' },
+  gym: { en: 'Gym (km)', pt: 'Ginásio (km)' },
+  park: { en: 'Park (km)', pt: 'Parque (km)' },
+  hospital: { en: 'Hospital (km)', pt: 'Hospital (km)' },
+  listingSource: { en: 'Listing Source', pt: 'Fonte do Anúncio' },
+  originalUrl: { en: 'Original Listing URL', pt: 'URL do Anúncio Original' },
+  listingConsent: { en: 'I confirm that I am <strong>authorised to list this property</strong> on homeAImatch and that the information provided is accurate.', pt: 'Confirmo que estou <strong>autorizado a listar este imóvel</strong> no homeAImatch e que a informação fornecida é precisa.' },
+  addPropertyBtn: { en: '✓ Add Property', pt: '✓ Adicionar Imóvel' },
+  addAndNew: { en: '✓ Add & Start New', pt: '✓ Adicionar e Criar Outro' },
+  corkDefaults: { en: '🇮🇪 Cork defaults', pt: '🇮🇪 Padrões Cork' },
+  portugalDefaults: { en: '🇵🇹 Portugal defaults', pt: '🇵🇹 Padrões Portugal' },
+  clear: { en: '✕ Clear', pt: '✕ Limpar' },
+
+  // Notifications
+  unread: { en: 'unread', pt: 'não lidas' },
+  markAllRead: { en: 'Mark all as read', pt: 'Marcar tudo como lido' },
+  allCaughtUp: { en: 'All caught up!', pt: 'Tudo em dia!' },
+  noNotifications: { en: 'No notifications yet.', pt: 'Sem notificações ainda.' },
+
+  // Profile
+  yourProfile: { en: 'Your Profile', pt: 'O Seu Perfil' },
+  name: { en: 'Name', pt: 'Nome' },
+  bio: { en: 'Bio', pt: 'Sobre Mim' },
+  bioPlaceholder: { en: 'Tell buyers about yourself...', pt: 'Fale sobre si aos compradores...' },
+  areasServed: { en: 'Areas Served (comma-separated)', pt: 'Áreas de Atuação (separadas por vírgula)' },
+  licenseNumber: { en: 'License Number', pt: 'Número de Licença' },
+  changePassword: { en: 'Change Password', pt: 'Alterar Palavra-passe' },
+  currentPassword: { en: 'Current Password', pt: 'Palavra-passe Atual' },
+  repeatNewPw: { en: 'Repeat new password', pt: 'Repetir nova palavra-passe' },
+  changePwBtn: { en: 'Change Password', pt: 'Alterar Palavra-passe' },
+
+  // Toasts / messages
+  welcomeBack: { en: 'Welcome back, ', pt: 'Bem-vindo de volta, ' },
+  accountCreated: { en: 'Account created! Welcome to homeAImatch.', pt: 'Conta criada! Bem-vindo ao homeAImatch.' },
+  listingClaimed: { en: 'Listing claimed!', pt: 'Imóvel reivindicado!' },
+  leadUpdated: { en: 'Lead updated', pt: 'Contacto atualizado' },
+  profileUpdated: { en: 'Profile updated', pt: 'Perfil atualizado' },
+  propertyAdded: { en: 'Property added!', pt: 'Imóvel adicionado!' },
+  propertyUpdated: { en: 'Property updated!', pt: 'Imóvel atualizado!' },
+  propertyDeleted: { en: 'Property deleted', pt: 'Imóvel eliminado' },
+  passwordChanged: { en: 'Password changed successfully', pt: 'Palavra-passe alterada com sucesso' },
+  templateApplied: { en: 'Template applied!', pt: 'Modelo aplicado!' },
+  allRead: { en: 'All marked as read', pt: 'Todas marcadas como lidas' },
+  claimCancelled: { en: 'Claim cancelled', pt: 'Reivindicação cancelada' },
+  titlePriceCity: { en: 'Title, Price, and City are required', pt: 'Título, Preço e Cidade são obrigatórios' },
+  confirmDelete: { en: 'Delete', pt: 'Eliminar' },
+  confirmDeleteMsg: { en: 'This cannot be undone.', pt: 'Esta ação não pode ser desfeita.' },
+  confirmCancelClaim: { en: 'Cancel this claim? This action cannot be undone.', pt: 'Cancelar esta reivindicação? Esta ação não pode ser desfeita.' },
+  pwNoMatch: { en: 'Passwords do not match', pt: 'As palavras-passe não coincidem' },
+  pwTooShort: { en: 'Password must be at least 8 characters', pt: 'A palavra-passe deve ter pelo menos 8 caracteres' },
+  newPwNoMatch: { en: 'New passwords do not match', pt: 'As novas palavras-passe não coincidem' },
+  resetSent: { en: 'If that email exists, a reset link has been sent. Check your inbox.', pt: 'Se esse email existir, foi enviado um link de reposição. Verifique a sua caixa de entrada.' },
+  pwUpdated: { en: 'Password updated! You can now sign in.', pt: 'Palavra-passe atualizada! Já pode entrar.' },
+  sessionExpired: { en: 'Session expired', pt: 'Sessão expirada' },
+  listingAuth: { en: 'Please confirm you are authorised to list this property', pt: 'Por favor confirme que está autorizado a listar este imóvel' },
+
+  // Property types (for dropdowns - keep English values but translate labels)
+  typeTerraced: { en: 'Terraced', pt: 'Banda' },
+  typeSemiDetached: { en: 'Semi-Detached', pt: 'Geminada' },
+  typeDetached: { en: 'Detached', pt: 'Moradia' },
+  typeFlat: { en: 'Flat/Apartment', pt: 'Apartamento' },
+  typeCottage: { en: 'Cottage', pt: 'Casa de Campo' },
+  typeTownhouse: { en: 'Townhouse', pt: 'Casa em Banda' },
+  typeVilla: { en: 'Villa', pt: 'Vivenda' },
+  typeFarmhouse: { en: 'Farmhouse', pt: 'Quinta' },
+  typeBungalow: { en: 'Bungalow', pt: 'Bungalow' },
+
+  // Styles
+  styleTraditional: { en: 'Traditional', pt: 'Tradicional' },
+  styleModern: { en: 'Modern', pt: 'Moderno' },
+  styleVictorian: { en: 'Victorian', pt: 'Vitoriano' },
+  styleGeorgian: { en: 'Georgian', pt: 'Georgiano' },
+  styleCottage: { en: 'Cottage', pt: 'Rústico' },
+  styleMediterranean: { en: 'Mediterranean', pt: 'Mediterrâneo' },
+  styleArtDeco: { en: 'Art Deco', pt: 'Art Deco' },
+
+  // Conditions
+  condMoveIn: { en: 'Move-in Ready', pt: 'Pronto a Habitar' },
+  condLightReno: { en: 'Light Renovation', pt: 'Obras Ligeiras' },
+  condMajorReno: { en: 'Major Renovation', pt: 'Renovação Total' },
+  condNewBuild: { en: 'New Build', pt: 'Construção Nova' },
+
+  // Listing status
+  statusActive: { en: 'Active', pt: 'Ativo' },
+  statusSaleAgreed: { en: 'Sale Agreed', pt: 'Venda Acordada' },
+  statusSold: { en: 'Sold', pt: 'Vendido' },
+
+  // Yes/No
+  yes: { en: 'Yes', pt: 'Sim' },
+  no: { en: 'No', pt: 'Não' },
+
+  // Walkability labels
+  walk0: { en: 'Car essential', pt: 'Carro essencial' },
+  walk1: { en: 'Very car-dependent', pt: 'Muito dependente de carro' },
+  walk2: { en: 'Car-dependent', pt: 'Dependente de carro' },
+  walk3: { en: 'A few local shops', pt: 'Algumas lojas locais' },
+  walk4: { en: 'Some basics nearby', pt: 'Alguns básicos perto' },
+  walk5: { en: 'Some shops nearby', pt: 'Algumas lojas perto' },
+  walk6: { en: 'Reasonably walkable', pt: 'Razoavelmente caminhável' },
+  walk7: { en: 'Very walkable', pt: 'Muito caminhável' },
+  walk8: { en: 'Most things on foot', pt: 'Quase tudo a pé' },
+  walk9: { en: 'Highly walkable', pt: 'Altamente caminhável' },
+  walk10: { en: 'Everything walkable', pt: 'Tudo a pé' },
+};
+
+function t(key) { return (i18n[key] && i18n[key][lang]) || (i18n[key] && i18n[key].en) || key; }
+function setLang(l) { lang = l; localStorage.setItem('agent_lang', l); render(); }
+
 let state = {
   screen: 'login', // login, register, forgot-password, reset-password, dashboard
   tab: 'overview', // overview, leads, listings, claims, add-property, notifications, profile
@@ -236,7 +527,7 @@ async function handleLogin(e) {
     saveSession(data.agent, data.token);
     loadDashboard();
     render();
-    showToast('Welcome back, ' + data.agent.name + '!', 'success');
+    showToast(t('welcomeBack') + data.agent.name + '!', 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -254,7 +545,7 @@ async function handleRegister(e) {
     saveSession(data.agent, data.token);
     loadDashboard();
     render();
-    showToast('Account created! Welcome to homeAImatch.', 'success');
+    showToast(t('accountCreated'), 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -291,7 +582,7 @@ async function loadUnclaimed(search = '') {
 async function claimListing(propertyId) {
   try {
     await apiFetch('/api/agents/claims', 'POST', { property_id: propertyId });
-    showToast('Listing claimed!', 'success');
+    showToast(t('listingClaimed'), 'success');
     loadDashboard();
     loadUnclaimed();
   } catch (err) {
@@ -300,7 +591,7 @@ async function claimListing(propertyId) {
 }
 
 async function cancelClaim(claimId) {
-  if (!confirm('Cancel this claim? This action cannot be undone.')) return;
+  if (!confirm(t('confirmCancelClaim'))) return;
   try {
     // Try the API endpoint first
     const res = await fetch(API_URL + '/api/agents/claims/' + claimId, {
@@ -308,7 +599,7 @@ async function cancelClaim(claimId) {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.token }
     });
     if (res.ok) {
-      showToast('Claim cancelled', 'success');
+      showToast(t('claimCancelled'), 'success');
       loadDashboard();
       renderContent();
       return;
@@ -320,21 +611,21 @@ async function cancelClaim(claimId) {
       body: JSON.stringify({ status: 'cancelled' })
     });
     if (res2.ok) {
-      showToast('Claim cancelled', 'success');
+      showToast(t('claimCancelled'), 'success');
       loadDashboard();
       renderContent();
       return;
     }
-    showToast('This endpoint is not deployed yet. Please contact admin to cancel the claim, or cancel it directly in Supabase (listing_claims table → delete the row).', 'error');
+    showToast(lang==='pt'?'Este endpoint ainda não está implementado. Contacte o admin para cancelar a reivindicação.':'This endpoint is not deployed yet. Please contact admin to cancel the claim, or cancel it directly in Supabase (listing_claims table → delete the row).', 'error');
   } catch (err) {
-    showToast('Endpoint not available. Contact admin or cancel via Supabase directly.', 'error');
+    showToast(lang==='pt'?'Endpoint não disponível. Contacte o admin.':'Endpoint not available. Contact admin or cancel via Supabase directly.', 'error');
   }
 }
 
 async function updateLeadStatus(leadId, status) {
   try {
     await apiFetch(`/api/agents/leads/${leadId}`, 'PUT', { status });
-    showToast('Lead updated', 'success');
+    showToast(t('leadUpdated'), 'success');
     loadDashboard();
   } catch (err) {
     showToast(err.message, 'error');
@@ -356,6 +647,13 @@ function showToast(msg, type) {
 // ============================================================
 function timeAgo(date) {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
+  if (lang === 'pt') {
+    if (s < 60) return 'agora mesmo';
+    if (s < 3600) return Math.floor(s / 60) + 'min atrás';
+    if (s < 86400) return Math.floor(s / 3600) + 'h atrás';
+    if (s < 604800) return Math.floor(s / 86400) + 'd atrás';
+    return new Date(date).toLocaleDateString('pt-PT');
+  }
   if (s < 60) return 'just now';
   if (s < 3600) return Math.floor(s / 60) + 'm ago';
   if (s < 86400) return Math.floor(s / 3600) + 'h ago';
@@ -395,17 +693,18 @@ function renderLogin() {
     <div class="auth-card fade-in">
       <div style="text-align:center;margin-bottom:24px">
         <div style="font-size:32px;margin-bottom:8px">🏠</div>
-        <h1>Agent Login</h1>
-        <p class="subtitle">Sign in to your homeAImatch agent dashboard</p>
+        <div style="display:flex;gap:2px;background:rgba(0,0,0,0.06);border-radius:8px;padding:2px;justify-content:center;margin:0 auto 16px;width:fit-content"><button onclick="setLang('en');document.getElementById('app').innerHTML=renderLogin()" style="font-size:11px;padding:4px 12px;border-radius:6px;border:none;background:${lang==='en'?'var(--dark)':'transparent'};color:${lang==='en'?'#fff':'var(--gray)'};font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">EN</button><button onclick="setLang('pt');document.getElementById('app').innerHTML=renderLogin()" style="font-size:11px;padding:4px 12px;border-radius:6px;border:none;background:${lang==='pt'?'var(--dark)':'transparent'};color:${lang==='pt'?'#fff':'var(--gray)'};font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">PT</button></div>
+        <h1>${t('agentLogin')}</h1>
+        <p class="subtitle">${t('signInSubtitle')}</p>
       </div>
       <form onsubmit="handleLogin(event)">
-        <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="agent@agency.ie" required/></div>
-        <div class="form-group"><label>Password</label><input id="login-password" type="password" placeholder="••••••••" required/></div>
-        <div style="text-align:right;margin-top:-4px;margin-bottom:8px"><a href="#" onclick="state.screen='forgot-password';render();return false;" style="font-size:12px;color:var(--blue);text-decoration:none">Forgot password?</a></div>
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Sign In</button>
+        <div class="form-group"><label>${t('email')}</label><input id="login-email" type="email" placeholder="agent@agency.pt" required/></div>
+        <div class="form-group"><label>${t('password')}</label><input id="login-password" type="password" placeholder="••••••••" required/></div>
+        <div style="text-align:right;margin-top:-4px;margin-bottom:8px"><a href="#" onclick="state.screen='forgot-password';render();return false;" style="font-size:12px;color:var(--blue);text-decoration:none">${t('forgotPw')}</a></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">${t('signIn')}</button>
       </form>
       <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
-        Don't have an account? <a href="#" onclick="state.screen='register';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">Register here</a>
+        ${t('noAccount')} <a href="#" onclick="state.screen='register';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">${t('registerHere')}</a>
       </div>
     </div>
   </div>`;
@@ -416,25 +715,26 @@ function renderRegister() {
     <div class="auth-card fade-in">
       <div style="text-align:center;margin-bottom:24px">
         <div style="font-size:32px;margin-bottom:8px">🏠</div>
-        <h1>Create Agent Account</h1>
-        <p class="subtitle">Join homeAImatch and connect with AI-matched buyers looking for properties like yours.</p>
+        <div style="display:flex;gap:2px;background:rgba(0,0,0,0.06);border-radius:8px;padding:2px;justify-content:center;margin:0 auto 16px;width:fit-content"><button onclick="setLang('en');document.getElementById('app').innerHTML=renderRegister()" style="font-size:11px;padding:4px 12px;border-radius:6px;border:none;background:${lang==='en'?'var(--dark)':'transparent'};color:${lang==='en'?'#fff':'var(--gray)'};font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">EN</button><button onclick="setLang('pt');document.getElementById('app').innerHTML=renderRegister()" style="font-size:11px;padding:4px 12px;border-radius:6px;border:none;background:${lang==='pt'?'var(--dark)':'transparent'};color:${lang==='pt'?'#fff':'var(--gray)'};font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">PT</button></div>
+        <h1>${t('createAccount')}</h1>
+        <p class="subtitle">${t('createAccountSub')}</p>
       </div>
       <form onsubmit="handleRegister(event)">
         <div class="form-row">
-          <div class="form-group"><label>Full Name *</label><input id="reg-name" placeholder="Sarah O'Brien" required/></div>
-          <div class="form-group"><label>Phone</label><input id="reg-phone" placeholder="+353 21 123 4567"/></div>
+          <div class="form-group"><label>${t('fullName')}</label><input id="reg-name" placeholder="${lang==='pt'?'Maria Silva':'Sarah O\'Brien'}" required/></div>
+          <div class="form-group"><label>${t('phone')}</label><input id="reg-phone" placeholder="${lang==='pt'?'+351 912 345 678':'+353 21 123 4567'}"/></div>
         </div>
-        <div class="form-group"><label>Agency Name</label><input id="reg-agency" placeholder="e.g. Sherry FitzGerald"/></div>
-        <div class="form-group"><label>Email *</label><input id="reg-email" type="email" placeholder="sarah@sherryfitz.ie" required/></div>
-        <div class="form-group"><label>Password *</label><input id="reg-password" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
+        <div class="form-group"><label>${t('agencyName')}</label><input id="reg-agency" placeholder="${lang==='pt'?'ex. RE/MAX':'e.g. Sherry FitzGerald'}"/></div>
+        <div class="form-group"><label>${t('email')} *</label><input id="reg-email" type="email" placeholder="${lang==='pt'?'maria@agencia.pt':'sarah@sherryfitz.ie'}" required/></div>
+        <div class="form-group"><label>${t('password')} *</label><input id="reg-password" type="password" placeholder="${t('passwordMin')}" minlength="8" required/></div>
         <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:12px;color:var(--gray);line-height:1.5;margin-top:8px">
           <input type="checkbox" id="reg-consent" required style="margin-top:2px;flex-shrink:0;accent-color:var(--blue)"/>
-          <span>I agree to the <a href="legal.html#tos" target="_blank" style="color:var(--blue)">Terms of Service</a> and <a href="legal.html#privacy" target="_blank" style="color:var(--blue)">Privacy Policy</a>. I confirm that I am authorised to list properties on behalf of my agency.</span>
+          <span>${t('agreeTerms')} <a href="legal.html#tos" target="_blank" style="color:var(--blue)">${t('termsOfService')}</a> ${lang==='pt'?'e':'and'} <a href="legal.html#privacy" target="_blank" style="color:var(--blue)">${t('privacyPolicy')}</a>. ${t('confirmAuth')}</span>
         </label>
-        <button type="submit" class="btn btn-orange" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Create Account</button>
+        <button type="submit" class="btn btn-orange" style="width:100%;padding:13px;font-size:14px;margin-top:8px">${t('createAccountBtn')}</button>
       </form>
       <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
-        Already have an account? <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">Sign in</a>
+        ${t('alreadyAccount')} <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">${t('signInLink')}</a>
       </div>
     </div>
   </div>`;
@@ -445,15 +745,15 @@ function renderForgotPassword() {
     <div class="auth-card fade-in">
       <div style="text-align:center;margin-bottom:24px">
         <div style="font-size:32px;margin-bottom:8px">🔑</div>
-        <h1>Reset Password</h1>
-        <p class="subtitle">Enter your email and we'll send you a link to reset your password.</p>
+        <h1>${t('resetPassword')}</h1>
+        <p class="subtitle">${t('resetPwSub')}</p>
       </div>
       <form onsubmit="handleForgotPassword(event)">
-        <div class="form-group"><label>Email</label><input id="forgot-email" type="email" placeholder="agent@agency.pt" required/></div>
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Send Reset Link</button>
+        <div class="form-group"><label>${t('email')}</label><input id="forgot-email" type="email" placeholder="agent@agency.pt" required/></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">${t('sendResetLink')}</button>
       </form>
       <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
-        <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">← Back to login</a>
+        <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">${t('backToLogin')}</a>
       </div>
     </div>
   </div>`;
@@ -464,16 +764,16 @@ function renderResetPassword() {
     <div class="auth-card fade-in">
       <div style="text-align:center;margin-bottom:24px">
         <div style="font-size:32px;margin-bottom:8px">🔒</div>
-        <h1>Set New Password</h1>
-        <p class="subtitle">Choose a new password for your account.</p>
+        <h1>${t('setNewPw')}</h1>
+        <p class="subtitle">${t('setNewPwSub')}</p>
       </div>
       <form onsubmit="handleResetPassword(event)">
-        <div class="form-group"><label>New Password</label><input id="reset-password" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
-        <div class="form-group"><label>Confirm Password</label><input id="reset-password-confirm" type="password" placeholder="Repeat password" minlength="8" required/></div>
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">Set New Password</button>
+        <div class="form-group"><label>${t('newPassword')}</label><input id="reset-password" type="password" placeholder="${t('passwordMin')}" minlength="8" required/></div>
+        <div class="form-group"><label>${t('confirmPassword')}</label><input id="reset-password-confirm" type="password" placeholder="${lang==='pt'?'Repetir palavra-passe':'Repeat password'}" minlength="8" required/></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-top:8px">${t('setNewPwBtn')}</button>
       </form>
       <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray)">
-        <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">← Back to login</a>
+        <a href="#" onclick="state.screen='login';render();return false;" style="color:var(--blue);font-weight:600;text-decoration:none">${t('backToLogin')}</a>
       </div>
     </div>
   </div>`;
@@ -484,10 +784,9 @@ async function handleForgotPassword(e) {
   const email = document.getElementById('forgot-email').value;
   try {
     await apiFetch('/api/agents/forgot-password', 'POST', { email });
-    showToast('If that email exists, a reset link has been sent. Check your inbox.', 'success');
+    showToast(t('resetSent'), 'success');
   } catch (err) {
-    // Always show success message to prevent email enumeration
-    showToast('If that email exists, a reset link has been sent. Check your inbox.', 'success');
+    showToast(t('resetSent'), 'success');
   }
 }
 
@@ -495,20 +794,19 @@ async function handleResetPassword(e) {
   e.preventDefault();
   const pw = document.getElementById('reset-password').value;
   const pw2 = document.getElementById('reset-password-confirm').value;
-  if (pw !== pw2) { showToast('Passwords do not match', 'error'); return; }
-  if (pw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
-  // Get token from URL hash
+  if (pw !== pw2) { showToast(t('pwNoMatch'), 'error'); return; }
+  if (pw.length < 8) { showToast(t('pwTooShort'), 'error'); return; }
   const params = new URLSearchParams(window.location.hash.replace('#', '?'));
   const token = params.get('reset_token') || params.get('token');
-  if (!token) { showToast('Invalid or expired reset link', 'error'); return; }
+  if (!token) { showToast(lang==='pt'?'Link inválido ou expirado':'Invalid or expired reset link', 'error'); return; }
   try {
     await apiFetch('/api/agents/reset-password', 'POST', { token, new_password: pw });
-    showToast('Password updated! You can now sign in.', 'success');
+    showToast(t('pwUpdated'), 'success');
     window.location.hash = '';
     state.screen = 'login';
     render();
   } catch (err) {
-    showToast(err.message || 'Invalid or expired reset link', 'error');
+    showToast(err.message || (lang==='pt'?'Link inválido ou expirado':'Invalid or expired reset link'), 'error');
   }
 }
 
@@ -516,16 +814,16 @@ async function handleChangePassword() {
   const curr = document.getElementById('pw-current').value;
   const newPw = document.getElementById('pw-new').value;
   const confirm = document.getElementById('pw-confirm').value;
-  if (newPw !== confirm) { showToast('New passwords do not match', 'error'); return; }
-  if (newPw.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+  if (newPw !== confirm) { showToast(t('newPwNoMatch'), 'error'); return; }
+  if (newPw.length < 8) { showToast(t('pwTooShort'), 'error'); return; }
   try {
     await apiFetch('/api/agents/change-password', 'POST', { current_password: curr, new_password: newPw });
-    showToast('Password changed successfully', 'success');
+    showToast(t('passwordChanged'), 'success');
     document.getElementById('pw-current').value = '';
     document.getElementById('pw-new').value = '';
     document.getElementById('pw-confirm').value = '';
   } catch (err) {
-    showToast(err.message || 'Failed to change password', 'error');
+    showToast(err.message || (lang==='pt'?'Falha ao alterar palavra-passe':'Failed to change password'), 'error');
   }
 }
 
@@ -545,18 +843,18 @@ function renderDashboard() {
         <span>🏠 homeAImatch</span>
       </div>
       <div class="sidebar-nav">
-        ${navItem('overview', '📊', 'Overview')}
-        ${navItem('leads', '📩', 'Leads', stats.new_leads)}
-        ${navItem('listings', '🏘️', 'My Listings')}
-        ${navItem('claims', '🔗', 'Claim Listings')}
-        ${navItem('add-property', '➕', 'Add Property')}
-        ${navItem('notifications', '🔔', 'Notifications', unread)}
-        ${navItem('profile', '👤', 'Profile')}
+        ${navItem('overview', '📊', t('overview'))}
+        ${navItem('leads', '📩', t('leads'), stats.new_leads)}
+        ${navItem('listings', '🏘️', t('myListings'))}
+        ${navItem('claims', '🔗', t('claimListings'))}
+        ${navItem('add-property', '➕', t('addProperty'))}
+        ${navItem('notifications', '🔔', t('notifications'), unread)}
+        ${navItem('profile', '👤', t('profile'))}
       </div>
       <div class="sidebar-footer">
         <div class="agent-name">${agent.name || ''}</div>
         <div class="agent-agency">${agent.agencies?.name || agent.agency || ''}</div>
-        <button class="btn btn-ghost" style="margin-top:8px;color:rgba(255,255,255,0.4);font-size:12px;padding:4px 0" onclick="logout()">Sign out</button>
+        <button class="btn btn-ghost" style="margin-top:8px;color:rgba(255,255,255,0.4);font-size:12px;padding:4px 0" onclick="logout()">${t('signOut')}</button>
       </div>
     </div>
 
@@ -564,10 +862,11 @@ function renderDashboard() {
     <div class="main">
       <div class="topbar">
         <h2 style="font-size:18px;font-weight:700;flex:1">${tabTitle()}</h2>
-        ${state.tab === 'overview' ? `<button class="btn btn-primary btn-sm" onclick="loadDashboard()">↻ Refresh</button>` : ''}
+        <div style="display:flex;gap:2px;background:#f0f2f5;border-radius:8px;padding:2px;margin-right:8px"><button onclick="setLang('en')" style="font-size:11px;padding:4px 10px;border-radius:6px;border:none;background:${lang==='en'?'var(--dark)':'transparent'};color:${lang==='en'?'#fff':'var(--gray)'};font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">EN</button><button onclick="setLang('pt')" style="font-size:11px;padding:4px 10px;border-radius:6px;border:none;background:${lang==='pt'?'var(--dark)':'transparent'};color:${lang==='pt'?'#fff':'var(--gray)'};font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">PT</button></div>
+        ${state.tab === 'overview' ? `<button class="btn btn-primary btn-sm" onclick="loadDashboard()">${t('refresh')}</button>` : ''}
       </div>
       <div class="content fade-in">
-        ${state.loading ? '<div style="text-align:center;padding:60px;color:var(--gray)"><div style="font-size:32px;margin-bottom:12px">⏳</div>Loading...</div>' : renderTab()}
+        ${state.loading ? `<div style="text-align:center;padding:60px;color:var(--gray)"><div style="font-size:32px;margin-bottom:12px">⏳</div>${t('loading')}</div>` : renderTab()}
       </div>
     </div>
   </div>`;
@@ -582,8 +881,8 @@ function navItem(tab, icon, label, badge = 0) {
 }
 
 function tabTitle() {
-  const titles = { overview: 'Dashboard', leads: 'Leads', listings: 'My Listings', claims: 'Claim Listings', 'add-property': 'Add Property', notifications: 'Notifications', profile: 'Profile' };
-  return titles[state.tab] || 'Dashboard';
+  const titles = { overview: t('dashboard'), leads: t('leads'), listings: t('myListings'), claims: t('claimListings'), 'add-property': t('addProperty'), notifications: t('notifications'), profile: t('profile') };
+  return titles[state.tab] || t('dashboard');
 }
 
 function renderTab() {
@@ -610,31 +909,31 @@ function renderOverview() {
   return `
     <div class="stats-grid">
       <div class="stat-card highlight">
-        <div class="label">New Leads</div>
+        <div class="label">${t('newLeads')}</div>
         <div class="value">${stats.new_leads || 0}</div>
-        <div class="sub">Awaiting your response</div>
+        <div class="sub">${t('awaitingResponse')}</div>
       </div>
       <div class="stat-card">
-        <div class="label">Total Leads</div>
+        <div class="label">${t('totalLeads')}</div>
         <div class="value">${stats.total_leads || 0}</div>
-        <div class="sub">All time</div>
+        <div class="sub">${t('allTime')}</div>
       </div>
       <div class="stat-card">
-        <div class="label">My Listings</div>
+        <div class="label">${t('myListings')}</div>
         <div class="value">${stats.total_listings || 0}</div>
-        <div class="sub">${stats.pending_claims || 0} pending claims</div>
+        <div class="sub">${stats.pending_claims || 0} ${t('pendingClaims')}</div>
       </div>
       <div class="stat-card">
-        <div class="label">Property Views</div>
+        <div class="label">${t('propertyViews')}</div>
         <div class="value">${stats.total_views || 0}</div>
-        <div class="sub">Last 30 days</div>
+        <div class="sub">${t('last30Days')}</div>
       </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div class="card">
-        <h3>Recent Leads</h3>
-        ${leads.length === 0 ? '<div class="empty"><div class="icon">📭</div><div class="title">No leads yet</div><div class="desc">Leads will appear here when buyers enquire about your properties.</div></div>' :
+        <h3>${t('recentLeads')}</h3>
+        ${leads.length === 0 ? `<div class="empty"><div class="icon">📭</div><div class="title">${t('noLeadsYet')}</div><div class="desc">${t('leadsWillAppear')}</div></div>` :
           leads.map(l => `<div class="prop-mini" style="cursor:pointer" onclick="switchTab('leads')">
             <div class="info">
               <div class="title">${l.buyer_name || 'Anonymous'}</div>
@@ -644,14 +943,14 @@ function renderOverview() {
           </div>`).join('')}
       </div>
       <div class="card">
-        <h3>Quick Actions</h3>
+        <h3>${t('quickActions')}</h3>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn btn-primary" onclick="switchTab('add-property')" style="justify-content:center">➕ Add New Listing</button>
-          <button class="btn btn-outline" onclick="switchTab('claims')" style="justify-content:center">🔗 Claim Existing Listings</button>
-          <button class="btn btn-outline" onclick="switchTab('leads')" style="justify-content:center">📩 View All Leads</button>
+          <button class="btn btn-primary" onclick="switchTab('add-property')" style="justify-content:center">➕ ${t('addNewListing')}</button>
+          <button class="btn btn-outline" onclick="switchTab('claims')" style="justify-content:center">🔗 ${t('claimExisting')}</button>
+          <button class="btn btn-outline" onclick="switchTab('leads')" style="justify-content:center">📩 ${t('viewAllLeads')}</button>
         </div>
         <div style="margin-top:18px;padding:14px;background:var(--blue-l);border-radius:10px;font-size:12px;line-height:1.5;color:var(--blue)">
-          <strong>💡 Tip:</strong> Properties with complete details (images, description, neighbourhood info) get matched to more buyers.
+          <strong>💡 ${t('tip')}:</strong> ${t('tipText')}
         </div>
       </div>
     </div>
@@ -663,31 +962,31 @@ function renderOverview() {
 // ============================================================
 function renderLeads() {
   const leads = state.dashboard?.leads || [];
-  if (leads.length === 0) return '<div class="empty" style="padding:60px"><div class="icon">📭</div><div class="title">No leads yet</div><div class="desc">When buyers enquire about your properties through homeAImatch, their details will appear here.</div></div>';
+  if (leads.length === 0) return `<div class="empty" style="padding:60px"><div class="icon">📭</div><div class="title">${t('noLeadsYet')}</div><div class="desc">${lang==='pt'?'Quando compradores perguntarem sobre os seus imóveis através do homeAImatch, os detalhes aparecerão aqui.':'When buyers enquire about your properties through homeAImatch, their details will appear here.'}</div></div>`;
 
   return `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>Buyer</th><th>Property</th><th>Message</th><th>Buyer Profile</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+    <thead><tr><th>${t('buyer')}</th><th>${t('property')}</th><th>${t('message')}</th><th>${t('buyerProfile')}</th><th>${t('status')}</th><th>${t('date')}</th><th>${t('actions')}</th></tr></thead>
     <tbody>
     ${leads.map(l => {
       const bp = l.buyer_profile;
       const hasProfile = bp && Object.keys(bp).length > 0;
       return `<tr>
       <td>
-        <div style="font-weight:600">${l.buyer_name || 'Anonymous'}</div>
+        <div style="font-weight:600">${l.buyer_name || (lang==='pt'?'Anónimo':'Anonymous')}</div>
         <div style="font-size:11px;color:var(--gray)">${l.buyer_email || ''}</div>
         ${l.buyer_phone ? `<div style="font-size:11px;color:var(--gray)">${l.buyer_phone}</div>` : ''}
       </td>
       <td style="max-width:200px"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.properties?.title || '—'}</div><div style="font-size:11px;color:var(--gray)">${l.properties?.city || ''} · ${formatPrice(l.properties?.price, l.properties?.currency || 'EUR')}</div></td>
       <td style="max-width:200px;font-size:12px;color:var(--gray);line-height:1.4">${(l.message || l.buyer_message || '—').substring(0, 100)}</td>
-      <td style="min-width:200px">${hasProfile ? renderBuyerProfile(bp) : '<span style="font-size:11px;color:#b0bec5">No profile data</span>'}</td>
+      <td style="min-width:200px">${hasProfile ? renderBuyerProfile(bp) : `<span style="font-size:11px;color:#b0bec5">${t('noProfileData')}</span>`}</td>
       <td><span class="badge badge-${l.status || 'new'}">${l.status || 'new'}</span></td>
       <td style="font-size:12px;color:var(--gray);white-space:nowrap">${timeAgo(l.created_at)}</td>
       <td>
         <select onchange="updateLeadStatus('${l.id}', this.value)" style="padding:5px 8px;border-radius:8px;border:1px solid var(--border);font-size:11px;font-family:'Outfit'">
-          <option value="new" ${l.status === 'new' ? 'selected' : ''}>New</option>
-          <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Contacted</option>
-          <option value="viewing_booked" ${l.status === 'viewing_booked' ? 'selected' : ''}>Viewing Booked</option>
-          <option value="closed" ${l.status === 'closed' ? 'selected' : ''}>Closed</option>
+          <option value="new" ${l.status === 'new' ? 'selected' : ''}>${t('statusNew')}</option>
+          <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>${t('statusContacted')}</option>
+          <option value="viewing_booked" ${l.status === 'viewing_booked' ? 'selected' : ''}>${t('statusViewing')}</option>
+          <option value="closed" ${l.status === 'closed' ? 'selected' : ''}>${t('statusClosed')}</option>
         </select>
       </td>
     </tr>`}).join('')}
@@ -720,21 +1019,21 @@ function getBuyerIntent(bp) {
 
   let label, color, bg, icon, details = [];
   if (score >= 7) {
-    label = '🔥 Hot Buyer'; color = '#c62828'; bg = '#ffebee';
-    details.push('High purchase intent');
+    label = t('hotBuyer'); color = '#c62828'; bg = '#ffebee';
+    details.push(t('highIntent'));
   } else if (score >= 4) {
-    label = '🔍 Actively Looking'; color = '#e65100'; bg = '#fff3e0';
-    details.push('Moderate intent');
+    label = t('activeLooking'); color = '#e65100'; bg = '#fff3e0';
+    details.push(t('moderateIntent'));
   } else {
-    label = '👀 Browsing'; color = '#546e7a'; bg = '#eceff1';
-    details.push('Early stage');
+    label = t('browsing'); color = '#546e7a'; bg = '#eceff1';
+    details.push(t('earlyStage'));
   }
 
   // Add specific detail tags
-  if (bp.mortgage === 'Pre-approved mortgage') details.push('Mortgage pre-approved');
-  else if (bp.mortgage === 'Cash buyer — no mortgage needed') details.push('Cash buyer');
-  if (bp.intent === 'Ready to buy now') details.push('Ready now');
-  else if (bp.intent === 'Actively searching') details.push('Actively searching');
+  if (bp.mortgage === 'Pre-approved mortgage') details.push(t('mortgagePreApproved'));
+  else if (bp.mortgage === 'Cash buyer — no mortgage needed') details.push(t('cashBuyer'));
+  if (bp.intent === 'Ready to buy now') details.push(t('readyNow'));
+  else if (bp.intent === 'Actively searching') details.push(t('activelySearching'));
   if (bp.timeline) details.push(bp.timeline);
   if (bp.purpose) details.push(bp.purpose);
 
@@ -771,26 +1070,26 @@ function renderBuyerProfile(bp) {
       <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;margin-top:4px">
         ${pills.slice(0, 4).map(p => `<span style="background:var(--blue-l);color:var(--blue-d, #1578A8);padding:2px 7px;border-radius:10px;font-size:10px;font-weight:500;white-space:nowrap">${p.icon} ${p.text}</span>`).join('')}
       </div>
-      <button onclick="document.getElementById('${profileId}').style.display=document.getElementById('${profileId}').style.display==='none'?'block':'none'" class="btn btn-ghost" style="font-size:10px;padding:2px 6px;color:var(--blue)">View full profile ▾</button>
+      <button onclick="document.getElementById('${profileId}').style.display=document.getElementById('${profileId}').style.display==='none'?'block':'none'" class="btn btn-ghost" style="font-size:10px;padding:2px 6px;color:var(--blue)">${t('viewFullProfile')}</button>
       <div id="${profileId}" style="display:none;margin-top:6px;padding:10px;background:var(--gray-l);border-radius:8px;font-size:11px">
-        ${bp.budget ? `<div style="margin-bottom:4px"><strong>Budget:</strong> ${bp.budget}</div>` : ''}
-        ${bp.family ? `<div style="margin-bottom:4px"><strong>Household:</strong> ${bp.family}</div>` : ''}
-        ${bp.lifestyle ? `<div style="margin-bottom:4px"><strong>Setting:</strong> ${bp.lifestyle}</div>` : ''}
-        ${bp.workFromHome ? `<div style="margin-bottom:4px"><strong>Work:</strong> ${bp.workFromHome}</div>` : ''}
-        ${bp.commuteTo ? `<div style="margin-bottom:4px"><strong>Commute to:</strong> ${bp.commuteTo}</div>` : ''}
-        ${bp.commuteMax ? `<div style="margin-bottom:4px"><strong>Max commute:</strong> ${bp.commuteMax}</div>` : ''}
-        ${bp.condition ? `<div style="margin-bottom:4px"><strong>Condition:</strong> ${bp.condition}</div>` : ''}
-        ${bp.pets ? `<div style="margin-bottom:4px"><strong>Pets:</strong> ${bp.pets}</div>` : ''}
-        ${bp.vibe ? `<div style="margin-bottom:4px"><strong>Dream style:</strong> ${bp.vibe}</div>` : ''}
-        ${vibes.length ? `<div style="margin-bottom:4px"><strong>Neighbourhood:</strong> ${vibes.join(', ')}</div>` : ''}
-        ${priorities.length ? `<div style="margin-bottom:4px"><strong>Top priorities:</strong> ${priorities.join(', ')}</div>` : ''}
-        ${parking.length ? `<div style="margin-bottom:4px"><strong>Parking:</strong> ${parking.join(', ')}</div>` : ''}
-        ${bp.location ? `<div style="margin-bottom:4px"><strong>Location:</strong> ${bp.location}</div>` : ''}
-        ${bp.radius ? `<div style="margin-bottom:4px"><strong>Radius:</strong> ${bp.radius}</div>` : ''}
-        ${bp.purpose ? `<div style="margin-bottom:4px;margin-top:8px;padding-top:8px;border-top:1px solid #e0e0e0"><strong>🎯 Purpose:</strong> ${bp.purpose}</div>` : ''}
-        ${bp.mortgage ? `<div style="margin-bottom:4px"><strong>🏦 Mortgage:</strong> ${bp.mortgage}</div>` : ''}
-        ${bp.intent ? `<div style="margin-bottom:4px"><strong>⚡ Readiness:</strong> ${bp.intent}</div>` : ''}
-        ${bp.timeline ? `<div><strong>📅 Timeline:</strong> ${bp.timeline}</div>` : ''}
+        ${bp.budget ? `<div style="margin-bottom:4px"><strong>${t('budget')}:</strong> ${bp.budget}</div>` : ''}
+        ${bp.family ? `<div style="margin-bottom:4px"><strong>${t('household')}:</strong> ${bp.family}</div>` : ''}
+        ${bp.lifestyle ? `<div style="margin-bottom:4px"><strong>${t('setting')}:</strong> ${bp.lifestyle}</div>` : ''}
+        ${bp.workFromHome ? `<div style="margin-bottom:4px"><strong>${t('work')}:</strong> ${bp.workFromHome}</div>` : ''}
+        ${bp.commuteTo ? `<div style="margin-bottom:4px"><strong>${t('commuteTo')}:</strong> ${bp.commuteTo}</div>` : ''}
+        ${bp.commuteMax ? `<div style="margin-bottom:4px"><strong>${t('maxCommute')}:</strong> ${bp.commuteMax}</div>` : ''}
+        ${bp.condition ? `<div style="margin-bottom:4px"><strong>${t('condition')}:</strong> ${bp.condition}</div>` : ''}
+        ${bp.pets ? `<div style="margin-bottom:4px"><strong>${t('pets')}:</strong> ${bp.pets}</div>` : ''}
+        ${bp.vibe ? `<div style="margin-bottom:4px"><strong>${t('dreamStyle')}:</strong> ${bp.vibe}</div>` : ''}
+        ${vibes.length ? `<div style="margin-bottom:4px"><strong>${t('neighbourhood')}:</strong> ${vibes.join(', ')}</div>` : ''}
+        ${priorities.length ? `<div style="margin-bottom:4px"><strong>${t('topPriorities')}:</strong> ${priorities.join(', ')}</div>` : ''}
+        ${parking.length ? `<div style="margin-bottom:4px"><strong>${t('parking')}:</strong> ${parking.join(', ')}</div>` : ''}
+        ${bp.location ? `<div style="margin-bottom:4px"><strong>${t('location')}:</strong> ${bp.location}</div>` : ''}
+        ${bp.radius ? `<div style="margin-bottom:4px"><strong>${t('radius')}:</strong> ${bp.radius}</div>` : ''}
+        ${bp.purpose ? `<div style="margin-bottom:4px;margin-top:8px;padding-top:8px;border-top:1px solid #e0e0e0"><strong>🎯 ${t('purpose')}:</strong> ${bp.purpose}</div>` : ''}
+        ${bp.mortgage ? `<div style="margin-bottom:4px"><strong>🏦 ${t('mortgage')}:</strong> ${bp.mortgage}</div>` : ''}
+        ${bp.intent ? `<div style="margin-bottom:4px"><strong>⚡ ${t('readiness')}:</strong> ${bp.intent}</div>` : ''}
+        ${bp.timeline ? `<div><strong>📅 ${t('timeline')}:</strong> ${bp.timeline}</div>` : ''}
       </div>
     </div>
   `;
@@ -807,10 +1106,10 @@ function renderListings() {
 
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <span style="font-size:13px;color:var(--gray)">${props.length} listing${props.length !== 1 ? 's' : ''}</span>
-      <button class="btn btn-primary btn-sm" onclick="switchTab('add-property')">➕ Add Property</button>
+      <span style="font-size:13px;color:var(--gray)">${props.length} ${props.length !== 1 ? t('listingsPlural') : t('listings')}</span>
+      <button class="btn btn-primary btn-sm" onclick="switchTab('add-property')">➕ ${t('addProperty')}</button>
     </div>
-    ${props.length === 0 ? '<div class="empty" style="padding:60px"><div class="icon">🏘️</div><div class="title">No listings yet</div><div class="desc">Add your first property or claim existing listings on the platform.</div></div>' :
+    ${props.length === 0 ? `<div class="empty" style="padding:60px"><div class="icon">🏘️</div><div class="title">${t('noListingsYet')}</div><div class="desc">${t('noListingsDesc')}</div></div>` :
       `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
         ${props.map(p => `<div class="card" style="padding:0;overflow:hidden">
           <div style="height:140px;background:var(--gray-l);overflow:hidden;position:relative">
@@ -822,7 +1121,7 @@ function renderListings() {
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span class="badge badge-${p.listing_status || 'active'}">${p.listing_status || 'active'}</span>
               <div style="display:flex;gap:6px">
-                <button class="btn btn-outline btn-sm" onclick="startEditProperty('${p.id}')">✏️ Edit</button>
+                <button class="btn btn-outline btn-sm" onclick="startEditProperty('${p.id}')">${t('edit')}</button>
                 <button class="btn btn-ghost btn-sm" onclick="deleteProperty('${p.id}','${p.title.replace(/'/g,"\\'")}')">🗑️</button>
               </div>
             </div>
@@ -834,7 +1133,7 @@ function renderListings() {
 
 function startEditProperty(id) {
   const p = (state.dashboard?.properties || []).find(x => x.id === id);
-  if (!p) { showToast('Property not found', 'error'); return; }
+  if (!p) { showToast(lang==='pt'?'Imóvel não encontrado':'Property not found', 'error'); return; }
   state.editingProperty = p;
   render();
   // Populate chips and walkability after render
@@ -867,10 +1166,10 @@ function cancelEdit() {
 }
 
 async function deleteProperty(id, title) {
-  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  if (!confirm(`${t('confirmDelete')} "${title}"? ${t('confirmDeleteMsg')}`)) return;
   try {
     await apiFetch(`/api/agents/properties/${id}`, 'DELETE');
-    showToast('Property deleted', 'success');
+    showToast(t('propertyDeleted'), 'success');
     loadDashboard();
   } catch (err) {
     showToast(err.message, 'error');
@@ -1036,8 +1335,7 @@ function updateEpWalk(val) {
     d.style.cssText = `flex:1;height:6px;border-radius:3px;background:${i < val ? (val <= 3 ? '#e74c3c' : val <= 6 ? '#F5921B' : '#2E8B57') : 'var(--border)'}`;
     bar.appendChild(d);
   }
-  const labels = { 0:'Car essential', 1:'Very car-dependent', 2:'Car-dependent', 3:'A few local shops', 4:'Some basics nearby', 5:'Some shops nearby', 6:'Reasonably walkable', 7:'Very walkable', 8:'Most things on foot', 9:'Highly walkable', 10:'Everything walkable' };
-  if (lbl) lbl.textContent = `${val}/10 — ${labels[val]}`;
+  if (lbl) lbl.textContent = `${val}/10 — ${t('walk'+val)}`;
 }
 
 async function saveEditProperty(id) {
@@ -1083,13 +1381,13 @@ async function saveEditProperty(id) {
   };
 
   if (!update.title || !update.price || !update.city) {
-    showToast('Title, Price, and City are required', 'error');
+    showToast(t('titlePriceCity'), 'error');
     return;
   }
 
   try {
     await apiFetch(`/api/agents/properties/${id}`, 'PUT', update);
-    showToast('Property updated!', 'success');
+    showToast(t('propertyUpdated'), 'success');
     state.editingProperty = null;
     loadDashboard();
   } catch (err) {
@@ -1104,15 +1402,15 @@ function renderClaims() {
   const claims = state.dashboard?.claims || [];
   return `
     <div class="card" style="margin-bottom:20px">
-      <h3>🔗 Claim Your Listings</h3>
-      <p style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:14px">Search for your listings by property title, location, agent name, or agency name. Claimed listings will show your contact details when buyers enquire.</p>
+      <h3>🔗 ${t('claimYourListings')}</h3>
+      <p style="font-size:13px;color:var(--gray);line-height:1.6;margin-bottom:14px">${t('claimDesc')}</p>
       <div style="display:flex;gap:10px">
-        <input id="claim-search" placeholder="Search by property, city, agent name, or agency..." style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" onkeyup="if(event.key==='Enter')loadUnclaimed(this.value)"/>
-        <button class="btn btn-primary" onclick="loadUnclaimed(document.getElementById('claim-search').value)">Search</button>
+        <input id="claim-search" placeholder="${t('searchPlaceholder')}" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit';font-size:13px" onkeyup="if(event.key==='Enter')loadUnclaimed(this.value)"/>
+        <button class="btn btn-primary" onclick="loadUnclaimed(document.getElementById('claim-search').value)">${t('search')}</button>
       </div>
     </div>
 
-    ${state.unclaimed.length > 0 ? `<div class="card"><h3>Unclaimed Properties (${state.unclaimed.length})</h3>
+    ${state.unclaimed.length > 0 ? `<div class="card"><h3>${t('unclaimedProps')} (${state.unclaimed.length})</h3>
       ${state.unclaimed.map((p, idx) => `<div class="prop-mini" style="flex-wrap:wrap">
         <div style="display:flex;gap:10px;align-items:center;width:100%">
           ${p.image_urls?.length ? `<img src="${p.image_urls[0]}" onerror="this.style.display='none'"/>` : '<div style="width:60px;height:45px;background:var(--gray-l);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">🏠</div>'}
@@ -1120,33 +1418,33 @@ function renderClaims() {
             <div class="title">${p.title}</div>
             <div class="meta">${formatPrice(p.price, p.currency)} · ${p.beds} bed · ${p.city}${p.region ? ' / ' + p.region : ''}</div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('claim-detail-${idx}').style.display=document.getElementById('claim-detail-${idx}').style.display==='none'?'block':'none'" style="font-size:10px">Details ▾</button>
-          <button class="btn btn-primary btn-sm" onclick="claimListing('${p.id}')">Claim</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('claim-detail-${idx}').style.display=document.getElementById('claim-detail-${idx}').style.display==='none'?'block':'none'" style="font-size:10px">${t('details')}</button>
+          <button class="btn btn-primary btn-sm" onclick="claimListing('${p.id}')">${t('claim')}</button>
         </div>
         <div id="claim-detail-${idx}" style="display:none;width:100%;margin-top:8px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid var(--border);font-size:11px;line-height:1.7">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
-            <div><strong>City:</strong> ${p.city || '—'}</div>
-            <div><strong>Region:</strong> ${p.region || '—'}</div>
-            <div><strong>Type:</strong> ${p.property_type || '—'}</div>
-            <div><strong>Size:</strong> ${p.sqm ? p.sqm + ' m²' : '—'}</div>
-            <div><strong>Agency:</strong> ${p.agents?.agency?.name || p.agents?.name || '—'}</div>
-            <div><strong>Agent:</strong> ${p.agents?.name || '—'}</div>
+            <div><strong>${t('city')}:</strong> ${p.city || '—'}</div>
+            <div><strong>${t('region')}:</strong> ${p.region || '—'}</div>
+            <div><strong>${t('type')}:</strong> ${p.property_type || '—'}</div>
+            <div><strong>${t('size')}:</strong> ${p.sqm ? p.sqm + ' m²' : '—'}</div>
+            <div><strong>${t('agency')}:</strong> ${p.agents?.agency?.name || p.agents?.name || '—'}</div>
+            <div><strong>${t('agent')}:</strong> ${p.agents?.name || '—'}</div>
           </div>
-          ${p.source_url ? `<div style="margin-top:6px"><a href="${p.source_url}" target="_blank" style="color:var(--blue);font-size:11px">🔗 View original listing</a></div>` : ''}
+          ${p.source_url ? `<div style="margin-top:6px"><a href="${p.source_url}" target="_blank" style="color:var(--blue);font-size:11px">${t('viewOriginal')}</a></div>` : ''}
           ${p.image_urls?.length > 1 ? `<div style="display:flex;gap:4px;margin-top:6px;overflow-x:auto">${p.image_urls.slice(0,4).map(img => `<img src="${img}" style="width:80px;height:55px;border-radius:6px;object-fit:cover" onerror="this.style.display='none'"/>`).join('')}</div>` : ''}
         </div>
       </div>`).join('')}
     </div>` : ''}
 
-    ${claims.length > 0 ? `<div class="card" style="margin-top:16px"><h3>My Claims</h3>
+    ${claims.length > 0 ? `<div class="card" style="margin-top:16px"><h3>${t('myClaims')}</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Property</th><th>Status</th><th>Claimed</th><th>Actions</th></tr></thead>
+        <thead><tr><th>${t('property')}</th><th>${t('status')}</th><th>${t('claimed')}</th><th>${t('actions')}</th></tr></thead>
         <tbody>
         ${claims.map(c => `<tr>
-          <td style="font-weight:500">${c.properties?.title || 'Unknown'}</td>
+          <td style="font-weight:500">${c.properties?.title || (lang==='pt'?'Desconhecido':'Unknown')}</td>
           <td><span class="badge badge-${c.status}">${c.status}</span></td>
           <td style="font-size:12px;color:var(--gray)">${timeAgo(c.claimed_at)}</td>
-          <td>${c.status === 'pending' ? `<button class="btn btn-sm" style="background:#e53935;color:#fff;font-size:11px" onclick="cancelClaim('${c.id}')">Cancel</button>` : c.status === 'rejected' ? `<button class="btn btn-sm btn-outline" style="font-size:11px" onclick="cancelClaim('${c.id}')">Remove</button>` : ''}</td>
+          <td>${c.status === 'pending' ? `<button class="btn btn-sm" style="background:#e53935;color:#fff;font-size:11px" onclick="cancelClaim('${c.id}')">${t('cancelClaim')}</button>` : c.status === 'rejected' ? `<button class="btn btn-sm btn-outline" style="font-size:11px" onclick="cancelClaim('${c.id}')">${t('remove')}</button>` : ''}</td>
         </tr>`).join('')}
         </tbody>
       </table></div>
@@ -1160,62 +1458,62 @@ function renderClaims() {
 function renderAddProperty() {
   return `
     <div style="display:flex;gap:8px;margin-bottom:16px">
-      <button class="btn btn-sm ${apTemplate==='cork'?'btn-primary':'btn-outline'}" onclick="fillApTemplate('cork')">🇮🇪 Cork defaults</button>
-      <button class="btn btn-sm ${apTemplate==='portugal'?'btn-primary':'btn-outline'}" onclick="fillApTemplate('portugal')">🇵🇹 Portugal defaults</button>
-      <button class="btn btn-sm btn-ghost" onclick="clearApForm()">✕ Clear</button>
+      <button class="btn btn-sm ${apTemplate==='cork'?'btn-primary':'btn-outline'}" onclick="fillApTemplate('cork')">${t('corkDefaults')}</button>
+      <button class="btn btn-sm ${apTemplate==='portugal'?'btn-primary':'btn-outline'}" onclick="fillApTemplate('portugal')">${t('portugalDefaults')}</button>
+      <button class="btn btn-sm btn-ghost" onclick="clearApForm()">${t('clear')}</button>
     </div>
 
     <div class="card">
-      <h3>1. Basic Details</h3>
-      <div class="form-group" style="grid-column:1/-1"><label>Title *</label><input id="ap-title" placeholder="e.g. 3-Bed Terrace in Ballintemple, Cork"/><div style="font-size:11px;color:var(--gray);margin-top:3px">Format: [Type] in [Area], [City]</div></div>
-      <div class="form-group"><label>Tagline</label><input id="ap-tagline" placeholder="e.g. Charming period home with garden"/></div>
+      <h3>${t('basicDetails')}</h3>
+      <div class="form-group" style="grid-column:1/-1"><label>${t('titleField')}</label><input id="ap-title" placeholder="${t('titlePlaceholder')}"/><div style="font-size:11px;color:var(--gray);margin-top:3px">${t('titleFormat')}</div></div>
+      <div class="form-group"><label>${t('tagline')}</label><input id="ap-tagline" placeholder="${lang==='pt'?'ex. Moradia encantadora com jardim':'e.g. Charming period home with garden'}"/></div>
       <div class="form-row">
-        <div class="form-group"><label>Price *</label><input id="ap-price" type="number" placeholder="350000"/></div>
-        <div class="form-group"><label>Currency</label><select id="ap-currency"><option value="EUR">€ EUR</option><option value="GBP">£ GBP</option></select></div>
+        <div class="form-group"><label>${t('price')}</label><input id="ap-price" type="number" placeholder="350000"/></div>
+        <div class="form-group"><label>${t('currency')}</label><select id="ap-currency"><option value="EUR">€ EUR</option><option value="GBP">£ GBP</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Beds</label><input id="ap-beds" type="number" placeholder="3"/></div>
-        <div class="form-group"><label>Baths</label><input id="ap-baths" type="number" placeholder="2"/></div>
+        <div class="form-group"><label>${t('beds')}</label><input id="ap-beds" type="number" placeholder="3"/></div>
+        <div class="form-group"><label>${t('baths')}</label><input id="ap-baths" type="number" placeholder="2"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Size (m²)</label><input id="ap-sqm" type="number" placeholder="120"/></div>
-        <div class="form-group"><label>Type</label><select id="ap-type"><option value="terraced">Terraced</option><option value="semi-detached">Semi-Detached</option><option value="detached">Detached</option><option value="flat">Flat/Apartment</option><option value="cottage">Cottage</option><option value="townhouse">Townhouse</option><option value="villa">Villa</option><option value="farmhouse">Farmhouse</option><option value="bungalow">Bungalow</option></select></div>
+        <div class="form-group"><label>${t('sizeSqm')}</label><input id="ap-sqm" type="number" placeholder="120"/></div>
+        <div class="form-group"><label>${t('propType')}</label><select id="ap-type"><option value="terraced">${t('typeTerraced')}</option><option value="semi-detached">${t('typeSemiDetached')}</option><option value="detached">${t('typeDetached')}</option><option value="flat">${t('typeFlat')}</option><option value="cottage">${t('typeCottage')}</option><option value="townhouse">${t('typeTownhouse')}</option><option value="villa">${t('typeVilla')}</option><option value="farmhouse">${t('typeFarmhouse')}</option><option value="bungalow">${t('typeBungalow')}</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Style</label><select id="ap-style"><option value="traditional">Traditional</option><option value="modern">Modern</option><option value="victorian">Victorian</option><option value="georgian">Georgian</option><option value="cottage">Cottage</option><option value="mediterranean">Mediterranean</option><option value="artdeco">Art Deco</option></select></div>
-        <div class="form-group"><label>Condition</label><select id="ap-condition"><option value="move-in">Move-in Ready</option><option value="renovation-light">Light Renovation</option><option value="renovation-major">Major Renovation</option><option value="new-build">New Build</option></select></div>
+        <div class="form-group"><label>${t('style')}</label><select id="ap-style"><option value="traditional">${t('styleTraditional')}</option><option value="modern">${t('styleModern')}</option><option value="victorian">${t('styleVictorian')}</option><option value="georgian">${t('styleGeorgian')}</option><option value="cottage">${t('styleCottage')}</option><option value="mediterranean">${t('styleMediterranean')}</option><option value="artdeco">${t('styleArtDeco')}</option></select></div>
+        <div class="form-group"><label>${t('condition')}</label><select id="ap-condition"><option value="move-in">${t('condMoveIn')}</option><option value="renovation-light">${t('condLightReno')}</option><option value="renovation-major">${t('condMajorReno')}</option><option value="new-build">${t('condNewBuild')}</option></select></div>
       </div>
-      <div class="form-group"><label>Listing Status</label><select id="ap-status"><option value="active">Active</option><option value="sale-agreed">Sale Agreed</option><option value="sold">Sold</option></select></div>
+      <div class="form-group"><label>${t('listingStatus')}</label><select id="ap-status"><option value="active">${t('statusActive')}</option><option value="sale-agreed">${t('statusSaleAgreed')}</option><option value="sold">${t('statusSold')}</option></select></div>
     </div>
 
     <div class="card">
-      <h3>2. Location</h3>
+      <h3>${t('locationSection')}</h3>
       <div class="form-row">
-        <div class="form-group"><label>Address</label><input id="ap-address" placeholder="12 Victoria Road"/></div>
-        <div class="form-group"><label>City *</label><input id="ap-city" placeholder="Cork"/></div>
+        <div class="form-group"><label>${t('address')}</label><input id="ap-address" placeholder="${lang==='pt'?'Rua da Liberdade, 12':'12 Victoria Road'}"/></div>
+        <div class="form-group"><label>${t('city')} *</label><input id="ap-city" placeholder="${lang==='pt'?'Lourinhã':'Cork'}"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Region / Area</label><input id="ap-region" placeholder="Ballintemple"/></div>
-        <div class="form-group"><label>County</label><input id="ap-county" placeholder="Cork"/></div>
+        <div class="form-group"><label>${t('region')}</label><input id="ap-region" placeholder="${lang==='pt'?'Oeste':'Ballintemple'}"/></div>
+        <div class="form-group"><label>${t('county')}</label><input id="ap-county" placeholder="${lang==='pt'?'Lisboa':'Cork'}"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Postcode / Eircode</label><input id="ap-postcode" placeholder="T12 AB34"/></div>
-        <div class="form-group"><label>Country</label><select id="ap-country"><option value="IE">Ireland 🇮🇪</option><option value="PT">Portugal 🇵🇹</option></select></div>
+        <div class="form-group"><label>${t('postcode')}</label><input id="ap-postcode" placeholder="${lang==='pt'?'2530-001':'T12 AB34'}"/></div>
+        <div class="form-group"><label>${t('country')}</label><select id="ap-country"><option value="IE">${lang==='pt'?'Irlanda':'Ireland'} 🇮🇪</option><option value="PT">Portugal 🇵🇹</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Latitude</label><input id="ap-lat" type="number" step="any" placeholder="51.8969"/></div>
-        <div class="form-group"><label>Longitude</label><input id="ap-lng" type="number" step="any" placeholder="-8.4863"/></div>
+        <div class="form-group"><label>${t('latitude')}</label><input id="ap-lat" type="number" step="any" placeholder="39.2417"/></div>
+        <div class="form-group"><label>${t('longitude')}</label><input id="ap-lng" type="number" step="any" placeholder="-9.3133"/></div>
       </div>
-      <div style="font-size:11px;color:var(--gray);margin-top:4px">📍 Right-click Google Maps → "What's here?" → copy coordinates</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:4px">${t('coordsTip')}</div>
     </div>
 
     <div class="card">
-      <h3>3. Description</h3>
-      <div class="form-group"><textarea id="ap-desc" rows="5" placeholder="Write or paste the property description. If Portuguese, translate to English — the AI uses this for scoring."></textarea></div>
+      <h3>${t('descSection')}</h3>
+      <div class="form-group"><textarea id="ap-desc" rows="5" placeholder="${t('descPlaceholder')}"></textarea></div>
     </div>
 
     <div class="card">
-      <h3>4. Images</h3>
+      <h3>${t('imageSection')}</h3>
       <div style="font-size:12px;color:var(--gray);margin-bottom:12px">Add image URLs one at a time. Right-click image on listing → "Open image in new tab" → copy URL. First image = hero thumbnail.</div>
       <div id="ap-image-list">
         <div class="ap-img-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
@@ -1224,69 +1522,69 @@ function renderAddProperty() {
           <button class="btn btn-ghost btn-sm" onclick="removeApImg(this)">✕</button>
         </div>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="addApImgRow()" style="margin-top:4px">+ Add another image</button>
+      <button class="btn btn-outline btn-sm" onclick="addApImgRow()" style="margin-top:4px">+ ${lang==='pt'?'Adicionar outra imagem':'Add another image'}</button>
     </div>
 
     <div class="card">
-      <h3>5. Livability & Neighbourhood</h3>
+      <h3>5. ${t('neighbourhoodSection')}</h3>
       <div class="form-row">
         <div class="form-group">
-          <label>Walkability (0-10)</label>
+          <label>${t('walkability')} (0-10)</label>
           <input id="ap-walkability" type="range" min="0" max="10" value="5" oninput="updateApWalk(this.value)" style="width:100%;padding:2px 0;border:none;box-shadow:none"/>
           <div id="ap-walk-bar" style="display:flex;gap:2px;margin-top:4px"></div>
-          <div id="ap-walk-label" style="font-size:11px;color:var(--gray);margin-top:3px">5/10 — Some shops nearby</div>
+          <div id="ap-walk-label" style="font-size:11px;color:var(--gray);margin-top:3px">5/10 — ${t('walk5')}</div>
         </div>
-        <div class="form-group"><label>Schools Quality</label><select id="ap-schools"><option value="excellent">Excellent</option><option value="good">Good</option><option value="average">Average</option><option value="n/a">N/A</option></select></div>
+        <div class="form-group"><label>${t('schoolsQuality')}</label><select id="ap-schools"><option value="excellent">${lang==='pt'?'Excelente':'Excellent'}</option><option value="good">${lang==='pt'?'Boa':'Good'}</option><option value="average">${lang==='pt'?'Média':'Average'}</option><option value="n/a">N/A</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>EPC / BER Rating</label><input id="ap-epc" placeholder="e.g. B3, C, D1"/></div>
-        <div class="form-group"><label>Commute to City Centre (mins)</label><input id="ap-commute" type="number" placeholder="15"/></div>
+        <div class="form-group"><label>${t('epcRating')}</label><input id="ap-epc" placeholder="${lang==='pt'?'ex. B, C, D':'e.g. B3, C, D1'}"/></div>
+        <div class="form-group"><label>${t('commuteCenter')}</label><input id="ap-commute" type="number" placeholder="15"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Pet Friendly</label><select id="ap-pets"><option value="true">Yes</option><option value="false">No</option><option value="unknown">Unknown</option></select></div>
-        <div class="form-group"><label>Dog Park Nearby</label><select id="ap-dogpark"><option value="true">Yes</option><option value="false">No</option><option value="unknown">Unknown</option></select></div>
+        <div class="form-group"><label>${t('petFriendly')}</label><select id="ap-pets"><option value="true">${t('yes')}</option><option value="false">${t('no')}</option><option value="unknown">${lang==='pt'?'Desconhecido':'Unknown'}</option></select></div>
+        <div class="form-group"><label>${t('dogPark')}</label><select id="ap-dogpark"><option value="true">${t('yes')}</option><option value="false">${t('no')}</option><option value="unknown">${lang==='pt'?'Desconhecido':'Unknown'}</option></select></div>
       </div>
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin:16px 0 6px">Neighbourhood Vibe (click all that apply)</label>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin:16px 0 6px">${t('neighVibe')} (${lang==='pt'?'clique em todos os que se aplicam':'click all that apply'})</label>
       <div id="ap-vibe-chips" style="display:flex;flex-wrap:wrap;gap:6px">
-        ${['family-friendly:👨‍👩‍👧 Family','quiet:🤫 Quiet','vibrant:🎉 Vibrant','historic:🏛️ Historic','city-centre:🏙️ City centre','suburban:🏘️ Suburban','rural:🌾 Rural','coastal:🌊 Coastal','artsy:🎨 Artsy','upscale:💎 Upscale','walkable:🚶 Walkable','green:🌿 Green'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
+        ${['family-friendly:👨‍👩‍👧 '+(lang==='pt'?'Familiar':'Family'),'quiet:🤫 '+(lang==='pt'?'Calmo':'Quiet'),'vibrant:🎉 '+(lang==='pt'?'Animado':'Vibrant'),'historic:🏛️ '+(lang==='pt'?'Histórico':'Historic'),'city-centre:🏙️ '+(lang==='pt'?'Centro':'City centre'),'suburban:🏘️ '+(lang==='pt'?'Suburbano':'Suburban'),'rural:🌾 Rural','coastal:🌊 '+(lang==='pt'?'Costeiro':'Coastal'),'artsy:🎨 '+(lang==='pt'?'Artístico':'Artsy'),'upscale:💎 '+(lang==='pt'?'Sofisticado':'Upscale'),'walkable:🚶 '+(lang==='pt'?'Caminhável':'Walkable'),'green:🌿 '+(lang==='pt'?'Verde':'Green')].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
       </div>
     </div>
 
     <div class="card">
-      <h3>6. Features & Amenities</h3>
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">Property Features (click all that apply)</label>
+      <h3>6. ${t('featuresSection')}</h3>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">${t('features')} (${lang==='pt'?'clique em todos os que se aplicam':'click all that apply'})</label>
       <div id="ap-feature-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-        ${['garden:🌳 Garden','pool:🏊 Pool','home-office:💻 Home office','balcony:🌇 Balcony','terrace:☀️ Terrace','sea-view:🌊 Sea view','period-features:🏛️ Period features','modern-kitchen:🍳 Modern kitchen','fireplace:🔥 Fireplace','smart-home:📱 Smart home','garage:🚗 Garage','ev-charging:⚡ EV charging','solar-panels:☀️ Solar','storage:📦 Storage'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
+        ${['garden:🌳 '+(lang==='pt'?'Jardim':'Garden'),'pool:🏊 '+(lang==='pt'?'Piscina':'Pool'),'home-office:💻 '+(lang==='pt'?'Escritório':'Home office'),'balcony:🌇 '+(lang==='pt'?'Varanda':'Balcony'),'terrace:☀️ '+(lang==='pt'?'Terraço':'Terrace'),'sea-view:🌊 '+(lang==='pt'?'Vista mar':'Sea view'),'period-features:🏛️ '+(lang==='pt'?'Traça antiga':'Period features'),'modern-kitchen:🍳 '+(lang==='pt'?'Cozinha moderna':'Modern kitchen'),'fireplace:🔥 '+(lang==='pt'?'Lareira':'Fireplace'),'smart-home:📱 '+(lang==='pt'?'Casa inteligente':'Smart home'),'garage:🚗 '+(lang==='pt'?'Garagem':'Garage'),'ev-charging:⚡ '+(lang==='pt'?'Carregamento EV':'EV charging'),'solar-panels:☀️ '+(lang==='pt'?'Solar':'Solar'),'storage:📦 '+(lang==='pt'?'Arrecadação':'Storage')].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
       </div>
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">Parking (click all that apply)</label>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--gray);margin-bottom:6px">${t('parking')} (${lang==='pt'?'clique em todos os que se aplicam':'click all that apply'})</label>
       <div id="ap-parking-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-        ${['driveway:Driveway','garage:Garage','on street parking:On-street','street parking / resident permit:Resident permit','public parking nearby:Public nearby','none:No parking'].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
+        ${['driveway:'+(lang==='pt'?'Entrada':'Driveway'),'garage:'+(lang==='pt'?'Garagem':'Garage'),'on street parking:'+(lang==='pt'?'Na rua':'On-street'),'street parking / resident permit:'+(lang==='pt'?'Dístico residente':'Resident permit'),'public parking nearby:'+(lang==='pt'?'Público perto':'Public nearby'),'none:'+(lang==='pt'?'Sem estacionamento':'No parking')].map(c=>{const[v,l]=c.split(':');return`<span class="ap-chip" data-value="${v}" onclick="this.classList.toggle('active')" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--white);cursor:pointer;user-select:none">${l}</span>`;}).join('')}
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Nearest Groceries (km)</label><input id="ap-groceries" type="number" step="0.1" placeholder="0.3"/></div>
-        <div class="form-group"><label>Nearest Gym (km)</label><input id="ap-gym" type="number" step="0.1" placeholder="0.5"/></div>
+        <div class="form-group"><label>${t('groceries')}</label><input id="ap-groceries" type="number" step="0.1" placeholder="0.3"/></div>
+        <div class="form-group"><label>${t('gym')}</label><input id="ap-gym" type="number" step="0.1" placeholder="0.5"/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Nearest Park (km)</label><input id="ap-park" type="number" step="0.1" placeholder="0.2"/></div>
-        <div class="form-group"><label>Nearest Hospital (km)</label><input id="ap-hospital" type="number" step="0.1" placeholder="2.0"/></div>
+        <div class="form-group"><label>${t('park')}</label><input id="ap-park" type="number" step="0.1" placeholder="0.2"/></div>
+        <div class="form-group"><label>${t('hospital')}</label><input id="ap-hospital" type="number" step="0.1" placeholder="2.0"/></div>
       </div>
     </div>
 
     <div class="card">
-      <h3>7. Listing Source</h3>
-      <div class="form-group"><label>Original Listing URL</label><input id="ap-source" placeholder="https://daft.ie/..."/></div>
+      <h3>7. ${t('listingSource')}</h3>
+      <div class="form-group"><label>${t('originalUrl')}</label><input id="ap-source" placeholder="https://idealista.pt/..."/></div>
     </div>
 
     <div class="card" style="margin-top:12px;border-left:3px solid var(--blue)">
       <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:12px;color:var(--dark);line-height:1.6">
         <input type="checkbox" id="ap-consent" style="margin-top:3px;flex-shrink:0;accent-color:var(--blue)"/>
-        <span>I confirm that I am <strong>authorised to list this property</strong> on homeAImatch and that the information provided is accurate. I agree that homeAImatch may display this listing to potential buyers, include it in AI matching results, and share my contact details with matched buyers. I have read the <a href="legal.html#tos" target="_blank" style="color:var(--blue)">Terms of Service</a> and <a href="legal.html#privacy" target="_blank" style="color:var(--blue)">Privacy Policy</a>.</span>
+        <span>${t('listingConsent')} ${lang==='pt'?'Concordo que o homeAImatch pode apresentar este imóvel a potenciais compradores, incluí-lo nos resultados de correspondência por IA e partilhar os meus contactos com compradores correspondidos.':'I agree that homeAImatch may display this listing to potential buyers, include it in AI matching results, and share my contact details with matched buyers.'} ${lang==='pt'?'Li os':'I have read the'} <a href="legal.html#tos" target="_blank" style="color:var(--blue)">${t('termsOfService')}</a> ${lang==='pt'?'e a':'and'} <a href="legal.html#privacy" target="_blank" style="color:var(--blue)">${t('privacyPolicy')}</a>.</span>
       </label>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn btn-primary" onclick="submitAgentProperty(false)">✓ Add Property</button>
-      <button class="btn btn-orange" onclick="submitAgentProperty(true)">✓ Add & Start New</button>
+      <button class="btn btn-primary" onclick="submitAgentProperty(false)">${t('addPropertyBtn')}</button>
+      <button class="btn btn-orange" onclick="submitAgentProperty(true)">${t('addAndNew')}</button>
     </div>
   `;
 }
@@ -1310,7 +1608,7 @@ function fillApTemplate(type) {
     document.getElementById('ap-country').value = 'PT';
     document.getElementById('ap-style').value = 'mediterranean';
   }
-  showToast('Template applied!', 'success');
+  showToast(t('templateApplied'), 'success');
 }
 
 function clearApForm() {
@@ -1334,8 +1632,7 @@ function updateApWalk(val) {
     d.style.cssText = `flex:1;height:6px;border-radius:3px;background:${i < val ? (val <= 3 ? '#e74c3c' : val <= 6 ? '#F5921B' : '#2E8B57') : 'var(--border)'}`;
     bar.appendChild(d);
   }
-  const labels = { 0:'Car essential', 1:'Very car-dependent', 2:'Car-dependent', 3:'A few local shops', 4:'Some basics nearby', 5:'Some shops nearby', 6:'Reasonably walkable', 7:'Very walkable', 8:'Most things on foot', 9:'Highly walkable', 10:'Everything walkable' };
-  if (lbl) lbl.textContent = `${val}/10 — ${labels[val]}`;
+  if (lbl) lbl.textContent = `${val}/10 — ${t('walk'+val)}`;
 }
 
 function addApImgRow() {
@@ -1371,7 +1668,7 @@ async function submitAgentProperty(andNew = false) {
 
   // Check listing consent
   if (!document.getElementById('ap-consent')?.checked) {
-    showToast('Please confirm you are authorised to list this property', 'error');
+    showToast(t('listingAuth'), 'error');
     document.getElementById('ap-consent')?.focus();
     return;
   }
@@ -1415,13 +1712,13 @@ async function submitAgentProperty(andNew = false) {
   };
 
   if (!property.title || !property.price || !property.city) {
-    showToast('Title, Price, and City are required', 'error');
+    showToast(t('titlePriceCity'), 'error');
     return;
   }
 
   try {
     await apiFetch('/api/agents/properties', 'POST', property);
-    showToast('Property added!', 'success');
+    showToast(t('propertyAdded'), 'success');
     loadDashboard();
     if (andNew) { setTimeout(() => { switchTab('add-property'); setTimeout(clearApForm, 100); }, 200); }
     else switchTab('listings');
@@ -1436,13 +1733,12 @@ async function submitAgentProperty(andNew = false) {
 // ============================================================
 function renderNotifications() {
   const notifs = state.dashboard?.notifications || [];
-  // We'll load them separately
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <span style="font-size:13px;color:var(--gray)">${state.dashboard?.unread_notifications || 0} unread</span>
-      <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all as read</button>
+      <span style="font-size:13px;color:var(--gray)">${state.dashboard?.unread_notifications || 0} ${t('unread')}</span>
+      <button class="btn btn-ghost btn-sm" onclick="markAllRead()">${t('markAllRead')}</button>
     </div>
-    <div id="notif-list"><div style="text-align:center;padding:40px;color:var(--gray)">Loading notifications...</div></div>
+    <div id="notif-list"><div style="text-align:center;padding:40px;color:var(--gray)">${t('loading')}</div></div>
   `;
 }
 
@@ -1452,7 +1748,7 @@ async function loadNotifications() {
     const list = document.getElementById('notif-list');
     if (!list) return;
     if (data.notifications.length === 0) {
-      list.innerHTML = '<div class="empty"><div class="icon">🔔</div><div class="title">All caught up!</div><div class="desc">No notifications yet.</div></div>';
+      list.innerHTML = `<div class="empty"><div class="icon">🔔</div><div class="title">${t('allCaughtUp')}</div><div class="desc">${t('noNotifications')}</div></div>`;
       return;
     }
     list.innerHTML = data.notifications.map(n => `
@@ -1472,7 +1768,7 @@ async function markRead(id, el) {
 
 async function markAllRead() {
   await apiFetch('/api/agents/notifications/read-all', 'PUT');
-  showToast('All marked as read', 'success');
+  showToast(t('allRead'), 'success');
   loadDashboard();
 }
 
@@ -1483,24 +1779,24 @@ function renderProfile() {
   const a = state.dashboard?.agent || state.agent || {};
   return `
     <div class="card" style="max-width:600px">
-      <h3>Your Profile</h3>
+      <h3>${t('yourProfile')}</h3>
       <div class="form-row">
-        <div class="form-group"><label>Name</label><input id="prof-name" value="${a.name || ''}"/></div>
-        <div class="form-group"><label>Phone</label><input id="prof-phone" value="${a.phone || ''}"/></div>
+        <div class="form-group"><label>${t('name')}</label><input id="prof-name" value="${a.name || ''}"/></div>
+        <div class="form-group"><label>${t('phone')}</label><input id="prof-phone" value="${a.phone || ''}"/></div>
       </div>
-      <div class="form-group"><label>Email</label><input value="${a.email || ''}" disabled style="background:var(--gray-l)"/></div>
-      <div class="form-group"><label>Agency</label><input value="${a.agencies?.name || ''}" disabled style="background:var(--gray-l)"/></div>
-      <div class="form-group"><label>Bio</label><textarea id="prof-bio" rows="3" placeholder="Tell buyers about yourself...">${a.bio || ''}</textarea></div>
-      <div class="form-group"><label>Areas Served (comma-separated)</label><input id="prof-areas" value="${(a.areas_served || []).join(', ')}"/></div>
-      <div class="form-group"><label>License Number</label><input id="prof-license" value="${a.license_number || ''}" placeholder="PSR License No."/></div>
-      <button class="btn btn-primary" onclick="saveProfile()" style="margin-top:8px">Save Changes</button>
+      <div class="form-group"><label>${t('email')}</label><input value="${a.email || ''}" disabled style="background:var(--gray-l)"/></div>
+      <div class="form-group"><label>${t('agency')}</label><input value="${a.agencies?.name || ''}" disabled style="background:var(--gray-l)"/></div>
+      <div class="form-group"><label>${t('bio')}</label><textarea id="prof-bio" rows="3" placeholder="${t('bioPlaceholder')}">${a.bio || ''}</textarea></div>
+      <div class="form-group"><label>${t('areasServed')}</label><input id="prof-areas" value="${(a.areas_served || []).join(', ')}"/></div>
+      <div class="form-group"><label>${t('licenseNumber')}</label><input id="prof-license" value="${a.license_number || ''}" placeholder="${lang==='pt'?'Nº de Licença AMI':'PSR License No.'}"/></div>
+      <button class="btn btn-primary" onclick="saveProfile()" style="margin-top:8px">${t('saveChanges')}</button>
     </div>
     <div class="card" style="max-width:600px;margin-top:16px">
-      <h3>Change Password</h3>
-      <div class="form-group"><label>Current Password</label><input id="pw-current" type="password" placeholder="••••••••" required/></div>
-      <div class="form-group"><label>New Password</label><input id="pw-new" type="password" placeholder="At least 8 characters" minlength="8" required/></div>
-      <div class="form-group"><label>Confirm New Password</label><input id="pw-confirm" type="password" placeholder="Repeat new password" minlength="8" required/></div>
-      <button class="btn btn-primary" onclick="handleChangePassword()" style="margin-top:8px">Change Password</button>
+      <h3>${t('changePassword')}</h3>
+      <div class="form-group"><label>${t('currentPassword')}</label><input id="pw-current" type="password" placeholder="••••••••" required/></div>
+      <div class="form-group"><label>${t('newPassword')}</label><input id="pw-new" type="password" placeholder="${t('passwordMin')}" minlength="8" required/></div>
+      <div class="form-group"><label>${t('confirmPassword')}</label><input id="pw-confirm" type="password" placeholder="${t('repeatNewPw')}" minlength="8" required/></div>
+      <button class="btn btn-primary" onclick="handleChangePassword()" style="margin-top:8px">${t('changePwBtn')}</button>
     </div>
   `;
 }
@@ -1515,7 +1811,7 @@ async function saveProfile() {
       areas_served: val('prof-areas') ? val('prof-areas').split(',').map(s => s.trim()).filter(Boolean) : [],
       license_number: val('prof-license'),
     });
-    showToast('Profile updated', 'success');
+    showToast(t('profileUpdated'), 'success');
     loadDashboard();
   } catch (err) {
     showToast(err.message, 'error');
